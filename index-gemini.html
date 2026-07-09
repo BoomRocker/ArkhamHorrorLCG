@@ -235,7 +235,7 @@
       padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     .skill-selector {
@@ -265,9 +265,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 0;
+      padding: 4px 0;
       border-bottom: 1px solid #ccc;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
     .counter-control {
@@ -277,8 +277,8 @@
     }
 
     .counter-control button {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       border: 1px solid var(--border-color);
       background: var(--accent-gold);
@@ -295,7 +295,7 @@
       font-weight: bold;
       background: #e2d7be;
       color: var(--text-dark);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
     .token-display-badge.token-positive {
@@ -315,14 +315,72 @@
       color: white;
     }
 
+    /* Chaos Bag Visual Inspector */
+    .chaos-bag-container {
+      background: #e2d7be;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px;
+      margin-top: 4px;
+    }
+
+    .bag-tokens-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      max-height: 85px;
+      overflow-y: auto;
+      padding-top: 4px;
+    }
+
+    .mini-token-badge {
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: #f2ebd9;
+      color: var(--text-dark);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mini-token-badge.token-positive {
+      background: #d4edda;
+      color: var(--success-green);
+      border-color: var(--success-green);
+    }
+
+    .mini-token-badge.token-negative {
+      background: #f8d7da;
+      color: var(--fail-red);
+      border-color: var(--fail-red);
+    }
+
+    .mini-token-badge.token-fail {
+      background: var(--fail-red);
+      color: white;
+    }
+
+    .mini-token-badge.token-star {
+      background: var(--accent-gold);
+      color: black;
+    }
+
+    .mini-token-badge.token-special {
+      background: #d9cdb8;
+      border-color: #8b6e4e;
+    }
+
     .action-btn {
       width: 100%;
-      padding: 10px;
+      padding: 9px;
       background: var(--accent-blue);
       color: white;
       border: none;
       border-radius: 4px;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-family: inherit;
       cursor: pointer;
       font-weight: bold;
@@ -505,19 +563,19 @@
 
   <!-- Top Selection Bar -->
   <header>
-    <select id="campaign-select" onchange="updateCampaignScenarios()">
+    <select id="campaign-select" onchange="onCampaignChange()">
       <option value="notz">Night of the Zealot</option>
       <option value="dunwich">The Dunwich Legacy</option>
       <option value="carcosa">Path to Carcosa</option>
     </select>
     
-    <select id="scenario-select">
+    <select id="scenario-select" onchange="updateChaosBag()">
       <option value="gathering">The Gathering</option>
       <option value="masks">Midnight Masks</option>
       <option value="devourer">The Devourer Below</option>
     </select>
 
-    <select id="difficulty-select">
+    <select id="difficulty-select" onchange="updateChaosBag()">
       <option value="easy">Easy</option>
       <option value="standard" selected>Standard</option>
       <option value="hard">Hard</option>
@@ -589,7 +647,7 @@
 
       <!-- Skill Test Panel -->
       <div class="skill-panel">
-        <h3 style="margin:0 0 8px 0; border-bottom: 1px solid var(--border-color);">Skill Test</h3>
+        <h3 style="margin:0 0 6px 0; border-bottom: 1px solid var(--border-color);">Skill Test</h3>
         
         <label style="font-size: 0.85rem; font-weight: bold;">Test Type</label>
         <div class="skill-selector">
@@ -624,13 +682,25 @@
         </div>
 
         <!-- Inline Drawn Chaos Token Line -->
-        <div class="calc-row" style="background: #ebdcc3; padding: 6px 8px; border-radius: 4px; margin-top: 4px;">
+        <div class="calc-row" style="background: #ebdcc3; padding: 6px 8px; border-radius: 4px; margin-top: 2px;">
           <span>Chaos Token Drawn:</span>
           <span id="token-display-inline" class="token-display-badge">Not Drawn</span>
         </div>
 
-        <button class="action-btn" style="margin-top: 4px;" onclick="drawChaosToken()">🎲 Draw Chaos Token</button>
-        <button class="action-btn" style="background: var(--accent-gold);" onclick="calculateOutcome()">Skill Test Outcome</button>
+        <button class="action-btn" onclick="drawChaosToken()">🎲 Draw Chaos Token</button>
+
+        <!-- Current Bag Inspector List -->
+        <div class="chaos-bag-container">
+          <div style="font-weight: bold; font-size: 0.8rem; display: flex; justify-content: space-between;">
+            <span>Current Chaos Bag Contents:</span>
+            <span>Count: <b id="bag-count">0</b></span>
+          </div>
+          <div id="bag-tokens-list" class="bag-tokens-grid">
+            <!-- Badges rendered via JavaScript -->
+          </div>
+        </div>
+
+        <button class="action-btn" style="background: var(--accent-gold); margin-top: 2px;" onclick="calculateOutcome()">Skill Test Outcome</button>
       </div>
 
       <!-- Skill Outcome Overlay Popup -->
@@ -742,6 +812,32 @@
       ]
     };
 
+    // Preset Chaos Bag configurations based on Campaign and Difficulty
+    const chaosBagPresets = {
+      notz: {
+        easy: ['+1', '+1', '0', '0', '0', '-1', '-1', '-1', '-2', '-2', '💀', '💀', '👹', '🌟', 'AUTO-FAIL'],
+        standard: ['+1', '0', '0', '-1', '-1', '-1', '-2', '-2', '-3', '-4', '💀', '💀', '👹', '👾', '🌟', 'AUTO-FAIL'],
+        hard: ['0', '0', '0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-5', '💀', '💀', '👹', '👾', '🌟', 'AUTO-FAIL']
+      },
+      dunwich: {
+        easy: ['+1', '+1', '0', '0', '0', '-1', '-1', '-1', '-2', '-2', '💀', '💀', '👹', '🌟', 'AUTO-FAIL'],
+        standard: ['+1', '0', '0', '-1', '-1', '-1', '-2', '-2', '-3', '-4', '💀', '💀', '👾', '🌟', 'AUTO-FAIL'],
+        hard: ['0', '0', '0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-5', '💀', '💀', '👹', '👾', '🌟', 'AUTO-FAIL']
+      },
+      carcosa: {
+        easy: ['+1', '+1', '0', '0', '0', '-1', '-1', '-1', '-2', '-2', '💀', '💀', '👹', '👹', '🌟', 'AUTO-FAIL'],
+        standard: ['+1', '0', '0', '-1', '-1', '-1', '-2', '-2', '-3', '-4', '💀', '💀', '👹', '👹', '🌟', 'AUTO-FAIL'],
+        hard: ['0', '0', '0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-5', '💀', '💀', '👹', '👹', '👾', '👾', '🌟', 'AUTO-FAIL']
+      }
+    };
+
+    let currentBag = [];
+
+    function onCampaignChange() {
+      updateCampaignScenarios();
+      updateChaosBag();
+    }
+
     function updateCampaignScenarios() {
       const campSelect = document.getElementById('campaign-select');
       const scenSelect = document.getElementById('scenario-select');
@@ -753,6 +849,53 @@
         opt.value = scen.id;
         opt.innerText = scen.name;
         scenSelect.appendChild(opt);
+      });
+    }
+
+    function updateChaosBag() {
+      const campaign = document.getElementById('campaign-select').value;
+      const difficulty = document.getElementById('difficulty-select').value;
+
+      const bag = (chaosBagPresets[campaign] && chaosBagPresets[campaign][difficulty]) 
+        ? chaosBagPresets[campaign][difficulty] 
+        : chaosBagPresets.notz.standard;
+
+      currentBag = [...bag];
+      renderBagList();
+
+      // Reset inline drawn token display when bag updates
+      currentChaosToken = null;
+      const tokenBadge = document.getElementById('token-display-inline');
+      tokenBadge.innerText = "Not Drawn";
+      tokenBadge.className = "token-display-badge";
+    }
+
+    function renderBagList() {
+      const container = document.getElementById('bag-tokens-list');
+      const countSpan = document.getElementById('bag-count');
+      countSpan.innerText = currentBag.length;
+
+      container.innerHTML = '';
+      currentBag.forEach(token => {
+        const badge = document.createElement('span');
+        badge.className = 'mini-token-badge';
+
+        if (token === 'AUTO-FAIL') {
+          badge.classList.add('token-fail');
+          badge.innerText = '💀 FAIL';
+        } else if (token === '🌟') {
+          badge.classList.add('token-star');
+          badge.innerText = '🌟 +2';
+        } else if (['💀', '👹', '👾', '🐙'].includes(token)) {
+          badge.classList.add('token-special');
+          badge.innerText = token;
+        } else {
+          const num = parseInt(token);
+          if (num > 0) badge.classList.add('token-positive');
+          else if (num < 0) badge.classList.add('token-negative');
+          badge.innerText = token;
+        }
+        container.appendChild(badge);
       });
     }
 
@@ -885,22 +1028,42 @@
       }
     }
 
+    // Convert raw token text to calculation value
+    function parseTokenValue(rawToken) {
+      if (rawToken === 'AUTO-FAIL') return -8;
+      if (rawToken === '🌟') return 2; // Default Elder Sign bonus (+2)
+      if (rawToken === '💀') return -2; // Default Skull modifier
+      if (rawToken === '👹') return -3; // Default Cultist modifier
+      if (rawToken === '👾') return -4; // Default Tablet modifier
+      return parseInt(rawToken) || 0;
+    }
+
     // Chaos Bag Drawing (Inline Display)
-    const chaosBag = [+1, 0, 0, -1, -1, -2, -2, -3, -4, -8]; // -8 = Auto-Fail
     function drawChaosToken() {
-      const randIndex = Math.floor(Math.random() * chaosBag.length);
-      currentChaosToken = chaosBag[randIndex];
+      if (!currentBag || currentBag.length === 0) return;
+
+      const randIndex = Math.floor(Math.random() * currentBag.length);
+      const rawToken = currentBag[randIndex];
+      const numericVal = parseTokenValue(rawToken);
+
+      currentChaosToken = numericVal;
 
       const tokenBadge = document.getElementById('token-display-inline');
 
-      if (currentChaosToken === -8) {
+      if (rawToken === 'AUTO-FAIL') {
         tokenBadge.innerText = "AUTO-FAIL 💀";
         tokenBadge.className = "token-display-badge token-fail";
-      } else if (currentChaosToken > 0) {
-        tokenBadge.innerText = `+${currentChaosToken}`;
+      } else if (rawToken === '🌟') {
+        tokenBadge.innerText = "🌟 Elder Sign (+2)";
         tokenBadge.className = "token-display-badge token-positive";
-      } else if (currentChaosToken < 0) {
-        tokenBadge.innerText = `${currentChaosToken}`;
+      } else if (['💀', '👹', '👾'].includes(rawToken)) {
+        tokenBadge.innerText = `${rawToken} Special (${numericVal})`;
+        tokenBadge.className = "token-display-badge token-negative";
+      } else if (numericVal > 0) {
+        tokenBadge.innerText = `+${numericVal}`;
+        tokenBadge.className = "token-display-badge token-positive";
+      } else if (numericVal < 0) {
+        tokenBadge.innerText = `${numericVal}`;
         tokenBadge.className = "token-display-badge token-negative";
       } else {
         tokenBadge.innerText = "0";
@@ -985,6 +1148,7 @@
 
     // Initial load sync
     renderInvestigatorCard();
+    updateChaosBag();
   </script>
 </body>
 </html>
