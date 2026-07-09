@@ -1,0 +1,488 @@
+Absolutely, Joe — I stopped because the message hit the platform’s length ceiling.  
+Let’s fix that cleanly.
+
+I will now deliver the **complete, fully merged, single‑file HTML (Option B)** in **two consecutive messages**, each safely under the limit.  
+
+You will get:
+
+### **Message 1 → PART A**
+- `<html>` start  
+- `<style>` full CSS  
+- `<body>` start  
+- All views up to the MUSIC VIEW  
+
+### **Message 2 → PART B**
+- Remaining views  
+- Full inline `<script>` (all JS logic)  
+- Closing tags  
+
+This keeps everything valid, copy‑paste‑ready, and GitHub‑friendly.
+
+---
+
+## ✅ **PART A — Single‑File HTML (Clean Rebuild, Inline CSS + HTML)**  
+### *(Copy/paste into a file named `index.html`)*
+
+**PART A begins below. PART B will follow immediately after this message.**
+
+---
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arkham Horror LCG Companion</title>
+
+<style>
+/* ---------------------------------------------------------
+   ARKHAM HORROR LCG COMPANION — CLEAN SINGLE-FILE REBUILD
+   Dark Mode Only · Parchment · Brass · Wood · Fog · Tactile
+   --------------------------------------------------------- */
+
+/* ---------- ROOT THEME ---------- */
+:root {
+  --bg: #0b0c0f;
+  --bg2: #14161a;
+  --parchment: #d2c6a4;
+  --wood: #3b2a1a;
+  --brass: #c89b4b;
+  --gold: #e0c46a;
+  --text: #f5f0e4;
+  --muted: #c3b9a0;
+  --success: #4b9b5a;
+  --danger: #b34b4b;
+  --radius: 14px;
+  --shadow: 0 8px 24px rgba(0,0,0,0.6);
+  --transition: 240ms ease;
+}
+
+/* ---------- GLOBAL ---------- */
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #1b1d22, #050608 60%);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
+  overflow-x: hidden;
+}
+
+/* Fog + vignette */
+#fog {
+  position: fixed;
+  inset: 0;
+  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2P4//8/AwAI/AL+X2VINwAAAABJRU5ErkJggg==');
+  opacity: .15;
+  mix-blend-mode: screen;
+  animation: fog 40s linear infinite;
+  pointer-events: none;
+}
+@keyframes fog {
+  from { transform: translate(0,0); }
+  to   { transform: translate(-40px,-20px); }
+}
+
+#vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 120px rgba(0,0,0,0.9);
+}
+
+/* ---------- HEADER ---------- */
+header {
+  padding: 12px 16px;
+  background: linear-gradient(to right, #1a1c20, #101216);
+  border-bottom: 1px solid rgba(200,155,75,0.25);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header .title {
+  font-size: 14px;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+header .subtitle {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+header .pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(200,155,75,.6);
+  background: radial-gradient(circle at top, #2a2c30, #14161a);
+  font-size: 11px;
+  margin-left: 6px;
+}
+
+/* ---------- VIEW SYSTEM ---------- */
+.view {
+  position: absolute;
+  inset: 0;
+  padding: 12px;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: var(--transition);
+}
+.view.active {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* ---------- INVESTIGATOR PANEL ---------- */
+#investigator-card {
+  background: radial-gradient(circle at top, #2a2520, #14161a);
+  border: 1px solid rgba(200,155,75,.4);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 12px;
+}
+
+#portrait {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 8px;
+  border-radius: 12px;
+  border: 2px solid rgba(200,155,75,.7);
+  background: #1a1c20;
+  box-shadow: var(--shadow);
+}
+
+.stat-row {
+  display: flex;
+  gap: 8px;
+  margin: 6px 0;
+}
+.stat {
+  flex: 1;
+  background: radial-gradient(circle at top, #2a2520, #18191d);
+  border: 1px solid rgba(200,155,75,.4);
+  border-radius: 10px;
+  padding: 6px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.skill-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.skill {
+  flex: 1;
+  background: radial-gradient(circle at top, #2a2c30, #14161a);
+  border: 1px solid rgba(200,155,75,.5);
+  border-radius: 10px;
+  padding: 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.skill:active {
+  transform: translateY(-2px);
+}
+
+/* ---------- ACTION BAR ---------- */
+#actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.action {
+  flex: 1;
+  background: linear-gradient(to bottom, #3b2a1a, #241711);
+  border: 1px solid rgba(200,155,75,.7);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.action.exhausted {
+  opacity: .4;
+  box-shadow: none;
+}
+
+/* ---------- UTILITY BAR ---------- */
+#utility {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.utility-btn {
+  flex: 1;
+  background: radial-gradient(circle at top, #2a2c30, #14161a);
+  border: 1px solid rgba(200,155,75,.5);
+  border-radius: 999px;
+  padding: 6px;
+  font-size: 11px;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* ---------- SKILL TEST ---------- */
+.step {
+  background: radial-gradient(circle at top, #26211c, #14161a);
+  border: 1px solid rgba(200,155,75,.35);
+  border-radius: var(--radius);
+  padding: 10px;
+  margin-bottom: 12px;
+  opacity: .4;
+  transform: translateY(8px);
+  transition: var(--transition);
+}
+.step.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.round-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle at top, #3b2a1a, #241711);
+  border: 1px solid rgba(200,155,75,.7);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* ---------- CHAOS BAG ---------- */
+#bag {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto;
+  border-radius: 80px 80px 40px 40px;
+  background: radial-gradient(circle at top, #5a3b2a, #2b1c12);
+  border: 2px solid rgba(200,155,75,.7);
+  box-shadow: var(--shadow);
+}
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+.shake { animation: shake .4s ease-out; }
+
+/* ---------- RESULT ---------- */
+#result-stamp {
+  margin: 12px auto;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 2px solid var(--success);
+  color: var(--success);
+  text-align: center;
+  font-size: 14px;
+  letter-spacing: .16em;
+}
+#result-stamp.fail {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* ---------- BOTTOM NAV ---------- */
+nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: linear-gradient(to top, #050608, #14161a);
+  border-top: 1px solid rgba(200,155,75,.25);
+  display: flex;
+}
+nav button {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+nav button.active {
+  color: var(--gold);
+}
+</style>
+</head>
+
+<body>
+
+<div id="fog"></div>
+<div id="vignette"></div>
+
+<header>
+  <div>
+    <div class="title" id="campaign-name">Night of the Zealot</div>
+    <div class="subtitle" id="scenario-name">The Gathering</div>
+  </div>
+  <div>
+    <span class="pill" id="difficulty-pill">Easy</span>
+    <span class="pill" id="investigator-pill">Roland Banks</span>
+  </div>
+</header>
+
+<!-- ---------------------------------------------------------
+     HOME VIEW
+--------------------------------------------------------- -->
+<div class="view active" id="home">
+
+  <div id="investigator-card">
+    <div id="portrait"></div>
+
+    <h2 id="inv-name">Roland Banks</h2>
+    <div class="subtitle" id="inv-sub">The Fed</div>
+
+    <div class="stat-row">
+      <div class="stat"><span>Health</span><span id="inv-health">9</span></div>
+      <div class="stat"><span>Sanity</span><span id="inv-sanity">5</span></div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat"><span>Resources</span><span id="inv-res">0</span></div>
+      <div class="stat"><span>Clues</span><span id="inv-clues">0</span></div>
+      <div class="stat"><span>Doom</span><span id="inv-doom">0</span></div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat"><span>Damage</span><span id="inv-dmg">0</span></div>
+      <div class="stat"><span>Horror</span><span id="inv-hor">0</span></div>
+    </div>
+
+    <div class="skill-row">
+      <div class="skill" data-skill="willpower">Will 3</div>
+      <div class="skill" data-skill="intellect">Int 3</div>
+      <div class="skill" data-skill="combat">Combat 4</div>
+      <div class="skill" data-skill="agility">Agility 2</div>
+    </div>
+  </div>
+
+  <div id="actions">
+    <div class="action" data-act="1">Action 1</div>
+    <div class="action" data-act="2">Action 2</div>
+    <div class="action" data-act="3">Action 3</div>
+  </div>
+
+  <div id="utility">
+    <div class="utility-btn" data-nav="investigator">Investigator</div>
+    <div class="utility-btn" data-nav="settings">Settings</div>
+    <div class="utility-btn" data-nav="music">Music</div>
+  </div>
+
+</div>
+
+<!-- ---------------------------------------------------------
+     SKILL TEST VIEW
+--------------------------------------------------------- -->
+<div class="view" id="skill">
+
+  <div class="step active" id="step1">
+    <h3>Choose Skill</h3>
+    <div class="skill-row">
+      <div class="skill" data-skill="willpower">Willpower</div>
+      <div class="skill" data-skill="intellect">Intellect</div>
+      <div class="skill" data-skill="combat">Combat</div>
+      <div class="skill" data-skill="agility">Agility</div>
+    </div>
+  </div>
+
+  <div class="step" id="step2">
+    <h3>Target Difficulty</h3>
+    <div style="display:flex;justify-content:center;gap:12px;">
+      <button class="round-btn" id="diff-minus">−</button>
+      <div style="font-size:20px;" id="diff-val">2</div>
+      <button class="round-btn" id="diff-plus">+</button>
+    </div>
+  </div>
+
+  <div class="step" id="step3">
+    <h3>Base Skill</h3>
+    <div style="font-size:22px;text-align:center;" id="base-skill">4</div>
+  </div>
+
+  <div class="step" id="step4">
+    <h3>Modifiers</h3>
+    <div style="display:flex;justify-content:center;gap:12px;">
+      <button class="round-btn" id="mod-minus">−</button>
+      <div style="font-size:20px;" id="mod-val">0</div>
+      <button class="round-btn" id="mod-plus">+</button>
+    </div>
+  </div>
+
+  <div class="step" id="step5">
+    <h3>Total Before Chaos</h3>
+    <div style="font-size:22px;text-align:center;" id="total-before">4</div>
+    <button class="utility-btn" id="go-chaos">Draw Chaos Token</button>
+  </div>
+
+</div>
+
+<!-- ---------------------------------------------------------
+     CHAOS BAG VIEW
+--------------------------------------------------------- -->
+<div class="view" id="chaos">
+  <h3 style="text-align:center;">Chaos Bag</h3>
+  <div id="bag"></div>
+  <button class="utility-btn" id="draw-token">Tap Bag</button>
+
+  <div style="margin-top:12px;background:radial-gradient(circle at top,#26211c,#14161a);padding:10px;border-radius:var(--radius);border:1px solid rgba(200,155,75,.4);">
+    <div style="font-size:16px;color:var(--gold);" id="token-name">—</div>
+    <div style="font-size:14px;" id="token-mod">—</div>
+    <div style="font-size:12px;color:var(--muted);" id="token-rule">Tap bag to draw.</div>
+  </div>
+</div>
+
+<!-- ---------------------------------------------------------
+     RESULT VIEW
+--------------------------------------------------------- -->
+<div class="view" id="result">
+  <h3 style="text-align:center;">Result</h3>
+
+  <div style="background:radial-gradient(circle at top,#26211c,#14161a);padding:10px;border-radius:var(--radius);border:1px solid rgba(200,155,75,.4);">
+    <div>Target: <span id="res-target">2</span></div>
+    <div>Investigator Total: <span id="res-base">4</span></div>
+    <div>Chaos Modifier: <span id="res-chaos">+0</span></div>
+    <div style="color:var(--gold);font-weight:bold;">Final: <span id="res-final">4</span></div>
+  </div>
+
+  <div id="result-stamp">SUCCESS</div>
+  <div style="text-align:center;color:var(--muted);" id="res-margin">Succeeded by 2</div>
+
+  <button class="utility-btn" id="close-result">Close</button>
+</div>
+
+<!-- ---------------------------------------------------------
+     SETTINGS VIEW
+--------------------------------------------------------- -->
+<div class="view" id="settings">
+  <h3>Settings</h3>
+  <div style="background:radial-gradient(circle at top,#26211c,#14161a);padding:10px;border-radius:var(--radius);border:1px solid rgba(200,155,75,.4);">
+    <div style="margin-bottom:8px;">Large Text <input type="checkbox" id="large-text"></div>
+    <div style="margin-bottom:8px;">Music Enabled <input type="checkbox" id="music-enabled" checked></div>
+    <button class="utility-btn" id="reset-actions">Reset Actions</button>
+  </div>
+</div>
+
+<!-- ---------------------------------------------------------
+     MUSIC VIEW
+--------------------------------------------------------- -->
+<div class="view" id="music">
+  <h3>Atmospheric Music</h3>
+  <div style="background:radial-gradient(circle at top,#26211c,#14161a);padding:10px;border-radius:var(--radius);border:1px solid rgba(200,155,75,.4);">
+    <div id="music-status">Paused</div>
+    <button class="utility-btn" id="music-play">Play / Pause</button>
+  </div>
+</div>
+
+<!-- ---------------------------------------------------------
+     PART A END — PART B WILL CONTAIN FULL INLINE JAVASCRIPT
+	 --------------------------------------------------------- -->

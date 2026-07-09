@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Arkham Horror LCG Companion</title>
+
+  <!-- iOS PWA Meta -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Arkham">
+
+  <style>
+    :root {
+      --bg-dark: #080d14;
+      --bg-blue-texture: #0e1e30;
+      --parchment: #eae2cb;
+      --parchment-border: #bca883;
+      --card-panel-bg: #fdfaf2;
+      --brass-gold: #cda250;
+      --text-dark: #111111;
+      --font-serif: "Georgia", "Times New Roman", serif;
+      --font-heading: "Times New Roman", serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      font-family: var(--font-serif);
+      color: #ffffff;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Main App Landscape Container */
+    .app-viewport {
+      width: 100%;
+      max-width: 960px;
+      height: 100vh;
+      max-height: 540px;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-blue-texture);
+      border: 2px solid #000;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Views Area */
+    .content-viewport {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Base Screen Layouts */
+    .screen-view {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-blue-texture);
+      display: none; /* Controlled via JS switchTab */
+    }
+
+    /* --------------------------------------------------------------------------
+       SCREEN 1: INVESTIGATOR CARD & TEST CALCULATOR (Matches App design_2.jpg)
+       -------------------------------------------------------------------------- */
+    #view-card {
+      display: grid;
+      grid-template-columns: 2.2fr 1fr;
+    }
+
+    .left-section {
+      display: flex;
+      flex-direction: column;
+      padding: 6px 10px;
+      border-right: 2px solid #000;
+      position: relative;
+    }
+
+    .top-dropdown-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .select-dropdown {
+      background: #000;
+      color: #fff;
+      border: 1px solid #444;
+      padding: 2px 6px;
+      font-family: var(--font-serif);
+      font-size: 0.75rem;
+      border-radius: 3px;
+      flex: 1;
+    }
+
+    .card-frame {
+      flex: 1;
+      display: grid;
+      grid-template-rows: 38px 1fr 32px;
+      grid-template-columns: 1fr 1fr;
+      border: 2px solid #000;
+      background: radial-gradient(circle at 30% 30%, #1a324d 0%, #0a1420 100%);
+      position: relative;
+    }
+
+    /* Floating Action Bar Overlay on Roland's Card */
+    .actions-drawer {
+      position: absolute;
+      left: 6px;
+      top: 46px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 5;
+    }
+
+    .actions-drawer-title {
+      font-size: 0.65rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 1px 1px 2px #000;
+    }
+
+    .action-token-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #2a415a 0%, #0d1722 100%);
+      border: 2px solid var(--brass-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--brass-gold);
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.8);
+    }
+
+    .action-token-btn.spent {
+      background: #111;
+      border-color: #555;
+      color: #444;
+    }
+
+    .card-header {
+      grid-column: 1 / -1;
+      background: linear-gradient(180deg, #f2ead3 0%, #d8c39e 100%);
+      color: var(--text-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px;
+      border-bottom: 2px solid #000;
+    }
+
+    .card-title h1 { font-size: 1.15rem; font-family: var(--font-heading); }
+    .card-title p { font-size: 0.65rem; font-style: italic; margin-top: -2px; }
+
+    .skill-badges { display: flex; gap: 4px; }
+    .badge {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: #fff; border: 1px solid #000; color: #000;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 0.85rem;
+    }
+
+    .card-portrait {
+      background: linear-gradient(135deg, #1f2a36 0%, #0b1118 100%);
+      border-right: 1px solid #000;
+      position: relative;
+    }
+
+    .card-textbox {
+      background: var(--card-panel-bg);
+      color: var(--text-dark);
+      padding: 8px;
+      font-size: 0.72rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-left: 1px solid #777;
+    }
+
+    .card-footer {
+      grid-column: 1 / -1;
+      background: var(--parchment);
+      border-top: 2px solid #000;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      color: var(--text-dark);
+    }
+
+    .vital-counter { display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 1.05rem; }
+    .btn-step { background: none; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; }
+
+    /* Calculator Panel (Right) */
+    .right-calculator-area {
+      background: var(--card-panel-bg);
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .panel-title { font-family: var(--font-heading); font-size: 1.3rem; text-align: center; }
+    .test-header-grid { display: flex; justify-content: space-around; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
+
+    .test-target-row { display: flex; justify-content: space-around; align-items: center; margin: 4px 0; }
+
+    .icon-diamond {
+      width: 38px; height: 38px; border: 2px solid #000; transform: rotate(45deg);
+      display: flex; align-items: center; justify-content: center; font-weight: bold; background: #fff;
+    }
+    .icon-diamond span { transform: rotate(-45deg); }
+
+    .test-breakdown { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #ccc; padding-top: 6px; }
+    .breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 0 4px; font-size: 0.8rem; }
+
+    .draw-chaos-btn {
+      background: #000; color: #fff; border: none; padding: 5px 8px;
+      font-family: var(--font-serif); font-size: 0.75rem; cursor: pointer; border-radius: 3px;
+    }
+
+    .skill-outcome-btn {
+      background: #112030; color: #fff; border: 1px solid var(--brass-gold);
+      padding: 8px; text-align: center; font-size: 0.8rem; cursor: pointer; font-weight: bold;
+    }
+
+    /* Outcome Popup Drawer (App design_2.jpg Bottom-Left screen) */
+    .outcome-modal {
+      position: absolute;
+      top: 10px; right: 10px; left: 10px; bottom: 10px;
+      background: var(--card-panel-bg);
+      border: 2px solid #000;
+      box-shadow: 0 0 15px rgba(0,0,0,0.8);
+      padding: 10px;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 20;
+    }
+
+    /* --------------------------------------------------------------------------
+       SCREEN 2: ROUND TURNS TRACKER (App design_2.jpg Top-Right screen)
+       -------------------------------------------------------------------------- */
+    #view-turns {
+      background: var(--parchment);
+      color: var(--text-dark);
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.2fr;
+      gap: 12px;
+    }
+
+    .turn-card-panel {
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid var(--parchment-border);
+      border-radius: 4px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .turn-card-panel h3 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      border-bottom: 1px solid #a89674;
+      padding-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .turn-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .step-circle-icon {
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 2px solid #000; background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    /* --------------------------------------------------------------------------
+       SCREEN 3: MUSIC PLAYER (App design_2.jpg Bottom-Right screen)
+       -------------------------------------------------------------------------- */
+    #view-music {
+      background: var(--parchment);
+      color: var(--text-dark);
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 12px;
+    }
+
+    .music-panel {
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid var(--parchment-border);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .track-list { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+    .track-item { padding: 4px 8px; cursor: pointer; font-size: 0.85rem; border-radius: 3px; }
+    .track-item.active { background: #dcd1b3; font-weight: bold; }
+
+    .ballroom-scene-art {
+      background: radial-gradient(circle, #3a2a1d 0%, #120b06 100%);
+      border: 2px solid #000;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--brass-gold);
+      font-style: italic;
+    }
+
+    /* --------------------------------------------------------------------------
+       BOTTOM NAVIGATION BAR (App design_2.jpg)
+       -------------------------------------------------------------------------- */
+    .bottom-navbar {
+      height: 42px;
+      background: #d8ceb3;
+      border-top: 2px solid #000;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 8px;
+      z-index: 30;
+    }
+
+    .nav-tab-button {
+      background: #eae2cb;
+      color: var(--text-dark);
+      border: 1px solid #8c7b5b;
+      border-radius: 12px;
+      padding: 5px 14px;
+      font-family: var(--font-serif);
+      font-size: 0.75rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .nav-tab-button.active {
+      background: #0f1c2b;
+      color: #ffffff;
+      border-color: var(--brass-gold);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-viewport">
+    
+    <div class="content-viewport">
+
+      <!-- ====================================================================
+         SCREEN 1: INVESTIGATOR CARD & CALCULATOR (Default Screen)
+         ==================================================================== -->
+      <div class="screen-view" id="view-card" style="display: grid;">
+        
+        <div class="left-section">
+          <div class="top-dropdown-bar">
+            <select class="select-dropdown"><option>Night of the Zealot</option></select>
+            <select class="select-dropdown"><option>The Gathering</option></select>
+            <select class="select-dropdown"><option>Easy</option></select>
+            <select class="select-dropdown"><option>Roland Banks</option></select>
+          </div>
+
+          <!-- Actions Bar Overlay -->
+          <div class="actions-drawer">
+            <span class="actions-drawer-title">Actions</span>
+            <div class="action-token-btn spent" onclick="toggleActionToken(this)">★</div>
+            <div class="action-token-btn" onclick="toggleActionToken(this)">★</div>
+            <div class="action-token-btn" onclick="toggleActionToken(this)">★</div>
+          </div>
+
+          <!-- Roland Card Replica -->
+          <div class="card-frame">
+            <div class="card-header">
+              <div class="card-title">
+                <h1>★ Roland Banks</h1>
+                <p>The Fed</p>
+              </div>
+              <div class="skill-badges">
+                <div class="badge">3</div>
+                <div class="badge">3</div>
+                <div class="badge">4</div>
+                <div class="badge">2</div>
+              </div>
+            </div>
+
+            <div class="card-portrait"></div>
+
+            <div class="card-textbox">
+              <div>
+                <p style="text-align:center;"><strong>Agency. Detective.</strong></p>
+                <p style="margin-top: 4px;"><strong>[Reaction]</strong> After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)</p>
+                <p style="margin-top: 4px;"><strong>★ effect:</strong> +1 for each clue on your location.</p>
+              </div>
+              <p style="font-style: italic; color: #555; border-top: 1px solid #ccc; padding-top: 3px;">
+                Everything by the book: every "i" dotted, every "t" crossed. It had worked, until now.
+              </p>
+            </div>
+
+            <div class="card-footer">
+              <div class="vital-counter">
+                <button class="btn-step" onclick="adjustVital('hp', -1)">±</button>
+                <span style="color:#a00;">🩸 <span id="val-hp">9</span></span>
+                <button class="btn-step" onclick="adjustVital('hp', 1)">+</button>
+              </div>
+              <div class="vital-counter">
+                <button class="btn-step" onclick="adjustVital('san', -1)">±</button>
+                <span style="color:#008;">🧠 <span id="val-san">5</span></span>
+                <button class="btn-step" onclick="adjustVital('san', 1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculator Panel -->
+        <div class="right-calculator-area">
+          <div>
+            <h2 class="panel-title">Night of the Zealot</h2>
+            <div class="test-header-grid">
+              <span>Test Type</span>
+              <span>Test to Beat</span>
+            </div>
+
+            <div class="test-target-row">
+              <div style="font-size: 1rem; cursor: pointer;" onclick="adjustTarget(1)">▲<br><span onclick="adjustTarget(-1)">▼</span></div>
+              <div class="icon-diamond"><span>📖</span></div>
+              <div class="icon-diamond"><span id="target-val">2</span></div>
+              <div style="font-size: 1rem; cursor: pointer;" onclick="adjustTarget(1)">+<br><span onclick="adjustTarget(-1)">-</span></div>
+            </div>
+          </div>
+
+          <div class="test-breakdown">
+            <div style="font-size: 0.72rem; text-align: center; font-weight: bold;">Roland Banks Test Total</div>
+            <div class="breakdown-row">
+              <span>📖 Base</span>
+              <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>3</span></div>
+              <span>±</span>
+            </div>
+            <div class="breakdown-row">
+              <span>🎴 Cards</span>
+              <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>1</span></div>
+              <span>±</span>
+            </div>
+            <div class="breakdown-row">
+              <span>◇ Chaos Token</span>
+              <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span id="token-val">-1</span></div>
+              <button class="draw-chaos-btn" onclick="drawChaos()">Draw Chaos</button>
+            </div>
+          </div>
+
+          <button class="skill-outcome-btn" onclick="toggleOutcomeModal(true)">
+            Skill Test Outcome
+          </button>
+
+          <!-- OUTCOME MODAL (Matches App design_2.jpg Bottom-Left screen) -->
+          <div class="outcome-modal" id="outcome-modal">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ccc; padding-bottom:4px;">
+              <span style="font-weight:bold; font-family: var(--font-heading); font-size: 1.1rem;">📖 Outcome</span>
+              <span style="cursor:pointer; font-weight:bold; font-size:1.1rem;" onclick="toggleOutcomeModal(false)">✕</span>
+            </div>
+
+            <div style="font-size: 0.8rem; display:flex; flex-direction:column; gap:6px;">
+              <div>
+                <strong>Player Total</strong>
+                <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
+                  <div class="icon-diamond" style="width:24px; height:24px; font-size:0.75rem;"><span>3</span></div>
+                  <span>+</span>
+                  <div class="icon-diamond" style="width:24px; height:24px; font-size:0.75rem;"><span>1</span></div>
+                  <span>▶</span>
+                  <div class="icon-diamond" style="width:28px; height:28px; font-size:0.85rem; background: var(--parchment);"><span>4</span></div>
+                </div>
+              </div>
+
+              <div style="border-top:1px solid #ccc; padding-top:4px;">
+                <strong>Chaos Bag</strong>
+                <p style="font-size: 0.68rem; color:#444; margin-top:2px;">
+                  [Skull]: If there is a Ghoul enemy at location, take 1 damage.
+                </p>
+                <div class="icon-diamond" style="width:26px; height:26px; font-size:0.8rem; margin-top:3px; background:#800; color:#fff;"><span>-2</span></div>
+              </div>
+
+              <div style="border-top:1px solid #ccc; padding-top:4px;">
+                <strong>Skill Test to Beat</strong>
+                <div style="display:flex; align-items:center; gap:6px; margin-top:3px;">
+                  <div class="icon-diamond" style="width:24px; height:24px; font-size:0.75rem;"><span>2</span></div>
+                  <span>≥</span>
+                  <div class="icon-diamond" style="width:24px; height:24px; font-size:0.75rem;"><span>2</span></div>
+                  <span style="color:green; font-weight:bold;">Succeeded!</span>
+                </div>
+              </div>
+            </div>
+
+            <button class="draw-chaos-btn" onclick="toggleOutcomeModal(false)">Close</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ====================================================================
+         SCREEN 2: ROUND TURNS TRACKER (App design_2.jpg Top-Right screen)
+         ==================================================================== -->
+      <div class="screen-view" id="view-turns">
+        <div class="turn-card-panel">
+          <h3>👁 Mythos</h3>
+          <div class="turn-step">
+            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>1</span></div>
+            <div class="step-circle-icon">👁</div>
+          </div>
+          <div class="turn-step">
+            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>2</span></div>
+            <div class="step-circle-icon">🦑</div>
+          </div>
+        </div>
+
+        <div class="turn-card-panel">
+          <h3>🎩 Investigator</h3>
+          <div class="turn-step">
+            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>3</span></div>
+            <div class="step-circle-icon" style="background:#2d6a4f; color:#fff;">📖</div>
+          </div>
+
+          <h3 style="margin-top: 6px;">🦅 Enemy</h3>
+          <div class="turn-step">
+            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>4</span></div>
+            <div class="step-circle-icon" style="background:#d90429; color:#fff;">🦅</div>
+          </div>
+        </div>
+
+        <div class="turn-card-panel">
+          <h3>⚙ Upkeep</h3>
+          <div class="turn-step">
+            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>5</span></div>
+            <div class="step-circle-icon" style="background:#0077b6; color:#fff;">🎒</div>
+          </div>
+          <div class="turn-step">
+            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>6</span></div>
+            <div class="step-circle-icon" style="background:#0077b6; color:#fff;">🎴</div>
+          </div>
+          <div class="turn-step">
+            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>7</span></div>
+            <div class="step-circle-icon" style="background:#0077b6; color:#fff;">8</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+         SCREEN 3: MUSIC PLAYER (App design_2.jpg Bottom-Right screen)
+         ==================================================================== -->
+      <div class="screen-view" id="view-music">
+        <div class="music-panel">
+          <h2 style="font-family: var(--font-heading); font-size: 1.2rem; border-bottom:1px solid #a89674; padding-bottom:4px;">Music Player</h2>
+          
+          <div style="display:flex; justify-content:center; gap:12px; font-size:1.3rem; margin: 8px 0;">
+            <span style="cursor:pointer;">⏮</span>
+            <span style="cursor:pointer;">⏸</span>
+            <span style="cursor:pointer;">⏭</span>
+          </div>
+
+          <input type="range" style="width:100%;">
+
+          <div class="track-list">
+            <div class="track-item active">▶ Song Title</div>
+            <div class="track-item">Song Title</div>
+            <div class="track-item">Song Title</div>
+            <div class="track-item">Song Title</div>
+            <div class="track-item">Song Title</div>
+          </div>
+        </div>
+
+        <div class="ballroom-scene-art">
+          <span>Atmospheric Scene Artwork</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM TAB NAVIGATION BAR -->
+    <div class="bottom-navbar">
+      <button class="nav-tab-button active" id="tab-card" onclick="switchTab('card')">
+        🎩 Investigator Card
+      </button>
+      <button class="nav-tab-button" id="tab-turns" onclick="switchTab('turns')">
+        ⚜ Round Turns
+      </button>
+      <button class="nav-tab-button" id="tab-music" onclick="switchTab('music')">
+        ♫ Music Player
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    // Tab Navigation Logic
+    function switchTab(screenKey) {
+      // Hide all screen views
+      const views = document.querySelectorAll('.screen-view');
+      views.forEach(v => {
+        v.style.display = 'none';
+      });
+
+      // Reset active tab button styles
+      const tabs = document.querySelectorAll('.nav-tab-button');
+      tabs.forEach(t => {
+        t.classList.remove('active');
+      });
+
+      // Show selected screen with proper display mode
+      const activeView = document.getElementById('view-' + screenKey);
+      if (activeView) {
+        if (screenKey === 'card') {
+          activeView.style.display = 'grid';
+        } else if (screenKey === 'turns' || screenKey === 'music') {
+          activeView.style.display = 'grid';
+        }
+      }
+
+      // Highlight active tab button
+      const activeTab = document.getElementById('tab-' + screenKey);
+      if (activeTab) {
+        activeTab.classList.add('active');
+      }
+    }
+
+    // Interactive Functions
+    function toggleActionToken(btn) {
+      btn.classList.toggle('spent');
+    }
+
+    function adjustVital(vital, delta) {
+      const el = document.getElementById(`val-${vital}`);
+      let current = parseInt(el.textContent);
+      el.textContent = Math.max(0, current + delta);
+    }
+
+    function adjustTarget(delta) {
+      const el = document.getElementById('target-val');
+      let current = parseInt(el.textContent);
+      el.textContent = Math.max(0, current + delta);
+    }
+
+    function drawChaos() {
+      const tokens = ["+1", "0", "-1", "-2", "-3", "AUTO FAIL", "ELDER SIGN"];
+      const drawn = tokens[Math.floor(Math.random() * tokens.length)];
+      document.getElementById('token-val').textContent = drawn;
+    }
+
+    function toggleOutcomeModal(show) {
+      const modal = document.getElementById('outcome-modal');
+      modal.style.display = show ? 'flex' : 'none';
+    }
+  </script>
+</body>
+</html>

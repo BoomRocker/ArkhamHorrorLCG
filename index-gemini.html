@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Arkham Horror Companion App</title>
+  <style>
+    :root {
+      --bg-dark: #12151c;
+      --bg-paper: #ded5c4;
+      --paper-card: #f2ebd9;
+      --border-color: #2c251e;
+      --accent-blue: #1b3854;
+      --accent-gold: #c5a059;
+      --text-dark: #1f1a17;
+      --success-green: #2a6f43;
+      --fail-red: #8b2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Georgia', serif;
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Top Bar Header */
+    header {
+      background: #1a1e27;
+      border-bottom: 2px solid var(--accent-gold);
+      padding: 6px 12px;
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      flex-wrap: wrap;
+    }
+
+    header select {
+      background: #2a303d;
+      color: #e2d7c5;
+      border: 1px solid var(--accent-gold);
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 0.8rem;
+      font-family: inherit;
+    }
+
+    /* Main App Container */
+    main {
+      flex: 1;
+      overflow-y: auto;
+      position: relative;
+      background: url('https://www.transparenttextures.com/patterns/aged-paper.png'), var(--bg-paper);
+    }
+
+    /* Tab Base Classes */
+    .tab-content {
+      display: none;
+      width: 100%;
+      height: 100%;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+
+    .tab-content.active {
+      display: flex !important;
+    }
+
+    /* --- TAB 1: INVESTIGATOR CARD & SKILL TEST --- */
+    #tab-investigator {
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .card-section {
+      flex: 1.2;
+      min-width: 300px;
+      background: var(--paper-card);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .investigator-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 6px;
+    }
+
+    .investigator-title h2 {
+      margin: 0;
+      font-size: 1.3rem;
+    }
+
+    .investigator-title span {
+      font-size: 0.8rem;
+      color: #666;
+      font-style: italic;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-around;
+      background: #e2d7be;
+      padding: 6px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Clickable Stat Badges on Card */
+    .stat-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 12px;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .stat-badge:hover {
+      background: rgba(27, 56, 84, 0.15);
+    }
+
+    .stat-badge.selected-stat {
+      background: var(--accent-blue);
+      color: white;
+    }
+
+    .stat-badge.selected-stat .stat-circle {
+      background: var(--accent-gold);
+      color: black;
+    }
+
+    .stat-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    .card-body {
+      display: flex;
+      gap: 12px;
+    }
+
+    .portrait {
+      width: 110px;
+      height: 140px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 2px solid var(--border-color);
+    }
+
+    .ability-box {
+      flex: 1;
+      font-size: 0.85rem;
+      line-height: 1.3;
+      background: #fdfaf2;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px dashed #a3957a;
+    }
+
+    /* Interactive Vital Trackers (Health & Mind) */
+    .vital-trackers {
+      display: flex;
+      justify-content: space-around;
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px solid #c0b298;
+    }
+
+    .vital-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      background: #e2d7be;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+    }
+
+    .vital-adjust-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: var(--accent-gold);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    /* Skill Test Panel */
+    .skill-panel {
+      flex: 0.9;
+      min-width: 280px;
+      background: var(--paper-card);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .skill-selector {
+      display: flex;
+      gap: 4px;
+      justify-content: space-between;
+    }
+
+    .skill-btn {
+      flex: 1;
+      padding: 6px 2px;
+      border: 1px solid var(--border-color);
+      background: #e5dac2;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      text-align: center;
+      font-size: 0.78rem;
+    }
+
+    .skill-btn.active {
+      background: var(--accent-blue);
+      color: white;
+    }
+
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #ccc;
+      font-size: 0.95rem;
+    }
+
+    .counter-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .counter-control button {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: var(--accent-gold);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Styled Inline Chaos Token */
+    .token-display-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      font-weight: bold;
+      background: #e2d7be;
+      color: var(--text-dark);
+      font-size: 0.95rem;
+    }
+
+    .token-display-badge.token-positive {
+      background: #d4edda;
+      color: var(--success-green);
+      border-color: var(--success-green);
+    }
+
+    .token-display-badge.token-negative {
+      background: #f8d7da;
+      color: var(--fail-red);
+      border-color: var(--fail-red);
+    }
+
+    .token-display-badge.token-fail {
+      background: var(--fail-red);
+      color: white;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 10px;
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* Outcome Overlay Modal */
+    .outcome-overlay {
+      display: none;
+      position: absolute;
+      inset: 12px;
+      background: rgba(242, 235, 217, 0.96);
+      border: 3px double var(--border-color);
+      border-radius: 8px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 10;
+      padding: 20px;
+    }
+
+    .outcome-banner {
+      font-size: 1.4rem;
+      font-weight: bold;
+      padding: 6px 16px;
+      border-radius: 4px;
+      color: white;
+    }
+
+    .outcome-banner.success { background: var(--success-green); }
+    .outcome-banner.fail { background: var(--fail-red); }
+
+    /* --- TAB 2: ROUND TURNS --- */
+    #tab-turns {
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .turn-column {
+      flex: 1;
+      min-width: 240px;
+      background: var(--paper-card);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .turn-column h3 {
+      margin: 0;
+      text-align: center;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 4px;
+      font-size: 1.1rem;
+    }
+
+    .turn-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #e6dcbe;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #c0b298;
+      font-size: 0.85rem;
+    }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(45deg);
+      background: var(--paper-card);
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .step-num span {
+      transform: rotate(-45deg);
+    }
+
+    /* --- TAB 3: MUSIC PLAYER --- */
+    #tab-music {
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .music-controls {
+      flex: 1;
+      min-width: 260px;
+      background: var(--paper-card);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .track-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .track-item {
+      padding: 10px;
+      background: #e2d7be;
+      border: 1px solid #c0b298;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+    }
+
+    .track-item.active {
+      background: var(--accent-blue);
+      color: white;
+    }
+
+    .ambience-view {
+      flex: 1.5;
+      min-width: 280px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid var(--border-color);
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+      max-height: 350px;
+    }
+
+    .ambience-view img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Bottom Navigation Bar */
+    nav {
+      background: #12151c;
+      border-top: 2px solid var(--accent-gold);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0;
+    }
+
+    .nav-btn {
+      color: #9aa0a6;
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .nav-btn.active {
+      color: var(--accent-gold);
+      font-weight: bold;
+    }
+
+    .nav-icon {
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Selection Bar -->
+  <header>
+    <select id="campaign-select" onchange="updateCampaignScenarios()">
+      <option value="notz">Night of the Zealot</option>
+      <option value="dunwich">The Dunwich Legacy</option>
+      <option value="carcosa">Path to Carcosa</option>
+    </select>
+    
+    <select id="scenario-select">
+      <option value="gathering">The Gathering</option>
+      <option value="masks">Midnight Masks</option>
+      <option value="devourer">The Devourer Below</option>
+    </select>
+
+    <select id="difficulty-select">
+      <option value="easy">Easy</option>
+      <option value="standard" selected>Standard</option>
+      <option value="hard">Hard</option>
+    </select>
+
+    <select id="investigator-select">
+      <option value="roland">Roland Banks</option>
+      <option value="daisy">Daisy Walker</option>
+      <option value="agnes">Agnes Baker</option>
+      <option value="skids">"Skids" O'Toole</option>
+      <option value="wendy">Wendy Adams</option>
+    </select>
+  </header>
+
+  <!-- Main Display Screen -->
+  <main>
+    
+    <!-- Tab 1: Investigator Card & Skill Test -->
+    <div id="tab-investigator" class="tab-content active">
+      
+      <!-- Investigator Card Component -->
+      <div class="card-section">
+        <div class="investigator-header">
+          <div class="investigator-title">
+            <h2 id="card-name">Roland Banks</h2>
+            <span id="card-sub">The Fed</span>
+          </div>
+          <span id="card-class" style="font-weight: bold; color: var(--accent-blue);">Guardian</span>
+        </div>
+
+        <!-- Interactive Stats Row (Clicking selects test & populates base skill) -->
+        <div class="stats-row">
+          <div id="badge-will" class="stat-badge" onclick="selectSkill('will')" title="Willpower (🗣️): Resist treacheries">
+            <div class="stat-circle">🗣️</div> <span id="stat-will">3</span>
+          </div>
+          <div id="badge-intellect" class="stat-badge selected-stat" onclick="selectSkill('intellect')" title="Intellect (📖): Investigate clues">
+            <div class="stat-circle">📖</div> <span id="stat-intellect">3</span>
+          </div>
+          <div id="badge-combat" class="stat-badge" onclick="selectSkill('combat')" title="Combat (👊): Fight enemies">
+            <div class="stat-circle">👊</div> <span id="stat-combat">4</span>
+          </div>
+          <div id="badge-agility" class="stat-badge" onclick="selectSkill('agility')" title="Agility (👟): Evade enemies">
+            <div class="stat-circle">👟</div> <span id="stat-agility">2</span>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <img id="card-portrait" class="portrait" src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=300&q=80" alt="Investigator Portrait">
+          <div class="ability-box">
+            <p id="card-ability"><b>Reaction:</b> After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)</p>
+            <p id="card-elder"><b>⭐ Effect:</b> +1 for each clue on your location.</p>
+          </div>
+        </div>
+
+        <!-- Health & Mind / Sanity Dynamic Counter Trackers -->
+        <div class="vital-trackers">
+          <div class="vital-btn">
+            <button class="vital-adjust-btn" onclick="adjustVital('health', -1)" title="Reduce Health">-</button>
+            <span>🩸 <span id="card-health">9</span></span>
+            <button class="vital-adjust-btn" onclick="adjustVital('health', 1)" title="Increase Health">+</button>
+          </div>
+          <div class="vital-btn">
+            <button class="vital-adjust-btn" onclick="adjustVital('sanity', -1)" title="Reduce Mind/Sanity">-</button>
+            <span>🧠 <span id="card-sanity">5</span></span>
+            <button class="vital-adjust-btn" onclick="adjustVital('sanity', 1)" title="Increase Mind/Sanity">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skill Test Panel -->
+      <div class="skill-panel">
+        <h3 style="margin:0 0 8px 0; border-bottom: 1px solid var(--border-color);">Skill Test</h3>
+        
+        <label style="font-size: 0.85rem; font-weight: bold;">Test Type</label>
+        <div class="skill-selector">
+          <div id="btn-will" class="skill-btn" onclick="selectSkill('will')">🗣️ Willpower</div>
+          <div id="btn-intellect" class="skill-btn active" onclick="selectSkill('intellect')">📖 Intellect</div>
+          <div id="btn-combat" class="skill-btn" onclick="selectSkill('combat')">👊 Combat</div>
+          <div id="btn-agility" class="skill-btn" onclick="selectSkill('agility')">👟 Agility</div>
+        </div>
+
+        <!-- Explicit Base Skill Field -->
+        <div class="calc-row">
+          <span>Base Skill Value:</span>
+          <span id="val-base-skill" style="font-weight: bold; font-size: 1.1rem; color: var(--accent-blue);">3</span>
+        </div>
+
+        <div class="calc-row">
+          <span>Card/Commit Bonus:</span>
+          <div class="counter-control">
+            <button onclick="updateVal('commit', -1)">-</button>
+            <span id="val-commit" style="font-weight: bold;">1</span>
+            <button onclick="updateVal('commit', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="calc-row">
+          <span>Test to Beat:</span>
+          <div class="counter-control">
+            <button onclick="updateVal('target', -1)">-</button>
+            <span id="val-target" style="font-weight: bold;">2</span>
+            <button onclick="updateVal('target', 1)">+</button>
+          </div>
+        </div>
+
+        <!-- Inline Drawn Chaos Token Line -->
+        <div class="calc-row" style="background: #ebdcc3; padding: 6px 8px; border-radius: 4px; margin-top: 4px;">
+          <span>Chaos Token Drawn:</span>
+          <span id="token-display-inline" class="token-display-badge">Not Drawn</span>
+        </div>
+
+        <button class="action-btn" style="margin-top: 4px;" onclick="drawChaosToken()">🎲 Draw Chaos Token</button>
+        <button class="action-btn" style="background: var(--accent-gold);" onclick="calculateOutcome()">Skill Test Outcome</button>
+      </div>
+
+      <!-- Skill Outcome Overlay Popup -->
+      <div id="outcome-modal" class="outcome-overlay">
+        <h2 style="margin:0;">Skill Test Result</h2>
+        <div id="outcome-banner" class="outcome-banner success">Succeeded!</div>
+        
+        <div style="text-align: center; font-size: 1rem; line-height: 1.6;">
+          <div>Base Skill + Cards: <b id="out-player-total">4</b></div>
+          <div>Chaos Token Impact: <b id="out-token">-2</b></div>
+          <div>Final Calculated Skill: <b id="out-final">2</b></div>
+          <div>Difficulty to Beat: <b id="out-target">2</b></div>
+        </div>
+
+        <button class="action-btn" style="width: 60%; margin-top: 10px;" onclick="closeOutcome()">Close</button>
+      </div>
+
+    </div>
+
+    <!-- Tab 2: Round Turns -->
+    <div id="tab-turns" class="tab-content">
+      <div class="turn-column">
+        <h3>👁️ Mythos Phase</h3>
+        <div class="turn-step"><div class="step-num"><span>1</span></div> <div>Place 1 doom on main scheme / check threshold.</div></div>
+        <div class="turn-step"><div class="step-num"><span>2</span></div> <div>Each investigator draws 1 encounter card. Resisted with Willpower (🗣️).</div></div>
+      </div>
+
+      <div class="turn-column">
+        <h3>🕵️ Investigator Phase</h3>
+        <div class="turn-step"><div class="step-num"><span>3</span></div> <div>Perform 3 actions per investigator (Investigate 📖, Move, Fight 👊, Evade 👟, Play, Draw, Resource).</div></div>
+        <div class="turn-step"><div class="step-num"><span>4</span></div> <div>Enemy Phase: Ready enemies attack / Hunter enemies move.</div></div>
+      </div>
+
+      <div class="turn-column">
+        <h3>🎒 Upkeep Phase</h3>
+        <div class="turn-step"><div class="step-num"><span>5</span></div> <div>Reset/ready exhausted cards.</div></div>
+        <div class="turn-step"><div class="step-num"><span>6</span></div> <div>Each investigator draws 1 card & gains 1 resource.</div></div>
+        <div class="turn-step"><div class="step-num"><span>7</span></div> <div>Check hand size (limit 8 cards).</div></div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Music Player -->
+    <div id="tab-music" class="tab-content">
+      <div class="music-controls">
+        <h3 style="margin:0; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">Music Player</h3>
+        
+        <audio id="audio-player" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lovecraftian-dark-ambient-112191.mp3" preload="auto"></audio>
+
+        <div style="display:flex; justify-content: space-around; align-items: center; margin: 10px 0;">
+          <button class="action-btn" style="width: 100px;" onclick="togglePlay()" id="play-btn">▶️ Play</button>
+        </div>
+
+        <ul class="track-list">
+          <li class="track-item active" onclick="loadTrack(this, 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lovecraftian-dark-ambient-112191.mp3')">
+            <span>Arkham Noir Ambient</span>
+            <span>🎵</span>
+          </li>
+          <li class="track-item" onclick="loadTrack(this, 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73211.mp3?filename=dark-mystery-10282.mp3')">
+            <span>The Gathering - Mystery</span>
+            <span>🎵</span>
+          </li>
+          <li class="track-item" onclick="loadTrack(this, 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_3d191d9047.mp3?filename=creepy-hollow-8249.mp3')">
+            <span>Mythos Encounter</span>
+            <span>🎵</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="ambience-view">
+        <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80" alt="Atmospheric Background">
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation Bar -->
+  <nav>
+    <button class="nav-btn active" onclick="switchTab('tab-investigator', this)">
+      <span class="nav-icon">👤</span>
+      <span>Investigator Card</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('tab-turns', this)">
+      <span class="nav-icon">🔄</span>
+      <span>Round Turns</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('tab-music', this)">
+      <span class="nav-icon">🎵</span>
+      <span>Music Player</span>
+    </button>
+  </nav>
+
+  <script>
+    // Campaign & Scenario Dropdown Data
+    const campaignScenarios = {
+      notz: [
+        { id: 'gathering', name: 'The Gathering' },
+        { id: 'masks', name: 'Midnight Masks' },
+        { id: 'devourer', name: 'The Devourer Below' }
+      ],
+      dunwich: [
+        { id: 'extracurricular', name: 'Extracurricular Activity' },
+        { id: 'house', name: 'The House Always Wins' },
+        { id: 'museum', name: 'The Miskatonic Museum' }
+      ],
+      carcosa: [
+        { id: 'curtain', name: 'Curtain Call' },
+        { id: 'last_king', name: 'The Last King' },
+        { id: 'echoes', name: 'Echoes of the Past' }
+      ]
+    };
+
+    function updateCampaignScenarios() {
+      const campSelect = document.getElementById('campaign-select');
+      const scenSelect = document.getElementById('scenario-select');
+      const selectedCamp = campSelect.value;
+
+      scenSelect.innerHTML = '';
+      campaignScenarios[selectedCamp].forEach(scen => {
+        const opt = document.createElement('option');
+        opt.value = scen.id;
+        opt.innerText = scen.name;
+        scenSelect.appendChild(opt);
+      });
+    }
+
+    // Investigators Database
+    const investigators = {
+      roland: {
+        name: "Roland Banks",
+        sub: "The Fed",
+        class: "Guardian",
+        will: 3, intellect: 3, combat: 4, agility: 2,
+        health: 9, sanity: 5,
+        ability: "<b>Reaction:</b> After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)",
+        elder: "<b>⭐ Effect:</b> +1 for each clue on your location.",
+        img: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=300&q=80"
+      },
+      daisy: {
+        name: "Daisy Walker",
+        sub: "The Librarian",
+        class: "Seeker",
+        will: 3, intellect: 5, combat: 2, agility: 2,
+        health: 5, sanity: 9,
+        ability: "You may take 1 additional action during your turn, which can only be used on <b>Tome</b> abilities.",
+        elder: "<b>⭐ Effect:</b> +0. Draw 1 card for each Tome you control.",
+        img: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=300&q=80"
+      },
+      agnes: {
+        name: "Agnes Baker",
+        sub: "The Waitress",
+        class: "Mystic",
+        will: 5, intellect: 2, combat: 2, agility: 3,
+        health: 6, sanity: 8,
+        ability: "<b>Reaction:</b> When 1 or more horror is placed on Agnes Baker: Deal 1 damage to an enemy at your location.",
+        elder: "<b>⭐ Effect:</b> +1 for each horror on Agnes Baker.",
+        img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
+      },
+      skids: {
+        name: '"Skids" O\'Toole',
+        sub: "The Ex-Con",
+        class: "Rogue",
+        will: 2, intellect: 3, combat: 3, agility: 4,
+        health: 8, sanity: 6,
+        ability: "<b>Free Trigger:</b> Spend 2 resources: Take 1 additional action during your turn. (Limit once per turn.)",
+        elder: "<b>⭐ Effect:</b> +2. Gain 2 resources if successful.",
+        img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80"
+      },
+      wendy: {
+        name: "Wendy Adams",
+        sub: "The Urchin",
+        class: "Survivor",
+        will: 4, intellect: 3, combat: 1, agility: 4,
+        health: 7, sanity: 7,
+        ability: "<b>Reaction:</b> When you reveal a chaos token, discard 1 card from your hand: Cancel that token and draw a new one.",
+        elder: "<b>⭐ Effect:</b> +0. Automatically succeed if Wendy's Amulet is in play.",
+        img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80"
+      }
+    };
+
+    // State Variables
+    let currentInvestigator = investigators.roland;
+    let currentHealth = currentInvestigator.health;
+    let currentSanity = currentInvestigator.sanity;
+    let selectedSkill = 'intellect';
+    let targetVal = 2;
+    let commitVal = 1;
+    let currentChaosToken = null;
+
+    // Investigator Selector Listener
+    document.getElementById('investigator-select').addEventListener('change', (e) => {
+      currentInvestigator = investigators[e.target.value];
+      currentHealth = currentInvestigator.health;
+      currentSanity = currentInvestigator.sanity;
+      renderInvestigatorCard();
+    });
+
+    function renderInvestigatorCard() {
+      document.getElementById('card-name').innerText = currentInvestigator.name;
+      document.getElementById('card-sub').innerText = currentInvestigator.sub;
+      document.getElementById('card-class').innerText = currentInvestigator.class;
+      document.getElementById('stat-will').innerText = currentInvestigator.will;
+      document.getElementById('stat-intellect').innerText = currentInvestigator.intellect;
+      document.getElementById('stat-combat').innerText = currentInvestigator.combat;
+      document.getElementById('stat-agility').innerText = currentInvestigator.agility;
+      document.getElementById('card-health').innerText = currentHealth;
+      document.getElementById('card-sanity').innerText = currentSanity;
+      document.getElementById('card-ability').innerHTML = currentInvestigator.ability;
+      document.getElementById('card-elder').innerHTML = currentInvestigator.elder;
+      document.getElementById('card-portrait').src = currentInvestigator.img;
+
+      // Refresh currently selected skill's base value
+      selectSkill(selectedSkill);
+    }
+
+    // Health & Mind/Sanity Adjustments
+    function adjustVital(type, delta) {
+      if (type === 'health') {
+        currentHealth = Math.max(0, currentHealth + delta);
+        document.getElementById('card-health').innerText = currentHealth;
+      } else if (type === 'sanity') {
+        currentSanity = Math.max(0, currentSanity + delta);
+        document.getElementById('card-sanity').innerText = currentSanity;
+      }
+    }
+
+    // Dynamic Skill Selection (Works from both Card Badges & Panel Buttons)
+    function selectSkill(skill) {
+      selectedSkill = skill;
+
+      // Update Panel Skill Buttons
+      document.querySelectorAll('.skill-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`btn-${skill}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      // Update Card Badges
+      document.querySelectorAll('.stat-badge').forEach(badge => badge.classList.remove('selected-stat'));
+      const activeBadge = document.getElementById(`badge-${skill}`);
+      if (activeBadge) activeBadge.classList.add('selected-stat');
+
+      // Update Base Skill Field automatically
+      const baseValue = currentInvestigator[skill];
+      document.getElementById('val-base-skill').innerText = baseValue;
+    }
+
+    function updateVal(type, delta) {
+      if (type === 'target') {
+        targetVal = Math.max(0, targetVal + delta);
+        document.getElementById('val-target').innerText = targetVal;
+      } else if (type === 'commit') {
+        commitVal = Math.max(0, commitVal + delta);
+        document.getElementById('val-commit').innerText = commitVal;
+      }
+    }
+
+    // Chaos Bag Drawing (Inline Display)
+    const chaosBag = [+1, 0, 0, -1, -1, -2, -2, -3, -4, -8]; // -8 = Auto-Fail
+    function drawChaosToken() {
+      const randIndex = Math.floor(Math.random() * chaosBag.length);
+      currentChaosToken = chaosBag[randIndex];
+
+      const tokenBadge = document.getElementById('token-display-inline');
+
+      if (currentChaosToken === -8) {
+        tokenBadge.innerText = "AUTO-FAIL 💀";
+        tokenBadge.className = "token-display-badge token-fail";
+      } else if (currentChaosToken > 0) {
+        tokenBadge.innerText = `+${currentChaosToken}`;
+        tokenBadge.className = "token-display-badge token-positive";
+      } else if (currentChaosToken < 0) {
+        tokenBadge.innerText = `${currentChaosToken}`;
+        tokenBadge.className = "token-display-badge token-negative";
+      } else {
+        tokenBadge.innerText = "0";
+        tokenBadge.className = "token-display-badge";
+      }
+    }
+
+    // Skill Calculation Logic
+    function calculateOutcome() {
+      const baseStat = currentInvestigator[selectedSkill];
+      const playerTotal = baseStat + commitVal;
+      
+      // Default token to 0 if not drawn yet
+      const tokenVal = currentChaosToken !== null ? currentChaosToken : 0;
+      const finalTotal = Math.max(0, playerTotal + tokenVal);
+      const succeeded = finalTotal >= targetVal && tokenVal !== -8;
+
+      document.getElementById('out-player-total').innerText = `${baseStat} (Base) + ${commitVal} (Bonus) = ${playerTotal}`;
+      
+      if (currentChaosToken === null) {
+        document.getElementById('out-token').innerText = "0 (No Token Drawn)";
+      } else {
+        document.getElementById('out-token').innerText = tokenVal === -8 ? "AUTO-FAIL" : (tokenVal > 0 ? `+${tokenVal}` : tokenVal);
+      }
+
+      document.getElementById('out-final').innerText = finalTotal;
+      document.getElementById('out-target').innerText = targetVal;
+
+      const banner = document.getElementById('outcome-banner');
+      if (succeeded) {
+        banner.innerText = "Succeeded!";
+        banner.className = "outcome-banner success";
+      } else {
+        banner.innerText = "Failed!";
+        banner.className = "outcome-banner fail";
+      }
+
+      document.getElementById('outcome-modal').style.display = 'flex';
+    }
+
+    function closeOutcome() {
+      document.getElementById('outcome-modal').style.display = 'none';
+    }
+
+    // Navigation Tab Switching
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.remove('active');
+      });
+      
+      const targetTab = document.getElementById(tabId);
+      if (targetTab) {
+        targetTab.classList.add('active');
+      }
+      btn.classList.add('active');
+    }
+
+    // Music Player Audio Controls
+    const audioPlayer = document.getElementById('audio-player');
+    const playBtn = document.getElementById('play-btn');
+
+    function togglePlay() {
+      if (audioPlayer.paused) {
+        audioPlayer.play();
+        playBtn.innerText = "⏸️ Pause";
+      } else {
+        audioPlayer.pause();
+        playBtn.innerText = "▶️ Play";
+      }
+    }
+
+    function loadTrack(element, src) {
+      document.querySelectorAll('.track-item').forEach(item => item.classList.remove('active'));
+      element.classList.add('active');
+      audioPlayer.src = src;
+      audioPlayer.play();
+      playBtn.innerText = "⏸️ Pause";
+    }
+
+    // Initial load sync
+    renderInvestigatorCard();
+  </script>
+</body>
+</html>
