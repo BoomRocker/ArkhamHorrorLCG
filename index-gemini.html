@@ -328,7 +328,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 4px;
-      max-height: 85px;
+      max-height: 70px;
       overflow-y: auto;
       padding-top: 4px;
     }
@@ -371,6 +371,31 @@
     .mini-token-badge.token-special {
       background: #d9cdb8;
       border-color: #8b6e4e;
+    }
+
+    /* Scenario Special Token Rules Inspector */
+    .special-tokens-reference {
+      margin-top: 8px;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 6px;
+    }
+
+    .special-effects-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 100px;
+      overflow-y: auto;
+      margin-top: 4px;
+    }
+
+    .special-rule-item {
+      font-size: 0.75rem;
+      line-height: 1.2;
+      background: #f2ebd9;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid #c0b298;
     }
 
     .action-btn {
@@ -698,6 +723,14 @@
           <div id="bag-tokens-list" class="bag-tokens-grid">
             <!-- Badges rendered via JavaScript -->
           </div>
+
+          <!-- Scenario Special Token Rules Reference -->
+          <div class="special-tokens-reference">
+            <div style="font-weight: bold; font-size: 0.78rem;">Scenario Special Token Effects:</div>
+            <div id="special-effects-list" class="special-effects-list">
+              <!-- Dynamically populated per scenario -->
+            </div>
+          </div>
         </div>
 
         <button class="action-btn" style="background: var(--accent-gold); margin-top: 2px;" onclick="calculateOutcome()">Skill Test Outcome</button>
@@ -831,6 +864,55 @@
       }
     };
 
+    // Special Token Effects per Campaign and Scenario
+    const specialTokenEffects = {
+      notz: {
+        gathering: {
+          '💀': "<b>💀 Skull:</b> -X (X = Ghoul enemies at your location).",
+          '👹': "<b>👹 Cultist:</b> -1 (-2 on Hard). If fail, take 1 horror.",
+          '👾': "<b>👾 Tablet:</b> -2 (-3 on Hard). If fail, take 1 damage."
+        },
+        masks: {
+          '💀': "<b>💀 Skull:</b> -X (X = highest doom count on any location in play).",
+          '👹': "<b>👹 Cultist:</b> -2. Place 1 doom on nearest Cultist enemy.",
+          '👾': "<b>👾 Tablet:</b> -3. If fail, lose 1 clue from your location."
+        },
+        devourer: {
+          '💀': "<b>💀 Skull:</b> -X (X = Monster enemies in play).",
+          '👹': "<b>👹 Cultist:</b> -4. Reveal another chaos token.",
+          '👾': "<b>👾 Tablet:</b> -5. If fail, discard 1 asset you control."
+        }
+      },
+      dunwich: {
+        extracurricular: {
+          '💀': "<b>💀 Skull:</b> -X (X = cards in discard pile ÷ 5, rounded down).",
+          '👾': "<b>👾 Tablet:</b> -3 (-5 on Hard). If fail, discard top 3 cards of deck."
+        },
+        house: {
+          '💀': "<b>💀 Skull:</b> -1 (-3 on Hard).",
+          '👾': "<b>👾 Tablet:</b> -2 (-4 on Hard). Pay 2 resources if fail."
+        },
+        museum: {
+          '💀': "<b>💀 Skull:</b> -1 (-3 if Hunting Horror is at your location).",
+          '👾': "<b>👾 Tablet:</b> -3 (-5 on Hard). Spawn Hunting Horror if in void."
+        }
+      },
+      carcosa: {
+        curtain: {
+          '💀': "<b>💀 Skull:</b> -1 (-3 on Hard).",
+          '👹': "<b>👹 Cultist:</b> -2 (-4 on Hard). If fail, take 1 horror."
+        },
+        last_king: {
+          '💀': "<b>💀 Skull:</b> -X (X = Clues on location).",
+          '👹': "<b>👹 Cultist:</b> -3. If fail, remove 1 Clue from your card."
+        },
+        echoes: {
+          '💀': "<b>💀 Skull:</b> -1 (-2 on Hard).",
+          '👹': "<b>👹 Cultist:</b> -2 (-4 on Hard). Place 1 doom on nearest Cultist."
+        }
+      }
+    };
+
     let currentBag = [];
 
     function onCampaignChange() {
@@ -862,6 +944,7 @@
 
       currentBag = [...bag];
       renderBagList();
+      renderSpecialTokenReference();
 
       // Reset inline drawn token display when bag updates
       currentChaosToken = null;
@@ -897,6 +980,30 @@
         }
         container.appendChild(badge);
       });
+    }
+
+    function renderSpecialTokenReference() {
+      const camp = document.getElementById('campaign-select').value;
+      const scen = document.getElementById('scenario-select').value;
+      const container = document.getElementById('special-effects-list');
+
+      container.innerHTML = '';
+
+      const scenarioEffects = (specialTokenEffects[camp] && specialTokenEffects[camp][scen]) 
+        ? specialTokenEffects[camp][scen] 
+        : null;
+
+      if (!scenarioEffects) {
+        container.innerHTML = '<div class="special-rule-item" style="font-style:italic; color:#666;">No special rules defined for this scenario.</div>';
+        return;
+      }
+
+      for (const [symbol, text] of Object.entries(scenarioEffects)) {
+        const item = document.createElement('div');
+        item.className = 'special-rule-item';
+        item.innerHTML = text;
+        container.appendChild(item);
+      }
     }
 
     // Investigators Database
