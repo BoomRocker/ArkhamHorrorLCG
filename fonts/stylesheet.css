@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Teutonic';
+    src: url('Teutonic.woff2') format('woff2'),
+        url('Teutonic.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+

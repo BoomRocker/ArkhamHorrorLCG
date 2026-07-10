@@ -17,6 +17,14 @@
       --text-dark: #1f1a17;
       --success-green: #2a6f43;
       --fail-red: #8b2626;
+
+      /* Class Color Theme Palette */
+      --color-guardian: #1b3854;
+      --color-seeker: #b37d14;
+      --color-mystic: #4a2163;
+      --color-rogue: #105432;
+      --color-survivor: #801616;
+      --color-neutral: #5e5e5e;
     }
 
     * {
@@ -36,6 +44,23 @@
       height: 100vh;
       overflow: hidden;
     }
+	
+	@font-face {
+		font-family: 'Teutonic';
+		src: url('fonts/Teutonic.woff2') format('woff2'),
+			url('fonts/Teutonic.woff') format('woff');
+		font-weight: normal;
+		font-style: normal;
+		font-display: swap;
+	}
+	
+	#card-name {
+		font-family: 'Teutonic', sans-serif;
+		font-size: 2em;
+		font-weight: normal;
+	}
+
+
 
     /* Token Icon Utility Styles */
     .token-icon {
@@ -113,14 +138,24 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      transition: background 0.25s ease, border-color 0.25s ease;
     }
+
+    /* Class Dynamic Background Styles */
+    .card-section.theme-guardian { background: #e3ebf2; }
+    .card-section.theme-seeker { background: #fdf5e6; }
+    .card-section.theme-mystic { background: #f1ebf5; }
+    .card-section.theme-rogue { background: #eaf2ed; }
+    .card-section.theme-survivor { background: #f5ebeb; }
+    .card-section.theme-neutral { background: #eaeaea; }
 
     .investigator-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid var(--border-color);
+      border-bottom: 3px solid var(--border-color);
       padding-bottom: 6px;
+      transition: border-color 0.25s ease;
     }
 
     .investigator-title h2 {
@@ -130,14 +165,29 @@
 
     .investigator-title span {
       font-size: 0.8rem;
-      color: #666;
+      color: #555;
       font-style: italic;
+    }
+
+    .class-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      transition: color 0.25s ease;
+    }
+
+    .class-icon-inline {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
     }
 
     .stats-row {
       display: flex;
       justify-content: space-around;
-      background: #e2d7be;
+      background: rgba(0, 0, 0, 0.06);
       padding: 6px;
       border-radius: 20px;
       border: 1px solid var(--border-color);
@@ -156,7 +206,7 @@
     }
 
     .stat-badge:hover {
-      background: rgba(27, 56, 84, 0.15);
+      background: rgba(0, 0, 0, 0.08);
     }
 
     .stat-badge.selected-stat {
@@ -195,14 +245,14 @@
       height: auto;
       border-radius: 6px;
       object-fit: cover;
-      border: 0px solid var(--border-color);
+      border: 0px solid rgba(0, 0, 0, 0.15);
     }
 
     .ability-box {
       flex: 1;
       font-size: 0.85rem;
       line-height: 1.3;
-      background: #fdfaf2;
+      background: rgba(255, 255, 255, 0.6);
       padding: 8px;
       border-radius: 4px;
       border: 1px dashed #a3957a;
@@ -213,7 +263,7 @@
       justify-content: space-around;
       margin-top: auto;
       padding-top: 8px;
-      border-top: 1px solid #c0b298;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
     }
 
     .vital-btn {
@@ -222,7 +272,7 @@
       gap: 8px;
       font-size: 1.1rem;
       font-weight: bold;
-      background: #e2d7be;
+      background: rgba(0, 0, 0, 0.05);
       padding: 4px 10px;
       border-radius: 20px;
       border: 1px solid var(--border-color);
@@ -289,7 +339,6 @@
       color: white;
     }
 
-    /* Filter active icon states to show neatly against light or dark tabs */
     .skill-btn.active img, .stat-badge.selected-stat .stat-circle img {
       filter: brightness(1) invert(1);
     }
@@ -675,7 +724,7 @@
     }
 
     .nav-btn.active .nav-icon-img {
-      filter: none; /* Shows full color tint when active */
+      filter: none;
     }
   </style>
 </head>
@@ -687,6 +736,7 @@
       <option value="notz">Night of the Zealot</option>
       <option value="dunwich">The Dunwich Legacy</option>
       <option value="carcosa">Path to Carcosa</option>
+      <option value="brethren">Brethren of Ash</option>
     </select>
     
     <select id="scenario-select" onchange="updateChaosBag()">
@@ -703,11 +753,7 @@
     </select>
 
     <select id="investigator-select">
-      <option value="roland">Roland Banks</option>
-      <option value="daisy">Daisy Walker</option>
-      <option value="agnes">Agnes Baker</option>
-      <option value="skids">"Skids" O'Toole</option>
-      <option value="wendy">Wendy Adams</option>
+      <!-- Dynamically filled via JS initialization to support the expanded 21 investigator cast -->
     </select>
   </header>
 
@@ -718,13 +764,16 @@
     <div id="tab-investigator" class="tab-content active">
       
       <!-- Investigator Card Component -->
-      <div class="card-section">
-        <div class="investigator-header">
+      <div id="investigator-card-box" class="card-section theme-guardian">
+        <div id="investigator-header-el" class="investigator-header" style="border-bottom-color: var(--color-guardian);">
           <div class="investigator-title">
             <h2 id="card-name">Roland Banks</h2>
             <span id="card-sub">The Fed</span>
           </div>
-          <span id="card-class" style="font-weight: bold; color: var(--accent-blue);">Guardian</span>
+          <div class="class-container" id="class-container-el" style="color: var(--color-guardian);">
+            <img id="card-class-icon" class="class-icon-inline" src="images/icons/class_guardian.png" alt="Guardian Icon">
+            <span id="card-class">Guardian</span>
+          </div>
         </div>
 
         <div class="stats-row">
@@ -743,7 +792,7 @@
         </div>
 
         <div class="card-body">
-          <img id="card-portrait" class="portrait" src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=300&q=80" alt="Investigator Portrait">
+          <img id="card-portrait" class="portrait" src="images/investigators/roland.png" alt="Investigator Portrait">
           <div class="ability-box">
             <p id="card-ability"><b>Reaction:</b> After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)</p>
             <p id="card-elder"><b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1 for each clue on your location.</p>
@@ -811,9 +860,7 @@
             <span>Current Chaos Bag Contents:</span>
             <span>Count: <b id="bag-count">0</b></span>
           </div>
-          <div id="bag-tokens-list" class="bag-tokens-grid">
-            <!-- Badges rendered via JavaScript -->
-          </div>
+          <div id="bag-tokens-list" class="bag-tokens-grid"></div>
 
           <!-- Token Key / Icon Legend -->
           <div style="margin-top: 8px; border-top: 1px dashed var(--border-color); padding-top: 6px;">
@@ -830,9 +877,7 @@
           <!-- Scenario Special Token Rules Reference -->
           <div class="special-tokens-reference">
             <div style="font-weight: bold; font-size: 0.78rem;">Scenario Special Token Effects:</div>
-            <div id="special-effects-list" class="special-effects-list">
-              <!-- Dynamically populated per scenario -->
-            </div>
+            <div id="special-effects-list" class="special-effects-list"></div>
           </div>
         </div>
 
@@ -889,7 +934,6 @@
           <button class="action-btn" style="width: 100px;" onclick="togglePlay()" id="play-btn">▶️ Play</button>
         </div>
 
-        <!-- Dynamic Scrubber Control -->
         <div class="scrubber-container">
           <div class="scrubber-row">
             <span id="time-current" class="time-display">0:00</span>
@@ -946,24 +990,16 @@
   </nav>
 
   <script>
-    // Token image mapping based on images/icons/ directory
     const tokenImageMap = {
-      '0': 'images/icons/chaos_0.png',
-      '-2': 'images/icons/chaos_minus2.png',
-      '-3': 'images/icons/chaos_minus3.png',
-      '-4': 'images/icons/chaos_minus4.png',
-      '-5': 'images/icons/chaos_minus5.png',
-      '-6': 'images/icons/chaos_minus6.png',
-      '-7': 'images/icons/chaos_minus7.png',
-      '-8': 'images/icons/chaos_minus8.png',
-      '💀': 'images/icons/chaos_skull.png',
-      '👹': 'images/icons/chaos_cultist.png',
-      '📜': 'images/icons/chaos_tablet.png',
-      'AUTO-FAIL': 'images/icons/chaos_fail.png',
+      '0': 'images/icons/chaos_0.png', '-2': 'images/icons/chaos_minus2.png',
+      '-3': 'images/icons/chaos_minus3.png', '-4': 'images/icons/chaos_minus4.png',
+      '-5': 'images/icons/chaos_minus5.png', '-6': 'images/icons/chaos_minus6.png',
+      '-7': 'images/icons/chaos_minus7.png', '-8': 'images/icons/chaos_minus8.png',
+      '💀': 'images/icons/chaos_skull.png', '👹': 'images/icons/chaos_cultist.png',
+      '📜': 'images/icons/chaos_tablet.png', 'AUTO-FAIL': 'images/icons/chaos_fail.png',
       '🌟': 'images/icons/chaos_elder.png'
     };
 
-    // Campaign & Scenario Dropdown Data
     const campaignScenarios = {
       notz: [
         { id: 'gathering', name: 'The Gathering' },
@@ -979,10 +1015,14 @@
         { id: 'curtain', name: 'Curtain Call' },
         { id: 'last_king', name: 'The Last King' },
         { id: 'echoes', name: 'Echoes of the Past' }
+      ],
+      brethren: [
+        { id: 'flames', name: 'Spreading Flames' },
+        { id: 'mirrors', name: 'Smoke and Mirrors' },
+        { id: 'queen', name: 'Queen of Ash' }
       ]
     };
 
-    // Preset Chaos Bag configurations
     const chaosBagPresets = {
       notz: {
         easy: ['+1', '+1', '0', '0', '0', '-1', '-1', '-1', '-2', '-2', '💀', '💀', '👹', '📜', 'AUTO-FAIL', '🌟'],
@@ -1001,10 +1041,15 @@
         standard: ['+1', '0', '0', '-1', '-1', '-1', '-2', '-2', '-3', '-4', '💀', '💀', '👹', '👹', '🌟', 'AUTO-FAIL'],
         hard: ['0', '0', '0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-5', '💀', '💀', '👹', '👹', '📜', '📜', '🌟', 'AUTO-FAIL'],
         expert: ['0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-4', '-5', '-6', '-8', '💀', '💀', '👹', '👹', '📜', '📜', '🌟', 'AUTO-FAIL']
+      },
+      brethren: {
+        easy: ['+1', '+1', '0', '0', '0', '-1', '-1', '-1', '-2', '-2', '💀', '💀', '👹', '📜', 'AUTO-FAIL', '🌟'],
+        standard: ['+1', '0', '0', '-1', '-1', '-1', '-2', '-2', '-3', '-4', '💀', '💀', '👹', '📜', 'AUTO-FAIL', '🌟'],
+        hard: ['0', '0', '0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-5', '💀', '💀', '👹', '📜', 'AUTO-FAIL', '🌟'],
+        expert: ['0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-4', '-5', '-6', '-8', '💀', '💀', '👹', '📜', 'AUTO-FAIL', '🌟']
       }
     };
 
-    // Special Token Effects per Campaign and Scenario
     const specialTokenEffects = {
       notz: {
         gathering: {
@@ -1050,10 +1095,219 @@
           '💀': '<img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull:</b> -1 (-2 on Hard).',
           '👹': '<img src="images/icons/chaos_cultist.png" class="token-icon" alt="Cultist"> <b>Cultist:</b> -2 (-4 on Hard). Place 1 doom on nearest Cultist.'
         }
+      },
+      brethren: {
+        flames: {
+          '💀': '<img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull:</b> -1 (-3 on Hard). If failed, place 1 fire token at your location.',
+          '👹': '<img src="images/icons/chaos_cultist.png" class="token-icon" alt="Cultist"> <b>Cultist:</b> -2. If you fail, place 1 doom on the current agenda.',
+          '📜': '<img src="images/icons/chaos_tablet.png" class="token-icon" alt="Tablet"> <b>Tablet:</b> -3. Each enemy at your location gets +1 Fight.'
+        },
+        mirrors: {
+          '💀': '<img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull:</b> -2 (-4 on Hard).',
+          '👹': '<img src="images/icons/chaos_cultist.png" class="token-icon" alt="Cultist"> <b>Cultist:</b> -2. If failed, take 1 Direct Horror.',
+          '📜': '<img src="images/icons/chaos_tablet.png" class="token-icon" alt="Tablet"> <b>Tablet:</b> -4. Discard a random card from your hand.'
+        },
+        queen: {
+          '💀': '<img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull:</b> -X (X = total Doom in play).',
+          '👹': '<img src="images/icons/chaos_cultist.png" class="token-icon" alt="Cultist"> <b>Cultist:</b> -4. If failed, Elokoss attacks.',
+          '📜': '<img src="images/icons/chaos_tablet.png" class="token-icon" alt="Tablet"> <b>Tablet:</b> -5. Take 1 Direct Damage.'
+        }
+      }
+    };
+
+    const investigators = {
+      // Core Set
+      roland: {
+        name: "Roland Banks", sub: "The Fed", class: "Guardian", classId: "guardian",
+        will: 3, intellect: 3, combat: 4, agility: 2, health: 9, sanity: 5,
+        ability: "<b>Reaction:</b> After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1 for each clue on your location.',
+        img: "images/investigators/roland.png"
+      },
+      daisy: {
+        name: "Daisy Walker", sub: "The Librarian", class: "Seeker", classId: "seeker",
+        will: 3, intellect: 5, combat: 2, agility: 2, health: 5, sanity: 9,
+        ability: "You may take 1 additional action during your turn, which can only be used on <b>Tome</b> abilities.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +0. Draw 1 card for each Tome you control.',
+        img: "images/investigators/daisy.png"
+      },
+      skids: {
+        name: '"Skids" O\'Toole', sub: "The Ex-Con", class: "Rogue", classId: "rogue",
+        will: 2, intellect: 3, combat: 3, agility: 4, health: 8, sanity: 6,
+        ability: "<b>Free Trigger:</b> Spend 2 resources: Take 1 additional action during your turn. (Limit once per turn.)",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +2. Gain 2 resources if successful.',
+        img: "images/investigators/skids.png"
+      },
+      agnes: {
+        name: "Agnes Baker", sub: "The Waitress", class: "Mystic", classId: "mystic",
+        will: 5, intellect: 2, combat: 2, agility: 3, health: 6, sanity: 8,
+        ability: "<b>Reaction:</b> When 1 or more horror is placed on Agnes Baker: Deal 1 damage to an enemy at your location.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1 for each horror on Agnes Baker.',
+        img: "images/investigators/agnes.png"
+      },
+      wendy: {
+        name: "Wendy Adams", sub: "The Urchin", class: "Survivor", classId: "survivor",
+        will: 4, intellect: 3, combat: 1, agility: 4, health: 7, sanity: 7,
+        ability: "<b>Reaction:</b> When you reveal a chaos token, discard 1 card from your hand: Cancel that token and draw a new one.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +0. You may choose to reveal a new token from the chaos bag instead.',
+        img: "images/investigators/wendy.png"
+      },
+      // Dunwich Legacy
+      zoey: {
+        name: "Zoey Samaras", sub: "The Chef", class: "Guardian", classId: "guardian",
+        will: 4, intellect: 2, combat: 4, agility: 2, health: 9, sanity: 6,
+        ability: "<b>Reaction:</b> After you engage an enemy: Gain 1 resource.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1. If successful, deal 1 damage to an engaged enemy.',
+        img: "images/investigators/zoey.png"
+      },
+      rex: {
+        name: "Rex Murphy", sub: "The Reporter", class: "Seeker", classId: "seeker",
+        will: 3, intellect: 4, combat: 2, agility: 3, health: 6, sanity: 9,
+        ability: "After you succeed on a skill test by 2 or more while investigating: Discover 1 additional clue.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +2. You may draw 1 card.',
+        img: "images/investigators/rex.png"
+      },
+      jenny: {
+        name: "Jenny Barnes", sub: "The Dilettante", class: "Rogue", classId: "rogue",
+        will: 3, intellect: 3, combat: 3, agility: 3, health: 8, sanity: 7,
+        ability: "You gain 1 additional resource during the upkeep phase.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1 for each resource you currently have.',
+        img: "images/investigators/jenny.png"
+      },
+      jim: {
+        name: "Jim Culver", sub: "The Musician", class: "Mystic", classId: "mystic",
+        will: 4, intellect: 3, combat: 3, agility: 2, health: 7, sanity: 8,
+        ability: "You may treat Skull tokens revealed during skill tests as if they were '0' tokens.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1. You may change this token to a Skull.',
+        img: "images/investigators/jim.png"
+      },
+      pete: {
+        name: '"Ashcan" Pete', sub: "The Drifter", class: "Survivor", classId: "survivor",
+        will: 4, intellect: 2, combat: 2, agility: 3, health: 6, sanity: 5,
+        ability: "You begin play with Duke in play. Discard a card to ready an exhausted asset.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +2. Ready Duke immediately.',
+        img: "images/investigators/pete.png"
+      },
+      // Path to Carcosa
+      mark: {
+        name: "Mark Harrigan", sub: "The Soldier", class: "Guardian", classId: "guardian",
+        will: 3, intellect: 2, combat: 5, agility: 3, health: 9, sanity: 5,
+        ability: "Draw 1 card after damage is placed on an asset or investigator card you control. (Limit once per phase.)",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1 for each damage on Mark Harrigan.',
+        img: "images/investigators/mark.png"
+      },
+      minh: {
+        name: "Minh Thi Phan", sub: "The Secretary", class: "Seeker", classId: "seeker",
+        will: 4, intellect: 4, combat: 2, agility: 2, health: 7, sanity: 7,
+        ability: "The first card committed to a skill test by an investigator gets a wild icon bonus.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1. Choose a card to return to hand.',
+        img: "images/investigators/minh.png"
+      },
+      sefina: {
+        name: "Sefina Rousseau", sub: "The Painter", class: "Rogue", classId: "rogue",
+        will: 4, intellect: 2, combat: 2, agility: 4, health: 5, sanity: 9,
+        ability: "Draw 13 opening cards instead of 5. Place up to 5 events beneath this card.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +3. Move an event from below to your hand.',
+        img: "images/investigators/sefina.png"
+      },
+      akachi: {
+        name: "Akachi Onyele", sub: "The Shaman", class: "Mystic", classId: "mystic",
+        will: 5, intellect: 2, combat: 3, agility: 3, health: 6, sanity: 8,
+        ability: "Each asset you control that enters play with charges gains 1 additional charge.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1. Add 1 charge to a card you control.',
+        img: "images/investigators/akachi.png"
+      },
+      yorick: {
+        name: "William Yorick", sub: "The Gravedigger", class: "Survivor", classId: "survivor",
+        will: 3, intellect: 2, combat: 4, agility: 3, health: 8, sanity: 6,
+        ability: "After you defeat an enemy, you may play an asset from your discard pile.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +2. Return 1 asset from discard to hand.',
+        img: "images/investigators/yorick.png"
+      },
+      lola: {
+        name: "Lola Hayes", sub: "The Actress", class: "Neutral", classId: "neutral",
+        will: 3, intellect: 3, combat: 3, agility: 3, health: 6, sanity: 6,
+        ability: "Choose a role at setup. You can only play, commit, or activate abilities of that role.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +2. You may switch roles immediately.',
+        img: "images/investigators/lola.png"
+      },
+      // Chapter 2 Core Set (2026 Expansion Cast)
+      daniela: {
+        name: "Daniela Reyes", sub: "The Mechanic", class: "Guardian", classId: "guardian",
+        will: 4, intellect: 1, combat: 5, agility: 2, health: 9, sanity: 5,
+        ability: "After an enemy attacks you, automatically deal 1 damage to it or evade it.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1. Heal 1 damage or 1 horror.',
+        img: "images/investigators/daniela.png"
+      },
+      joe: {
+        name: "Joe Diamond", sub: "The Private Investigator", class: "Seeker", classId: "seeker",
+        will: 3, intellect: 4, combat: 4, agility: 1, health: 8, sanity: 6,
+        ability: "Has a secondary 40-card hunch deck. Reveal and play the top card of your hunch deck at a discount.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1. Draw top card of your hunch deck.',
+        img: "images/investigators/joe.png"
+      },
+      trish: {
+        name: "Trish Scarborough", sub: "The Spy", class: "Rogue", classId: "rogue",
+        will: 2, intellect: 4, combat: 2, agility: 4, health: 8, sanity: 6,
+        ability: "After you discover clues at a location with an enemy, discover 1 additional clue or evade that enemy.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +2. Automatically evade a local enemy.',
+        img: "images/investigators/trish.png"
+      },
+      dexter: {
+        name: "Dexter Drake", sub: "The Magician", class: "Mystic", classId: "mystic",
+        will: 5, intellect: 2, combat: 3, agility: 2, health: 6, sanity: 8,
+        ability: "Discard an asset in play to play a asset from your hand with a different title at reduced resource cost.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +2. Return an asset to your hand.',
+        img: "images/investigators/dexter.png"
+      },
+      isabelle: {
+        name: "Isabelle Barnes", sub: "The Returned", class: "Survivor", classId: "survivor",
+        will: 3, intellect: 2, combat: 3, agility: 4, health: 7, sanity: 7,
+        ability: "When you fail a test, place 1 tracking resource on Isabelle. Spend 2 tracking resources to look at the top 3 cards of the deck.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +0. Gain 2 tracking resources.',
+        img: "images/investigators/isabelle.png"
       }
     };
 
     let currentBag = [];
+    let currentInvestigator = investigators.roland;
+    let currentHealth = currentInvestigator.health;
+    let currentSanity = currentInvestigator.sanity;
+    let selectedSkill = 'intellect';
+    let targetVal = 2;
+    let commitVal = 1;
+    let currentChaosToken = null;
+
+    function initInvestigatorDropdown() {
+      const select = document.getElementById('investigator-select');
+      select.innerHTML = '';
+      
+      const groups = {
+        "Core Set": ['roland', 'daisy', 'skids', 'agnes', 'wendy'],
+        "The Dunwich Legacy": ['zoey', 'rex', 'jenny', 'jim', 'pete'],
+        "The Path to Carcosa": ['mark', 'minh', 'sefina', 'akachi', 'yorick', 'lola'],
+        "Chapter 2 Core Set (2026)": ['daniela', 'joe', 'trish', 'dexter', 'isabelle']
+      };
+
+      for (const [groupName, keys] of Object.entries(groups)) {
+        const optGroup = document.createElement('optgroup');
+        optGroup.label = groupName;
+        keys.forEach(key => {
+          const opt = document.createElement('option');
+          opt.value = key;
+          opt.innerText = `${investigators[key].name} (${investigators[key].class})`;
+          optGroup.appendChild(opt);
+        });
+        select.appendChild(optGroup);
+      }
+
+      select.addEventListener('change', (e) => {
+        currentInvestigator = investigators[e.target.value];
+        currentHealth = currentInvestigator.health;
+        currentSanity = currentInvestigator.sanity;
+        renderInvestigatorCard();
+      });
+    }
 
     function onCampaignChange() {
       updateCampaignScenarios();
@@ -1146,73 +1400,6 @@
       }
     }
 
-    const investigators = {
-      roland: {
-        name: "Roland Banks",
-        sub: "The Fed",
-        class: "Guardian",
-        will: 3, intellect: 3, combat: 4, agility: 2,
-        health: 9, sanity: 5,
-        ability: "<b>Reaction:</b> After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)",
-        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1 for each clue on your location.',
-        img: "images/investigators/roland.png"
-      },
-      daisy: {
-        name: "Daisy Walker",
-        sub: "The Librarian",
-        class: "Seeker",
-        will: 3, intellect: 5, combat: 2, agility: 2,
-        health: 5, sanity: 9,
-        ability: "You may take 1 additional action during your turn, which can only be used on <b>Tome</b> abilities.",
-        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +0. Draw 1 card for each Tome you control.',
-        img: "images/investigators/daisy.png"
-      },
-      agnes: {
-        name: "Agnes Baker",
-        sub: "The Waitress",
-        class: "Mystic",
-        will: 5, intellect: 2, combat: 2, agility: 3,
-        health: 6, sanity: 8,
-        ability: "<b>Reaction:</b> When 1 or more horror is placed on Agnes Baker: Deal 1 damage to an enemy at your location.",
-        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1 for each horror on Agnes Baker.',
-        img: "images/investigators/agnes.png"
-      },
-      skids: {
-        name: '"Skids" O\'Toole',
-        sub: "The Ex-Con",
-        class: "Rogue",
-        will: 2, intellect: 3, combat: 3, agility: 4,
-        health: 8, sanity: 6,
-        ability: "<b>Free Trigger:</b> Spend 2 resources: Take 1 additional action during your turn. (Limit once per turn.)",
-        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +2. Gain 2 resources if successful.',
-        img: "images/investigators/skids.png"
-      },
-      wendy: {
-        name: "Wendy Adams",
-        sub: "The Urchin",
-        class: "Survivor",
-        will: 4, intellect: 3, combat: 1, agility: 4,
-        health: 7, sanity: 7,
-        ability: "<b>Reaction:</b> When you reveal a chaos token, discard 1 card from your hand: Cancel that token and draw a new one.",
-        img: "images/investigators/wendy.png"
-      }
-    };
-
-    let currentInvestigator = investigators.roland;
-    let currentHealth = currentInvestigator.health;
-    let currentSanity = currentInvestigator.sanity;
-    let selectedSkill = 'intellect';
-    let targetVal = 2;
-    let commitVal = 1;
-    let currentChaosToken = null;
-
-    document.getElementById('investigator-select').addEventListener('change', (e) => {
-      currentInvestigator = investigators[e.target.value];
-      currentHealth = currentInvestigator.health;
-      currentSanity = currentInvestigator.sanity;
-      renderInvestigatorCard();
-    });
-
     function renderInvestigatorCard() {
       document.getElementById('card-name').innerText = currentInvestigator.name;
       document.getElementById('card-sub').innerText = currentInvestigator.sub;
@@ -1226,6 +1413,21 @@
       document.getElementById('card-ability').innerHTML = currentInvestigator.ability;
       document.getElementById('card-elder').innerHTML = currentInvestigator.elder;
       document.getElementById('card-portrait').src = currentInvestigator.img;
+
+      const cardBox = document.getElementById('investigator-card-box');
+      const headerEl = document.getElementById('investigator-header-el');
+      const containerEl = document.getElementById('class-container-el');
+      const classIcon = document.getElementById('card-class-icon');
+
+      cardBox.className = "card-section"; 
+      cardBox.classList.add(`theme-${currentInvestigator.classId}`);
+
+      const targetColor = `var(--color-${currentInvestigator.classId})`;
+      headerEl.style.borderBottomColor = targetColor;
+      containerEl.style.color = targetColor;
+
+      classIcon.src = `images/icons/class_${currentInvestigator.classId}.png`;
+      classIcon.alt = `${currentInvestigator.class} Icon`;
 
       selectSkill(selectedSkill);
     }
@@ -1364,6 +1566,7 @@
       btn.classList.add('active');
     }
 
+    /* --- REFACTORED AUDIO INTERPOLATION SECTION --- */
     const audioPlayer = document.getElementById('audio-player');
     const playBtn = document.getElementById('play-btn');
     const trackScrubber = document.getElementById('track-scrubber');
@@ -1371,13 +1574,12 @@
     const timeDuration = document.getElementById('time-duration');
 
     function formatTime(secs) {
-      if (isNaN(secs)) return "0:00";
+      if (isNaN(secs) || !isFinite(secs)) return "0:00";
       const minutes = Math.floor(secs / 60);
       const seconds = Math.floor(secs % 60);
       return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }
 
-    // Keep range scrubber slider synced with track progression
     audioPlayer.addEventListener('timeupdate', () => {
       if (!isNaN(audioPlayer.duration) && audioPlayer.duration > 0) {
         const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
@@ -1386,12 +1588,10 @@
       }
     });
 
-    // Populate duration once metadata loads
     audioPlayer.addEventListener('loadedmetadata', () => {
       timeDuration.innerText = formatTime(audioPlayer.duration);
     });
 
-    // Handle manual timeline manipulation
     function scrubAudio() {
       if (!isNaN(audioPlayer.duration) && audioPlayer.duration > 0) {
         const newTime = (trackScrubber.value / 100) * audioPlayer.duration;
@@ -1402,8 +1602,13 @@
 
     function togglePlay() {
       if (audioPlayer.paused) {
-        audioPlayer.play();
-        playBtn.innerText = "⏸️ Pause";
+        audioPlayer.play()
+          .then(() => {
+            playBtn.innerText = "⏸️ Pause";
+          })
+          .catch(err => {
+            console.log("Playback engine delayed until manual engagement:", err);
+          });
       } else {
         audioPlayer.pause();
         playBtn.innerText = "▶️ Play";
@@ -1413,13 +1618,23 @@
     function loadTrack(element, src) {
       document.querySelectorAll('.track-item').forEach(item => item.classList.remove('active'));
       element.classList.add('active');
+      
       audioPlayer.src = src;
       trackScrubber.value = 0;
       timeCurrent.innerText = "0:00";
-      audioPlayer.play();
-      playBtn.innerText = "⏸️ Pause";
+      
+      audioPlayer.play()
+        .then(() => {
+          playBtn.innerText = "⏸️ Pause";
+        })
+        .catch(err => {
+          console.warn("Autoplay context blocked by target sandbox browser setup. Resetting button view toggle state.", err);
+          playBtn.innerText = "▶️ Play";
+        });
     }
 
+    // Initialize application state loops
+    initInvestigatorDropdown();
     renderInvestigatorCard();
     updateChaosBag();
   </script>
