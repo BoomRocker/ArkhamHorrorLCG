@@ -2,686 +2,818 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Arkham Horror LCG Companion</title>
-
-  <!-- iOS PWA Meta -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Arkham">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Arkham Horror Companion App - Enhanced Landscape</title>
+  <link rel="icon" href="images/icons/favicon.png">
   <style>
+    /* Embed the original Teutonic font family */
+    @font-face {
+      font-family: 'Teutonic';
+      src: url('fonts/teutonic.ttf') format('truetype'),
+           url('fonts/Teutonic-Mediaeval.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
     :root {
-      --bg-dark: #080d14;
-      --bg-blue-texture: #0e1e30;
-      --parchment: #eae2cb;
-      --parchment-border: #bca883;
-      --card-panel-bg: #fdfaf2;
-      --brass-gold: #cda250;
-      --text-dark: #111111;
-      --font-serif: "Georgia", "Times New Roman", serif;
-      --font-heading: "Times New Roman", serif;
+      --bg-dark: #0a0c10;
+      --panel-bg: #141822;
+      --panel-border: #323d52;
+      --accent-gold: #dcb365;
+      --accent-blue: #2c5e8c;
+      --text-light: #f4edd9;
+      --text-muted: #a1acc2;
+      --success-green: #348a53;
+      --fail-red: #aa3333;
+      --alert-orange: #ff9900;
+
+      --compact-height: 30px;
     }
 
     * {
       box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
       margin: 0;
       padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
     }
 
     body {
       background-color: var(--bg-dark);
-      font-family: var(--font-serif);
-      color: #ffffff;
-      height: 100vh;
+      color: var(--text-light);
+      font-family: 'Georgia', serif;
+      font-size: 1.15rem;
       width: 100vw;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    /* Main App Landscape Container */
-    .app-viewport {
-      width: 100%;
-      max-width: 960px;
       height: 100vh;
-      max-height: 540px;
-      display: flex;
-      flex-direction: column;
-      background: var(--bg-blue-texture);
-      border: 2px solid #000;
-      position: relative;
       overflow: hidden;
-    }
-
-    /* Views Area */
-    .content-viewport {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Base Screen Layouts */
-    .screen-view {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--bg-blue-texture);
-      display: none; /* Controlled via JS switchTab */
-    }
-
-    /* --------------------------------------------------------------------------
-       SCREEN 1: INVESTIGATOR CARD & TEST CALCULATOR (Matches App design_2.jpg)
-       -------------------------------------------------------------------------- */
-    #view-card {
-      display: grid;
-      grid-template-columns: 2.2fr 1fr;
-    }
-
-    .left-section {
       display: flex;
-      flex-direction: column;
-      padding: 6px 10px;
-      border-right: 2px solid #000;
-      position: relative;
-    }
-
-    .top-dropdown-bar {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 6px;
-    }
-
-    .select-dropdown {
-      background: #000;
-      color: #fff;
-      border: 1px solid #444;
-      padding: 2px 6px;
-      font-family: var(--font-serif);
-      font-size: 0.75rem;
-      border-radius: 3px;
-      flex: 1;
-    }
-
-    .card-frame {
-      flex: 1;
-      display: grid;
-      grid-template-rows: 38px 1fr 32px;
-      grid-template-columns: 1fr 1fr;
-      border: 2px solid #000;
-      background: radial-gradient(circle at 30% 30%, #1a324d 0%, #0a1420 100%);
-      position: relative;
-    }
-
-    /* Floating Action Bar Overlay on Roland's Card */
-    .actions-drawer {
-      position: absolute;
-      left: 6px;
-      top: 46px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      z-index: 5;
-    }
-
-    .actions-drawer-title {
-      font-size: 0.65rem;
-      font-weight: bold;
-      text-transform: uppercase;
-      color: #fff;
-      text-shadow: 1px 1px 2px #000;
-    }
-
-    .action-token-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #2a415a 0%, #0d1722 100%);
-      border: 2px solid var(--brass-gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--brass-gold);
-      font-size: 1.1rem;
-      cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.8);
-    }
-
-    .action-token-btn.spent {
-      background: #111;
-      border-color: #555;
-      color: #444;
-    }
-
-    .card-header {
-      grid-column: 1 / -1;
-      background: linear-gradient(180deg, #f2ead3 0%, #d8c39e 100%);
-      color: var(--text-dark);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 10px;
-      border-bottom: 2px solid #000;
-    }
-
-    .card-title h1 { font-size: 1.15rem; font-family: var(--font-heading); }
-    .card-title p { font-size: 0.65rem; font-style: italic; margin-top: -2px; }
-
-    .skill-badges { display: flex; gap: 4px; }
-    .badge {
-      width: 24px; height: 24px; border-radius: 50%;
-      background: #fff; border: 1px solid #000; color: #000;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: bold; font-size: 0.85rem;
-    }
-
-    .card-portrait {
-      background: linear-gradient(135deg, #1f2a36 0%, #0b1118 100%);
-      border-right: 1px solid #000;
-      position: relative;
-    }
-
-    .card-textbox {
-      background: var(--card-panel-bg);
-      color: var(--text-dark);
-      padding: 8px;
-      font-size: 0.72rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      border-left: 1px solid #777;
-    }
-
-    .card-footer {
-      grid-column: 1 / -1;
-      background: var(--parchment);
-      border-top: 2px solid #000;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      color: var(--text-dark);
-    }
-
-    .vital-counter { display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 1.05rem; }
-    .btn-step { background: none; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; }
-
-    /* Calculator Panel (Right) */
-    .right-calculator-area {
-      background: var(--card-panel-bg);
-      color: var(--text-dark);
-      display: flex;
-      flex-direction: column;
-      padding: 10px;
-      justify-content: space-between;
-      position: relative;
-    }
-
-    .panel-title { font-family: var(--font-heading); font-size: 1.3rem; text-align: center; }
-    .test-header-grid { display: flex; justify-content: space-around; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
-
-    .test-target-row { display: flex; justify-content: space-around; align-items: center; margin: 4px 0; }
-
-    .icon-diamond {
-      width: 38px; height: 38px; border: 2px solid #000; transform: rotate(45deg);
-      display: flex; align-items: center; justify-content: center; font-weight: bold; background: #fff;
-    }
-    .icon-diamond span { transform: rotate(-45deg); }
-
-    .test-breakdown { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #ccc; padding-top: 6px; }
-    .breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 0 4px; font-size: 0.8rem; }
-
-    .draw-chaos-btn {
-      background: #000; color: #fff; border: none; padding: 5px 8px;
-      font-family: var(--font-serif); font-size: 0.75rem; cursor: pointer; border-radius: 3px;
-    }
-
-    .skill-outcome-btn {
-      background: #112030; color: #fff; border: 1px solid var(--brass-gold);
-      padding: 8px; text-align: center; font-size: 0.8rem; cursor: pointer; font-weight: bold;
-    }
-
-    /* Outcome Popup Drawer (App design_2.jpg Bottom-Left screen) */
-    .outcome-modal {
-      position: absolute;
-      top: 10px; right: 10px; left: 10px; bottom: 10px;
-      background: var(--card-panel-bg);
-      border: 2px solid #000;
-      box-shadow: 0 0 15px rgba(0,0,0,0.8);
-      padding: 10px;
-      display: none;
-      flex-direction: column;
-      justify-content: space-between;
-      z-index: 20;
-    }
-
-    /* --------------------------------------------------------------------------
-       SCREEN 2: ROUND TURNS TRACKER (App design_2.jpg Top-Right screen)
-       -------------------------------------------------------------------------- */
-    #view-turns {
-      background: var(--parchment);
-      color: var(--text-dark);
-      padding: 12px;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1.2fr;
-      gap: 12px;
-    }
-
-    .turn-card-panel {
-      background: rgba(255, 255, 255, 0.5);
-      border: 1px solid var(--parchment-border);
-      border-radius: 4px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .turn-card-panel h3 {
-      font-family: var(--font-heading);
-      font-size: 1.1rem;
-      border-bottom: 1px solid #a89674;
-      padding-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .turn-step {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .step-circle-icon {
-      width: 38px; height: 38px; border-radius: 50%;
-      border: 2px solid #000; background: #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem;
-    }
-
-    /* --------------------------------------------------------------------------
-       SCREEN 3: MUSIC PLAYER (App design_2.jpg Bottom-Right screen)
-       -------------------------------------------------------------------------- */
-    #view-music {
-      background: var(--parchment);
-      color: var(--text-dark);
-      padding: 12px;
-      display: grid;
-      grid-template-columns: 1fr 1.5fr;
-      gap: 12px;
-    }
-
-    .music-panel {
-      background: rgba(255, 255, 255, 0.5);
-      border: 1px solid var(--parchment-border);
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
+      padding: 6px;
       gap: 8px;
     }
 
-    .track-list { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
-    .track-item { padding: 4px 8px; cursor: pointer; font-size: 0.85rem; border-radius: 3px; }
-    .track-item.active { background: #dcd1b3; font-weight: bold; }
+    /* Column Framework */
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
 
-    .ballroom-scene-art {
-      background: radial-gradient(circle, #3a2a1d 0%, #120b06 100%);
-      border: 2px solid #000;
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+    .left-panel { flex: 1.1; }
+    .right-panel { flex: 1.3; }
+
+    h3 {
+      font-family: 'Teutonic', 'Georgia', serif;
+      font-size: 2.2rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 2px solid var(--panel-border);
+      padding-bottom: 4px;
+      color: var(--accent-gold);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* Form Setup layout rules */
+    .setup-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 6px 0;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    select {
+      width: 100%;
+      height: var(--compact-height);
+      padding: 0 6px;
+      background: #1e2433;
+      color: var(--text-light);
+      border: 1px solid var(--panel-border);
+      border-radius: 4px;
+      font-size: 0.95rem;
+      font-weight: bold;
+    }
+
+    /* Tappable Skill Badge Interface */
+    .skills-row {
+      display: flex;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--panel-border);
+      margin-top: 4px;
+      gap: 6px;
+    }
+
+    .stat-badge {
+      flex: 1;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--brass-gold);
+      gap: 6px;
+      font-family: 'Teutonic', 'Georgia', serif;
+      font-weight: bold;
+      font-size: 1.6rem;
+      cursor: pointer;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: background 0.2s, border-color 0.2s;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .stat-badge:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .stat-badge.active-test {
+      background: var(--accent-blue);
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 6px rgba(220, 179, 101, 0.3);
+    }
+
+    .stat-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px;
+    }
+
+    .stat-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* Investigator Layout Profile */
+    .profile-card {
+      display: flex;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 8px;
+      border-radius: 6px;
+      margin: 4px 0;
+      flex: 1;
+      min-height: 0;
+      border-left: 3px solid var(--accent-gold);
+      position: relative;
+    }
+
+    .portrait {
+      width: 75px;
+      height: auto;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid var(--panel-border);
+    }
+
+    .ability-text {
+      flex: 1;
+      font-size: 0.85rem;
+      line-height: 1.25;
+      overflow-y: auto;
+      color: #dfecff;
+    }
+
+    /* Visual Active Attention Flag for Elder Sign */
+    .elder-flag {
+      display: none;
+      background: var(--alert-orange);
+      color: #000;
+      font-family: 'Teutonic', sans-serif;
+      font-size: 1rem;
+      font-weight: bold;
+      text-align: center;
+      padding: 4px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+      animation: pulseAlert 1s infinite alternate;
+    }
+
+    @keyframes pulseAlert {
+      0% { opacity: 0.7; }
+      100% { opacity: 1; background: #fff000; }
+    }
+
+    /* Calculator Rows */
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0,0,0,0.25);
+      padding: 4px 12px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+      min-height: var(--compact-height);
+    }
+
+    .calc-row span {
+      font-size: 0.95rem;
+      font-weight: bold;
+    }
+
+    .counter-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .counter-control button {
+      width: var(--compact-height);
+      height: var(--compact-height);
+      border-radius: 4px;
+      border: 1px solid var(--panel-border);
+      background: var(--accent-gold);
+      color: #000;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Action Buttons */
+    .btn {
+      width: 100%;
+      height: var(--compact-height);
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Teutonic', 'Georgia', serif;
+      font-weight: bold;
+      font-size: 1.2rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-utility {
+      background: #1e2433;
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+      height: 26px;
+      padding: 0 8px;
+      font-size: 0.85rem;
+      width: auto;
+    }
+
+    /* Draw Stage Theatre area */
+    .token-theater {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #06080b;
+      border: 1px dashed var(--panel-border);
+      border-radius: 6px;
+      margin-bottom: 4px;
+      position: relative;
+    }
+
+    .theater-top-controls {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      z-index: 10;
+    }
+
+    .animated-token {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: scale(0);
+    }
+
+    .animated-token img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .spin-roll {
+      animation: bg3Roll 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes bg3Roll {
+      0% { transform: scale(0.3) rotate(0deg); }
+      70% { transform: scale(1.2) rotate(720deg); }
+      100% { transform: scale(1) rotate(1080deg); }
+    }
+
+    .result-banner {
+      font-family: 'Teutonic', 'Georgia', serif;
+      font-size: 1.6rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .campaign-rule-ticker {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 0 8px;
       font-style: italic;
     }
 
-    /* --------------------------------------------------------------------------
-       BOTTOM NAVIGATION BAR (App design_2.jpg)
-       -------------------------------------------------------------------------- */
-    .bottom-navbar {
-      height: 42px;
-      background: #d8ceb3;
-      border-top: 2px solid #000;
-      display: flex;
+    /* Popover Modal Engines */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 1000;
+      justify-content: center;
       align-items: center;
-      padding: 0 12px;
+    }
+
+    .modal-window {
+      background: var(--panel-bg);
+      border: 2px solid var(--accent-gold);
+      border-radius: 8px;
+      padding: 16px;
+      width: 85%;
+      max-width: 500px;
+    }
+
+    /* Chaos Bag Viewer Grid Styles */
+    .bag-token-grid {
+      display: flex;
+      flex-wrap: wrap;
       gap: 8px;
-      z-index: 30;
+      margin: 12px 0;
+      max-height: 180px;
+      overflow-y: auto;
+      background: rgba(0,0,0,0.3);
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid var(--panel-border);
     }
 
-    .nav-tab-button {
-      background: #eae2cb;
-      color: var(--text-dark);
-      border: 1px solid #8c7b5b;
-      border-radius: 12px;
-      padding: 5px 14px;
-      font-family: var(--font-serif);
-      font-size: 0.75rem;
+    .mini-token-badge {
+      background: #1e2433;
+      border: 1px solid var(--panel-border);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.9rem;
       font-weight: bold;
-      cursor: pointer;
+      color: var(--accent-gold);
       display: flex;
       align-items: center;
-      gap: 6px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      gap: 4px;
     }
 
-    .nav-tab-button.active {
-      background: #0f1c2b;
-      color: #ffffff;
-      border-color: var(--brass-gold);
+    /* Accessible Audio Controller Dashboard */
+    .audio-dashboard {
+      background: #06080b;
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 44px;
+    }
+
+    .audio-btn {
+      background: var(--accent-gold);
+      color: #000;
+      border: none;
+      height: var(--compact-height);
+      padding: 0 12px;
+      font-size: 0.9rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .scrubber {
+      flex: 1;
+      height: var(--compact-height);
+      accent-color: var(--accent-gold);
+      cursor: pointer;
+    }
+
+    .track-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .track-item {
+      background: #1e2433;
+      height: var(--compact-height);
+      padding: 0 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .track-item.active {
+      background: var(--accent-blue);
     }
   </style>
 </head>
 <body>
 
-  <div class="app-viewport">
-    
-    <div class="content-viewport">
-
-      <!-- ====================================================================
-         SCREEN 1: INVESTIGATOR CARD & CALCULATOR (Default Screen)
-         ==================================================================== -->
-      <div class="screen-view" id="view-card" style="display: grid;">
-        
-        <div class="left-section">
-          <div class="top-dropdown-bar">
-            <select class="select-dropdown"><option>Night of the Zealot</option></select>
-            <select class="select-dropdown"><option>The Gathering</option></select>
-            <select class="select-dropdown"><option>Easy</option></select>
-            <select class="select-dropdown"><option>Roland Banks</option></select>
-          </div>
-
-          <!-- Actions Bar Overlay -->
-          <div class="actions-drawer">
-            <span class="actions-drawer-title">Actions</span>
-            <div class="action-token-btn spent" onclick="toggleActionToken(this)">★</div>
-            <div class="action-token-btn" onclick="toggleActionToken(this)">★</div>
-            <div class="action-token-btn" onclick="toggleActionToken(this)">★</div>
-          </div>
-
-          <!-- Roland Card Replica -->
-          <div class="card-frame">
-            <div class="card-header">
-              <div class="card-title">
-                <h1>★ Roland Banks</h1>
-                <p>The Fed</p>
-              </div>
-              <div class="skill-badges">
-                <div class="badge">3</div>
-                <div class="badge">3</div>
-                <div class="badge">4</div>
-                <div class="badge">2</div>
-              </div>
-            </div>
-
-            <div class="card-portrait"></div>
-
-            <div class="card-textbox">
-              <div>
-                <p style="text-align:center;"><strong>Agency. Detective.</strong></p>
-                <p style="margin-top: 4px;"><strong>[Reaction]</strong> After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)</p>
-                <p style="margin-top: 4px;"><strong>★ effect:</strong> +1 for each clue on your location.</p>
-              </div>
-              <p style="font-style: italic; color: #555; border-top: 1px solid #ccc; padding-top: 3px;">
-                Everything by the book: every "i" dotted, every "t" crossed. It had worked, until now.
-              </p>
-            </div>
-
-            <div class="card-footer">
-              <div class="vital-counter">
-                <button class="btn-step" onclick="adjustVital('hp', -1)">±</button>
-                <span style="color:#a00;">🩸 <span id="val-hp">9</span></span>
-                <button class="btn-step" onclick="adjustVital('hp', 1)">+</button>
-              </div>
-              <div class="vital-counter">
-                <button class="btn-step" onclick="adjustVital('san', -1)">±</button>
-                <span style="color:#008;">🧠 <span id="val-san">5</span></span>
-                <button class="btn-step" onclick="adjustVital('san', 1)">+</button>
-              </div>
-            </div>
-          </div>
+  <!-- LEFT PANEL: INFRASTRUCTURE & ACTIVE PROFILE INTERFACE -->
+  <div class="panel left-panel">
+    <div>
+      <h3>Setup 
+        <div class="header-controls">
+          <button id="btn-round-tracker" class="btn btn-utility" onclick="adjustRound(1)" oncontextmenu="event.preventDefault(); adjustRound(-1);">⏳ Round 1</button>
+          <button class="btn btn-utility" onclick="toggleMusicModal(true)">🎵 Music</button>
+        </div>
+      </h3>
+      
+      <div class="setup-row">
+        <div class="form-group">
+          <label>Campaign</label>
+          <select id="campaign-select" onchange="updateChaosBag()">
+            <option value="notz">Night of the Zealot</option>
+            <option value="dunwich">The Dunwich Legacy</option>
+            <option value="carcosa">Path to Carcosa</option>
+            <option value="brethren">Brethren of Ash</option>
+          </select>
         </div>
 
-        <!-- Calculator Panel -->
-        <div class="right-calculator-area">
-          <div>
-            <h2 class="panel-title">Night of the Zealot</h2>
-            <div class="test-header-grid">
-              <span>Test Type</span>
-              <span>Test to Beat</span>
-            </div>
-
-            <div class="test-target-row">
-              <div style="font-size: 1rem; cursor: pointer;" onclick="adjustTarget(1)">▲<br><span onclick="adjustTarget(-1)">▼</span></div>
-              <div class="icon-diamond"><span>📖</span></div>
-              <div class="icon-diamond"><span id="target-val">2</span></div>
-              <div style="font-size: 1rem; cursor: pointer;" onclick="adjustTarget(1)">+<br><span onclick="adjustTarget(-1)">-</span></div>
-            </div>
-          </div>
-
-          <div class="test-breakdown">
-            <div style="font-size: 0.72rem; text-align: center; font-weight: bold;">Roland Banks Test Total</div>
-            <div class="breakdown-row">
-              <span>📖 Base</span>
-              <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>3</span></div>
-              <span>±</span>
-            </div>
-            <div class="breakdown-row">
-              <span>🎴 Cards</span>
-              <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>1</span></div>
-              <span>±</span>
-            </div>
-            <div class="breakdown-row">
-              <span>◇ Chaos Token</span>
-              <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span id="token-val">-1</span></div>
-              <button class="draw-chaos-btn" onclick="drawChaos()">Draw Chaos</button>
-            </div>
-          </div>
-
-          <button class="skill-outcome-btn" onclick="toggleOutcomeModal(true)">
-            Skill Test Outcome
-          </button>
-
-          <!-- OUTCOME MODAL (Matches App design_2.jpg Bottom-Left screen) -->
-          <div class="outcome-modal" id="outcome-modal">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ccc; padding-bottom:4px;">
-              <span style="font-weight:bold; font-family: var(--font-heading); font-size: 1.1rem;">📖 Outcome</span>
-              <span style="cursor:pointer; font-weight:bold; font-size:1.1rem;" onclick="toggleOutcomeModal(false)">✕</span>
-            </div>
-
-            <div style="font-size: 0.8rem; display:flex; flex-direction:column; gap:6px;">
-              <div>
-                <strong>Player Total</strong>
-                <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
-                  <div class="icon-diamond" style="width:24px; height:24px; font-size:0.75rem;"><span>3</span></div>
-                  <span>+</span>
-                  <div class="icon-diamond" style="width:24px; height:24px; font-size:0.75rem;"><span>1</span></div>
-                  <span>▶</span>
-                  <div class="icon-diamond" style="width:28px; height:28px; font-size:0.85rem; background: var(--parchment);"><span>4</span></div>
-                </div>
-              </div>
-
-              <div style="border-top:1px solid #ccc; padding-top:4px;">
-                <strong>Chaos Bag</strong>
-                <p style="font-size: 0.68rem; color:#444; margin-top:2px;">
-                  [Skull]: If there is a Ghoul enemy at location, take 1 damage.
-                </p>
-                <div class="icon-diamond" style="width:26px; height:26px; font-size:0.8rem; margin-top:3px; background:#800; color:#fff;"><span>-2</span></div>
-              </div>
-
-              <div style="border-top:1px solid #ccc; padding-top:4px;">
-                <strong>Skill Test to Beat</strong>
-                <div style="display:flex; align-items:center; gap:6px; margin-top:3px;">
-                  <div class="icon-diamond" style="width:24px; height:24px; font-size:0.75rem;"><span>2</span></div>
-                  <span>≥</span>
-                  <div class="icon-diamond" style="width:24px; height:24px; font-size:0.75rem;"><span>2</span></div>
-                  <span style="color:green; font-weight:bold;">Succeeded!</span>
-                </div>
-              </div>
-            </div>
-
-            <button class="draw-chaos-btn" onclick="toggleOutcomeModal(false)">Close</button>
-          </div>
+        <div class="form-group">
+          <label>Scenario</label>
+          <select id="scenario-select" onchange="updateChaosBag()">
+            <!-- Loaded Dynamically -->
+          </select>
         </div>
 
-      </div>
-
-      <!-- ====================================================================
-         SCREEN 2: ROUND TURNS TRACKER (App design_2.jpg Top-Right screen)
-         ==================================================================== -->
-      <div class="screen-view" id="view-turns">
-        <div class="turn-card-panel">
-          <h3>👁 Mythos</h3>
-          <div class="turn-step">
-            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>1</span></div>
-            <div class="step-circle-icon">👁</div>
-          </div>
-          <div class="turn-step">
-            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>2</span></div>
-            <div class="step-circle-icon">🦑</div>
-          </div>
-        </div>
-
-        <div class="turn-card-panel">
-          <h3>🎩 Investigator</h3>
-          <div class="turn-step">
-            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>3</span></div>
-            <div class="step-circle-icon" style="background:#2d6a4f; color:#fff;">📖</div>
-          </div>
-
-          <h3 style="margin-top: 6px;">🦅 Enemy</h3>
-          <div class="turn-step">
-            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>4</span></div>
-            <div class="step-circle-icon" style="background:#d90429; color:#fff;">🦅</div>
-          </div>
-        </div>
-
-        <div class="turn-card-panel">
-          <h3>⚙ Upkeep</h3>
-          <div class="turn-step">
-            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>5</span></div>
-            <div class="step-circle-icon" style="background:#0077b6; color:#fff;">🎒</div>
-          </div>
-          <div class="turn-step">
-            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>6</span></div>
-            <div class="step-circle-icon" style="background:#0077b6; color:#fff;">🎴</div>
-          </div>
-          <div class="turn-step">
-            <div class="icon-diamond" style="width:28px; height:28px; font-size:0.8rem;"><span>7</span></div>
-            <div class="step-circle-icon" style="background:#0077b6; color:#fff;">8</div>
-          </div>
+        <div class="form-group">
+          <label>Difficulty</label>
+          <select id="difficulty-select" onchange="updateChaosBag()">
+            <option value="easy" selected>Easy</option>
+            <option value="standard">Standard</option>
+            <option value="hard">Hard</option>
+            <option value="expert">Expert</option>
+          </select>
         </div>
       </div>
 
-      <!-- ====================================================================
-         SCREEN 3: MUSIC PLAYER (App design_2.jpg Bottom-Right screen)
-         ==================================================================== -->
-      <div class="screen-view" id="view-music">
-        <div class="music-panel">
-          <h2 style="font-family: var(--font-heading); font-size: 1.2rem; border-bottom:1px solid #a89674; padding-bottom:4px;">Music Player</h2>
-          
-          <div style="display:flex; justify-content:center; gap:12px; font-size:1.3rem; margin: 8px 0;">
-            <span style="cursor:pointer;">⏮</span>
-            <span style="cursor:pointer;">⏸</span>
-            <span style="cursor:pointer;">⏭</span>
-          </div>
-
-          <input type="range" style="width:100%;">
-
-          <div class="track-list">
-            <div class="track-item active">▶ Song Title</div>
-            <div class="track-item">Song Title</div>
-            <div class="track-item">Song Title</div>
-            <div class="track-item">Song Title</div>
-            <div class="track-item">Song Title</div>
-          </div>
-        </div>
-
-        <div class="ballroom-scene-art">
-          <span>Atmospheric Scene Artwork</span>
-        </div>
+      <div class="form-group" style="margin-bottom: 2px;">
+        <label>Investigator Profile</label>
+        <select id="investigator-select" onchange="loadInvestigatorProfile()">
+          <!-- Dynamic Generation Loop -->
+        </select>
       </div>
-
     </div>
 
-    <!-- BOTTOM TAB NAVIGATION BAR -->
-    <div class="bottom-navbar">
-      <button class="nav-tab-button active" id="tab-card" onclick="switchTab('card')">
-        🎩 Investigator Card
-      </button>
-      <button class="nav-tab-button" id="tab-turns" onclick="switchTab('turns')">
-        ⚜ Round Turns
-      </button>
-      <button class="nav-tab-button" id="tab-music" onclick="switchTab('music')">
-        ♫ Music Player
-      </button>
+    <!-- Active Profile Metadata Container with Dynamic Elder Flag Alert Banner -->
+    <div class="profile-card">
+      <img id="card-portrait" class="portrait" src="images/investigators/roland.png" alt="Portrait">
+      <div class="ability-text">
+        <div id="elder-sign-alert" class="elder-flag">⚠️ TAKE ACTION: TRIGGER ELDER SIGN!</div>
+        <div id="card-ability" style="margin-bottom:4px;"></div>
+        <div id="card-elder" style="border-top:1px dashed var(--panel-border); padding-top:4px;"></div>
+      </div>
     </div>
 
+    <!-- Tappable Stats Block Header -->
+    <div>
+      <label style="color: var(--accent-gold); display: block; margin-bottom: 2px;">Tap Skill to Test</label>
+      <div class="skills-row">
+        <div id="badge-will" class="stat-badge" onclick="selectTestSkill('will')">
+          <div class="stat-circle"><img src="images/icons/invest_willpower.png" alt="Will"></div>
+          <span id="stat-will">3</span>
+        </div>
+        <div id="badge-intellect" class="stat-badge" onclick="selectTestSkill('intellect')">
+          <div class="stat-circle"><img src="images/icons/invest_intellect.png" alt="Intellect"></div>
+          <span id="stat-intellect">3</span>
+        </div>
+        <div id="badge-combat" class="stat-badge" onclick="selectTestSkill('combat')">
+          <div class="stat-circle"><img src="images/icons/invest_combat.png" alt="Combat"></div>
+          <span id="stat-combat">4</span>
+        </div>
+        <div id="badge-agility" class="stat-badge" onclick="selectTestSkill('agility')">
+          <div class="stat-circle"><img src="images/icons/invest_agility.png" alt="Agility"></div>
+          <span id="stat-agility">2</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: TESTING GROUNDS -->
+  <div class="panel right-panel">
+    <h3 style="font-size: 2.2rem;">Arena</h3>
+
+    <div class="calc-row">
+      <span>Active Skill Target Value:</span>
+      <span id="val-base-skill" style="font-family: 'Teutonic', serif; font-size: 1.6rem; color: var(--accent-gold);">3</span>
+    </div>
+
+    <div class="calc-row">
+      <span>Card Commit Modifiers:</span>
+      <div class="counter-control">
+        <button onclick="adjustCommit(-1)">-</button>
+        <span id="val-commit" style="font-size: 1.2rem; font-weight: bold; min-width: 20px; text-align: center;">0</span>
+        <button onclick="adjustCommit(1)">+</button>
+      </div>
+    </div>
+
+    <div class="calc-row">
+      <span>Difficulty to Beat:</span>
+      <div class="counter-control">
+        <button onclick="adjustTarget(-1)">-</button>
+        <span id="val-target" style="font-size: 1.2rem; font-weight: bold; min-width: 20px; text-align: center;">2</span>
+        <button onclick="adjustTarget(1)">+</button>
+      </div>
+    </div>
+
+    <!-- Screen Animation Center Area -->
+    <div class="token-theater">
+      <div class="theater-top-controls">
+        <button class="btn btn-utility" onclick="toggleBagModal(true)">🔍 View Bag</button>
+      </div>
+      <div id="token-graphic" class="animated-token"></div>
+      <div id="test-outcome-msg" class="result-banner"></div>
+      <div id="token-effect-desc" class="campaign-rule-ticker"></div>
+    </div>
+
+    <button class="btn" onclick="drawChaosToken()">Draw Chaos Token</button>
+  </div>
+
+  <!-- PLAYOVER AUDIO SYSTEM CONTAINER MODAL -->
+  <div id="music-modal" class="modal-overlay">
+    <div class="modal-window">
+      <h3 style="margin-bottom: 10px;">Audio Suite</h3>
+      <audio id="audio-player" src="music/music01.mp4" loop></audio>
+
+      <div class="audio-dashboard">
+        <button class="audio-btn" id="play-btn" onclick="togglePlay()">▶ Play</button>
+        <input type="range" id="track-scrubber" class="scrubber" value="0" min="0" max="100" oninput="scrubAudio()">
+      </div>
+
+      <div class="track-list">
+        <div class="track-item active" onclick="loadTrack(this, 'music/music01.mp4')"><span>Ambient Environment 01</span><span>🎵</span></div>
+        <div class="track-item" onclick="loadTrack(this, 'music/music02.mp4')"><span>Ambient Environment 02</span><span>🎵</span></div>
+        <div class="track-item" onclick="loadTrack(this, 'music/music03.mp4')"><span>Ambient Environment 03</span><span>🎵</span></div>
+      </div>
+
+      <button class="btn" style="margin-top: 14px; background: var(--fail-red);" onclick="toggleMusicModal(false)">Close Audio</button>
+    </div>
+  </div>
+
+  <!-- CHAOS BAG INSPECTION MODAL -->
+  <div id="bag-modal" class="modal-overlay">
+    <div class="modal-window">
+      <h3 style="margin-bottom: 10px;">Chaos Bag Contents</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">Current tokens loaded for calculation rules:</p>
+      
+      <div id="bag-contents-grid" class="bag-token-grid">
+        <!-- Loaded Dynamically -->
+      </div>
+
+      <button class="btn" style="margin-top: 14px; background: var(--accent-blue);" onclick="toggleBagModal(false)">Back to Arena</button>
+    </div>
   </div>
 
   <script>
-    // Tab Navigation Logic
-    function switchTab(screenKey) {
-      // Hide all screen views
-      const views = document.querySelectorAll('.screen-view');
-      views.forEach(v => {
-        v.style.display = 'none';
-      });
+    const tokenImageMap = {
+      '0': 'images/icons/chaos_0.png', '-1': 'images/icons/chaos_minus1.png', '-2': 'images/icons/chaos_minus2.png',
+      '-3': 'images/icons/chaos_minus3.png', '-4': 'images/icons/chaos_minus4.png', '-5': 'images/icons/chaos_minus5.png',
+      '-6': 'images/icons/chaos_minus6.png', '-7': 'images/icons/chaos_minus7.png', '-8': 'images/icons/chaos_minus8.png',
+      '+1': 'images/icons/chaos_plus1.png',
+      '💀': 'images/icons/chaos_skull.png', '👹': 'images/icons/chaos_cultist.png',
+      '📜': 'images/icons/chaos_tablet.png', 'AUTO-FAIL': 'images/icons/chaos_fail.png',
+      '🌟': 'images/icons/chaos_elder.png'
+    };
 
-      // Reset active tab button styles
-      const tabs = document.querySelectorAll('.nav-tab-button');
-      tabs.forEach(t => {
-        t.classList.remove('active');
-      });
+    const campaignScenarios = {
+      notz: [{ id: 'gathering', name: 'The Gathering' }, { id: 'masks', name: 'Midnight Masks' }, { id: 'devourer', name: 'The Devourer Below' }],
+      dunwich: [{ id: 'extracurricular', name: 'Extracurricular Activity' }, { id: 'house', name: 'The House Always Wins' }],
+      carcosa: [{ id: 'curtain', name: 'Curtain Call' }, { id: 'last_king', name: 'The Last King' }],
+      brethren: [{ id: 'flames', name: 'Spreading Flames' }, { id: 'mirrors', name: 'Smoke and Mirrors' }]
+    };
 
-      // Show selected screen with proper display mode
-      const activeView = document.getElementById('view-' + screenKey);
-      if (activeView) {
-        if (screenKey === 'card') {
-          activeView.style.display = 'grid';
-        } else if (screenKey === 'turns' || screenKey === 'music') {
-          activeView.style.display = 'grid';
-        }
+    const chaosBagPresets = {
+      notz: {
+        easy: ['+1', '+1', '0', '0', '0', '-1', '-1', '-1', '-2', '-2', '💀', '👹', '🌟', 'AUTO-FAIL'],
+        standard: ['+1', '0', '0', '-1', '-1', '-2', '-3', '-4', '💀', '👹', '📜', 'AUTO-FAIL', '🌟']
+      },
+      dunwich: {
+        easy: ['+1', '+1', '0', '0', '0', '-1', '-1', '-1', '-2', '-3', '💀', '👹', '🌟', 'AUTO-FAIL'],
+        standard: ['+1', '0', '-1', '-1', '-2', '-2', '-3', '-4', '💀', '👹', '🌟', 'AUTO-FAIL']
+      },
+      carcosa: {
+        easy: ['+1', '+1', '0', '0', '0', '-1', '-1', '-1', '-2', '-3', '💀', '👹', '🌟', 'AUTO-FAIL'],
+        standard: ['+1', '0', '-1', '-1', '-2', '-2', '-3', '-4', '💀', '👹', '🌟', 'AUTO-FAIL']
+      },
+      brethren: {
+        easy: ['+1', '+1', '0', '0', '0', '-1', '-1', '-1', '-2', '-3', '💀', '👹', '🌟', 'AUTO-FAIL'],
+        standard: ['+1', '0', '-1', '-1', '-2', '-2', '-3', '-4', '💀', '👹', '🌟', 'AUTO-FAIL']
       }
+    };
 
-      // Highlight active tab button
-      const activeTab = document.getElementById('tab-' + screenKey);
-      if (activeTab) {
-        activeTab.classList.add('active');
+    const investigators = {
+      roland: { name: "Roland Banks", classId: "Guardian", will: 3, intellect: 3, combat: 4, agility: 2, ability: "<b>Reaction:</b> After you defeat an enemy: Discover 1 clue at your location.", elder: "<b>Elder Sign:</b> +1 for each clue on your location.", img: "images/investigators/roland.png" },
+      daisy: { name: "Daisy Walker", classId: "Seeker", will: 3, intellect: 5, combat: 2, agility: 2, ability: "Additional action each turn for <b>Tome</b> activities.", elder: "<b>Elder Sign:</b> +0. Draw 1 card for each Tome you control.", img: "images/investigators/daisy.png" },
+      skids: { name: '"Skids" O\'Toole', classId: "Rogue", will: 2, intellect: 3, combat: 3, agility: 4, ability: "Spend 2 resources: Take 1 additional action.", elder: "<b>Elder Sign:</b> +2. Gain 2 resources if successful.", img: "images/investigators/skids.png" },
+      agnes: { name: "Agnes Baker", classId: "Mystic", will: 5, intellect: 2, combat: 2, agility: 3, ability: "<b>Reaction:</b> After 1 or more horror is placed on you: Deal 1 damage to an enemy at your location.", elder: "<b>Elder Sign:</b> +1. You may heal 1 horror from yourself.", img: "images/investigators/agnes.png" },
+      wendy: { name: "Wendy Adams", classId: "Survivor", will: 4, intellect: 3, combat: 1, agility: 4, ability: "Discard a card from your hand: Redraw a chaos token from the bag. (Limit once per test).", elder: "<b>Elder Sign:</b> +0. If Wendy's Amulet is in play, you automatically succeed.", img: "images/investigators/wendy.png" }
+    };
+
+    let currentBag = [];
+    let selectedSkill = 'will';
+    let commitVal = 0;
+    let targetVal = 2;
+    let currentGameRound = 1;
+
+    function initializeApp() {
+      buildInvestigatorDropdown();
+      updateChaosBag();
+      loadInvestigatorProfile();
+    }
+
+    function adjustRound(delta) {
+      currentGameRound = Math.max(1, currentGameRound + delta);
+      document.getElementById('btn-round-tracker').innerText = `⏳ Round ${currentGameRound}`;
+    }
+
+    function buildInvestigatorDropdown() {
+      const select = document.getElementById('investigator-select');
+      select.innerHTML = '';
+      for (const [key, profile] of Object.entries(investigators)) {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.innerText = `${profile.name} (${profile.classId})`;
+        select.appendChild(opt);
       }
     }
 
-    // Interactive Functions
-    function toggleActionToken(btn) {
-      btn.classList.toggle('spent');
+    function updateChaosBag() {
+      const camp = document.getElementById('campaign-select').value;
+      const diff = document.getElementById('difficulty-select').value;
+      
+      const scenSelect = document.getElementById('scenario-select');
+      scenSelect.innerHTML = '';
+      campaignScenarios[camp].forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id; opt.innerText = s.name;
+        scenSelect.appendChild(opt);
+      });
+      
+      currentBag = [...(chaosBagPresets[camp]?.[diff] || chaosBagPresets[camp]?.standard || chaosBagPresets.notz.standard)];
+      populateBagInspector();
     }
 
-    function adjustVital(vital, delta) {
-      const el = document.getElementById(`val-${vital}`);
-      let current = parseInt(el.textContent);
-      el.textContent = Math.max(0, current + delta);
+    function populateBagInspector() {
+      const grid = document.getElementById('bag-contents-grid');
+      grid.innerHTML = '';
+      currentBag.forEach(token => {
+        const badge = document.createElement('span');
+        badge.className = 'mini-token-badge';
+        badge.innerText = token;
+        grid.appendChild(badge);
+      });
+    }
+
+    function toggleBagModal(open) {
+      document.getElementById('bag-modal').style.display = open ? 'flex' : 'none';
+    }
+
+    function loadInvestigatorProfile() {
+      const id = document.getElementById('investigator-select').value;
+      const profile = investigators[id];
+
+      document.getElementById('stat-will').innerText = profile.will;
+      document.getElementById('stat-intellect').innerText = profile.intellect;
+      document.getElementById('stat-combat').innerText = profile.combat;
+      document.getElementById('stat-agility').innerText = profile.agility;
+      document.getElementById('card-ability').innerHTML = profile.ability;
+      document.getElementById('card-elder').innerHTML = profile.elder;
+      document.getElementById('card-portrait').src = profile.img;
+      document.getElementById('elder-sign-alert').style.display = 'none';
+
+      selectTestSkill(selectedSkill);
+    }
+
+    function selectTestSkill(skillKey) {
+      selectedSkill = skillKey;
+      document.querySelectorAll('.stat-badge').forEach(b => b.classList.remove('active-test'));
+      document.getElementById(`badge-${skillKey}`).classList.add('active-test');
+
+      const id = document.getElementById('investigator-select').value;
+      document.getElementById('val-base-skill').innerText = investigators[id][skillKey];
+    }
+
+    function adjustCommit(delta) {
+      commitVal = Math.max(-5, commitVal + delta);
+      document.getElementById('val-commit').innerText = commitVal;
     }
 
     function adjustTarget(delta) {
-      const el = document.getElementById('target-val');
-      let current = parseInt(el.textContent);
-      el.textContent = Math.max(0, current + delta);
+      targetVal = Math.max(0, targetVal + delta);
+      document.getElementById('val-target').innerText = targetVal;
     }
 
-    function drawChaos() {
-      const tokens = ["+1", "0", "-1", "-2", "-3", "AUTO FAIL", "ELDER SIGN"];
-      const drawn = tokens[Math.floor(Math.random() * tokens.length)];
-      document.getElementById('token-val').textContent = drawn;
+    function drawChaosToken() {
+      if(currentBag.length === 0) return;
+
+      const graphic = document.getElementById('token-graphic');
+      const outcomeText = document.getElementById('test-outcome-msg');
+      const alertBanner = document.getElementById('elder-sign-alert');
+
+      graphic.classList.remove('spin-roll');
+      graphic.style.transform = "scale(0)";
+      outcomeText.innerText = '';
+      alertBanner.style.display = 'none';
+
+      void graphic.offsetWidth;
+
+      const pickedToken = currentBag[Math.floor(Math.random() * currentBag.length)];
+      let numericModifier = parseInt(pickedToken) || 0;
+      if (pickedToken === '🌟') numericModifier = 2;
+      if (pickedToken === 'AUTO-FAIL') numericModifier = -99;
+
+      const id = document.getElementById('investigator-select').value;
+      const testPassed = (pickedToken !== 'AUTO-FAIL') && ((investigators[id][selectedSkill] + commitVal + numericModifier) >= targetVal);
+
+      if(tokenImageMap[pickedToken]) {
+        graphic.innerHTML = `<img src="${tokenImageMap[pickedToken]}" alt="token">`;
+      } else {
+        graphic.innerHTML = `<div style="color:white; font-size:1.4rem;">${pickedToken}</div>`;
+      }
+
+      graphic.classList.add('spin-roll');
+
+      setTimeout(() => {
+        outcomeText.innerText = testPassed ? "Succeeded!" : "Failed!";
+        outcomeText.style.color = testPassed ? "var(--success-green)" : "var(--fail-red)";
+
+        if (pickedToken === '🌟') {
+          alertBanner.style.display = 'block';
+        }
+      }, 600);
     }
 
-    function toggleOutcomeModal(show) {
-      const modal = document.getElementById('outcome-modal');
-      modal.style.display = show ? 'flex' : 'none';
+    const audioPlayer = document.getElementById('audio-player');
+    const playBtn = document.getElementById('play-btn');
+    const scrubber = document.getElementById('track-scrubber');
+
+    function toggleMusicModal(open) { document.getElementById('music-modal').style.display = open ? 'flex' : 'none'; }
+    function togglePlay() {
+      if(audioPlayer.paused) { audioPlayer.play().then(() => playBtn.innerText = "⏸ Pause"); } 
+      else { audioPlayer.pause(); playBtn.innerText = "▶ Play"; }
     }
+    audioPlayer.addEventListener('timeupdate', () => { if(audioPlayer.duration) scrubber.value = (audioPlayer.currentTime / audioPlayer.duration) * 100; });
+    function scrubAudio() { if(audioPlayer.duration) audioPlayer.currentTime = (scrubber.value / 100) * audioPlayer.duration; }
+    function loadTrack(el, source) {
+      document.querySelectorAll('.track-item').forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
+      audioPlayer.src = source;
+      audioPlayer.play().then(() => playBtn.innerText = "⏸ Pause");
+    }
+
+    window.onload = initializeApp;
   </script>
 </body>
 </html>
