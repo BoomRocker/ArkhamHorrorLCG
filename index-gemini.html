@@ -54,13 +54,19 @@
 		font-display: swap;
 	}
 	
+		@font-face {
+		font-family: 'thronesdb';
+		src: url(../bundles/app/fonts/arkham-icons.otf);
+		src: url(../bundles/app/fonts/arkham-icons.otf) format('opentype');
+		font-weight: normal;
+		font-style: normal;
+	}
+	
 	#card-name {
 		font-family: 'Teutonic', sans-serif;
 		font-size: 2em;
 		font-weight: normal;
 	}
-
-
 
     /* Token Icon Utility Styles */
     .token-icon {
@@ -398,6 +404,137 @@
       background: var(--fail-red);
       color: white;
     }
+	
+	/* Optimized Container for both Trackers */
+.action-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  padding: 6px;
+  margin-top: 4px;
+}
+
+/* Action Tracker Row */
+.action-tracker-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px dashed rgba(0, 0, 0, 0.12);
+}
+
+.action-tracker-label {
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.action-circles {
+  display: flex;
+  gap: 8px;
+}
+
+.action-circle-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: var(--accent-blue);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+  transition: all 0.15s ease;
+}
+
+.action-circle-btn img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  filter: brightness(1) invert(0);
+}
+
+.action-circle-btn.used {
+  background-color: #7a7a7a !important;
+  border-color: #555555;
+  box-shadow: none;
+  transform: scale(0.9);
+}
+
+.action-circle-btn.used img {
+  filter: brightness(0) invert(0.85);
+}
+
+/* No-Scroll Compact Action Selection Grid */
+.action-reference-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.action-ref-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #444;
+  padding-bottom: 2px;
+}
+
+.action-count-badge {
+  background: var(--border-color);
+  color: white;
+  padding: 1px 5px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+}
+
+/* Dense 3-Column Grid to fit completely across */
+.action-ref-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 4px;
+}
+
+/* Micro blocks adjusted for a 3-across footprint */
+.action-ref-item {
+  font-size: 0.65rem; 
+  line-height: 1.15;
+  padding: 4px 5px;
+  background: #fcf8ee;
+  border: 1px solid #c0b298;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 42px; 
+  transition: all 0.1s ease;
+}
+
+.action-ref-item strong {
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  letter-spacing: 0.3px;
+  color: var(--text-dark);
+}
+
+.action-ref-item.selected-action {
+  color: white !important;
+  box-shadow: inset 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.action-ref-item.selected-action strong {
+  color: white !important;
+}
 
     /* Chaos Bag Visual Inspector */
     .chaos-bag-container {
@@ -746,14 +883,14 @@
     </select>
 
     <select id="difficulty-select" onchange="updateChaosBag()">
-      <option value="easy">Easy</option>
-      <option value="standard" selected>Standard</option>
+      <option value="easy" selected>Easy</option>
+      <option value="standard">Standard</option>
       <option value="hard">Hard</option>
       <option value="expert">Expert</option>
     </select>
 
     <select id="investigator-select">
-      <!-- Dynamically filled via JS initialization to support the expanded 21 investigator cast -->
+      <!-- Dynamically filled via JS initialization -->
     </select>
   </header>
 
@@ -780,7 +917,7 @@
           <div id="badge-will" class="stat-badge" onclick="selectSkill('will')" title="Willpower: Resist treacheries">
             <div class="stat-circle"><img src="images/icons/invest_willpower.png" alt="Willpower"></div> <span id="stat-will">3</span>
           </div>
-          <div id="badge-intellect" class="stat-badge selected-stat" onclick="selectSkill('intellect')" title="Intellect: Investigate clues">
+          <div id="badge-intellect" class="stat-badge" onclick="selectSkill('intellect')" title="Intellect: Investigate clues">
             <div class="stat-circle"><img src="images/icons/invest_intellect.png" alt="Intellect"></div> <span id="stat-intellect">3</span>
           </div>
           <div id="badge-combat" class="stat-badge" onclick="selectSkill('combat')" title="Combat: Fight enemies">
@@ -796,6 +933,33 @@
           <div class="ability-box">
             <p id="card-ability"><b>Reaction:</b> After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)</p>
             <p id="card-elder"><b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1 for each clue on your location.</p>
+          </div>
+        </div>
+		
+		<!-- Combined No-Scroll Action Dashboard -->
+        <div class="action-dashboard">
+          <div class="action-reference-container">
+            <div class="action-ref-header">
+	          <span class="action-tracker-label">Action Tracker:</span>
+              <div class="action-circles">
+                <div class="action-circle-btn" onclick="toggleActionCircle(this)"><img id="action-icon-1" src="images/icons/class_guardian.png" alt="Action"></div>
+                <div class="action-circle-btn" onclick="toggleActionCircle(this)"><img id="action-icon-2" src="images/icons/class_guardian.png" alt="Action"></div>
+                <div class="action-circle-btn" onclick="toggleActionCircle(this)"><img id="action-icon-3" src="images/icons/class_guardian.png" alt="Action"></div>
+              </div>
+	          <span onclick="resetTurnDashboard()" style="cursor: pointer; color: var(--fail-red); font-size: 0.68rem; text-transform: uppercase; border: 1px solid rgba(0,0,0,0.15); padding: 1px 4px; border-radius: 4px; background: #fff;">🔄 Reset</span>
+              <span class="action-count-badge"><span id="action-select-count">0</span>/3 Chosen</span>
+            </div>
+            
+            <div class="action-ref-list">
+              <div class="action-ref-item" onclick="selectTurnAction(this)"><strong>Investigate</strong> Get clues nearby.</div>
+              <div class="action-ref-item" onclick="selectTurnAction(this)"><strong>Move</strong> Go to a link location.</div>
+              <div class="action-ref-item" onclick="selectTurnAction(this)"><strong>Fight</strong> Attack local enemy.</div>
+              <div class="action-ref-item" onclick="selectTurnAction(this)"><strong>Evade</strong> Break engagement.</div>
+              <div class="action-ref-item" onclick="selectTurnAction(this)"><strong>Play</strong> Drop asset/event.</div>
+              <div class="action-ref-item" onclick="selectTurnAction(this)"><strong>Draw</strong> Take 1 card.</div>
+              <div class="action-ref-item" onclick="selectTurnAction(this)"><strong>Resource</strong> Gain 1 supply token.</div>
+              <div class="action-ref-item" onclick="selectTurnAction(this)"><strong>Activate</strong> Trigger capability.</div>
+            </div>
           </div>
         </div>
 
@@ -820,7 +984,7 @@
         <label style="font-size: 0.85rem; font-weight: bold;">Test Type</label>
         <div class="skill-selector">
           <div id="btn-will" class="skill-btn" onclick="selectSkill('will')"><img src="images/icons/invest_willpower.png" alt="Willpower"> Willpower</div>
-          <div id="btn-intellect" class="skill-btn active" onclick="selectSkill('intellect')"><img src="images/icons/invest_intellect.png" alt="Intellect"> Intellect</div>
+          <div id="btn-intellect" class="skill-btn" onclick="selectSkill('intellect')"><img src="images/icons/invest_intellect.png" alt="Intellect"> Intellect</div>
           <div id="btn-combat" class="skill-btn" onclick="selectSkill('combat')"><img src="images/icons/invest_combat.png" alt="Combat"> Combat</div>
           <div id="btn-agility" class="skill-btn" onclick="selectSkill('agility')"><img src="images/icons/invest_agility.png" alt="Agility"> Agility</div>
         </div>
@@ -834,7 +998,7 @@
           <span>Card/Commit Bonus:</span>
           <div class="counter-control">
             <button onclick="updateVal('commit', -1)">-</button>
-            <span id="val-commit" style="font-weight: bold;">1</span>
+            <span id="val-commit" style="font-weight: bold;">0</span>
             <button onclick="updateVal('commit', 1)">+</button>
           </div>
         </div>
@@ -943,26 +1107,11 @@
         </div>
 
         <ul class="track-list">
-          <li class="track-item active" onclick="loadTrack(this, 'music/music01.mp4')">
-            <span>Music Track 01</span>
-            <span>🎵</span>
-          </li>
-          <li class="track-item" onclick="loadTrack(this, 'music/music02.mp4')">
-            <span>Music Track 02</span>
-            <span>🎵</span>
-          </li>
-          <li class="track-item" onclick="loadTrack(this, 'music/music03.mp4')">
-            <span>Music Track 03</span>
-            <span>🎵</span>
-          </li>
-          <li class="track-item" onclick="loadTrack(this, 'music/music04.mp4')">
-            <span>Music Track 04</span>
-            <span>🎵</span>
-          </li>
-          <li class="track-item" onclick="loadTrack(this, 'music/music05.mp4')">
-            <span>Music Track 05</span>
-            <span>🎵</span>
-          </li>
+          <li class="track-item active" onclick="loadTrack(this, 'music/music01.mp4')"><span>Music Track 01</span><span>🎵</span></li>
+          <li class="track-item" onclick="loadTrack(this, 'music/music02.mp4')"><span>Music Track 02</span><span>🎵</span></li>
+          <li class="track-item" onclick="loadTrack(this, 'music/music03.mp4')"><span>Music Track 03</span><span>🎵</span></li>
+          <li class="track-item" onclick="loadTrack(this, 'music/music04.mp4')"><span>Music Track 04</span><span>🎵</span></li>
+          <li class="track-item" onclick="loadTrack(this, 'music/music05.mp4')"><span>Music Track 05</span><span>🎵</span></li>
         </ul>
       </div>
 
@@ -1116,7 +1265,6 @@
     };
 
     const investigators = {
-      // Core Set
       roland: {
         name: "Roland Banks", sub: "The Fed", class: "Guardian", classId: "guardian",
         will: 3, intellect: 3, combat: 4, agility: 2, health: 9, sanity: 5,
@@ -1152,7 +1300,6 @@
         elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +0. You may choose to reveal a new token from the chaos bag instead.',
         img: "images/investigators/wendy.png"
       },
-      // Dunwich Legacy
       zoey: {
         name: "Zoey Samaras", sub: "The Chef", class: "Guardian", classId: "guardian",
         will: 4, intellect: 2, combat: 4, agility: 2, health: 9, sanity: 6,
@@ -1188,7 +1335,6 @@
         elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +2. Ready Duke immediately.',
         img: "images/investigators/pete.png"
       },
-      // Path to Carcosa
       mark: {
         name: "Mark Harrigan", sub: "The Soldier", class: "Guardian", classId: "guardian",
         will: 3, intellect: 2, combat: 5, agility: 3, health: 9, sanity: 5,
@@ -1231,7 +1377,6 @@
         elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +2. You may switch roles immediately.',
         img: "images/investigators/lola.png"
       },
-      // Chapter 2 Core Set (2026 Expansion Cast)
       daniela: {
         name: "Daniela Reyes", sub: "The Mechanic", class: "Guardian", classId: "guardian",
         will: 4, intellect: 1, combat: 5, agility: 2, health: 9, sanity: 5,
@@ -1275,7 +1420,7 @@
     let currentSanity = currentInvestigator.sanity;
     let selectedSkill = 'intellect';
     let targetVal = 2;
-    let commitVal = 1;
+    let commitVal = 0;
     let currentChaosToken = null;
 
     function initInvestigatorDropdown() {
@@ -1401,6 +1546,7 @@
     }
 
     function renderInvestigatorCard() {
+      // 1. Base Rendering Logic
       document.getElementById('card-name').innerText = currentInvestigator.name;
       document.getElementById('card-sub').innerText = currentInvestigator.sub;
       document.getElementById('card-class').innerText = currentInvestigator.class;
@@ -1429,6 +1575,24 @@
       classIcon.src = `images/icons/class_${currentInvestigator.classId}.png`;
       classIcon.alt = `${currentInvestigator.class} Icon`;
 
+      // 2. Action Circles Dynamic Themes & Automatic Resets
+      document.querySelectorAll('.action-circle-btn').forEach(btn => {
+        btn.style.backgroundColor = targetColor;
+        btn.classList.remove('used'); 
+      });
+
+      document.getElementById('action-icon-1').src = `images/icons/class_${currentInvestigator.classId}.png`;
+      document.getElementById('action-icon-2').src = `images/icons/class_${currentInvestigator.classId}.png`;
+      document.getElementById('action-icon-3').src = `images/icons/class_${currentInvestigator.classId}.png`;
+
+      // 3. Reset List Choices
+      document.querySelectorAll('.action-ref-item').forEach(item => {
+        item.classList.remove('selected-action');
+        item.style.backgroundColor = '';
+      });
+      document.getElementById('action-select-count').innerText = '0';
+
+      // 4. Force Skill Calculator Updates
       selectSkill(selectedSkill);
     }
 
@@ -1453,6 +1617,7 @@
       const activeBadge = document.getElementById(`badge-${skill}`);
       if (activeBadge) activeBadge.classList.add('selected-stat');
 
+      // Crucial Fix: Grab the real updated number directly from current profile array
       const baseValue = currentInvestigator[skill];
       document.getElementById('val-base-skill').innerText = baseValue;
     }
@@ -1566,7 +1731,7 @@
       btn.classList.add('active');
     }
 
-    /* --- REFACTORED AUDIO INTERPOLATION SECTION --- */
+    /* --- AUDIO PLAYBACK MANAGEMENT --- */
     const audioPlayer = document.getElementById('audio-player');
     const playBtn = document.getElementById('play-btn');
     const trackScrubber = document.getElementById('track-scrubber');
@@ -1628,9 +1793,50 @@
           playBtn.innerText = "⏸️ Pause";
         })
         .catch(err => {
-          console.warn("Autoplay context blocked by target sandbox browser setup. Resetting button view toggle state.", err);
+          console.warn("Autoplay context blocked.", err);
           playBtn.innerText = "▶️ Play";
         });
+    }
+	
+	function toggleActionCircle(element) {
+      element.classList.toggle('used');
+    }
+
+    function selectTurnAction(element) {
+      const targetColor = `var(--color-${currentInvestigator.classId})`;
+      const maxActions = 3;
+      
+      if (element.classList.contains('selected-action')) {
+        element.classList.remove('selected-action');
+        element.style.backgroundColor = '';
+      } else {
+        const currentlySelected = document.querySelectorAll('.action-ref-item.selected-action').length;
+        
+        if (currentlySelected >= maxActions) {
+          const badge = document.querySelector('.action-count-badge');
+          badge.style.backgroundColor = 'var(--fail-red)';
+          setTimeout(() => badge.style.backgroundColor = '', 300);
+          return; 
+        }
+        
+        element.classList.add('selected-action');
+        element.style.backgroundColor = targetColor;
+      }
+      
+      const finalCount = document.querySelectorAll('.action-ref-item.selected-action').length;
+      document.getElementById('action-select-count').innerText = finalCount;
+    }
+
+    function resetTurnDashboard() {
+      document.querySelectorAll('.action-ref-item').forEach(item => {
+        item.classList.remove('selected-action');
+        item.style.backgroundColor = '';
+      });
+      document.getElementById('action-select-count').innerText = '0';
+
+      document.querySelectorAll('.action-circle-btn').forEach(btn => {
+        btn.classList.remove('used');
+      });
     }
 
     // Initialize application state loops
