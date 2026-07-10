@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Arkham Horror Companion App</title>
+  <!-- Favicon -->
+  <link rel="icon" href="images/icons/favicon.png">
   <style>
     :root {
       --bg-dark: #12151c;
@@ -33,6 +35,21 @@
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
+    }
+
+    /* Token Icon Utility Styles */
+    .token-icon {
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+      object-fit: contain;
+    }
+
+    .token-icon-lg {
+      width: 22px;
+      height: 22px;
+      vertical-align: middle;
+      object-fit: contain;
     }
 
     /* Top Bar Header */
@@ -126,15 +143,14 @@
       border: 1px solid var(--border-color);
     }
 
-    /* Clickable Stat Badges on Card */
     .stat-badge {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       font-weight: bold;
       font-size: 1rem;
       cursor: pointer;
-      padding: 2px 6px;
+      padding: 2px 8px;
       border-radius: 12px;
       transition: background 0.2s, transform 0.1s;
     }
@@ -150,7 +166,6 @@
 
     .stat-badge.selected-stat .stat-circle {
       background: var(--accent-gold);
-      color: black;
     }
 
     .stat-circle {
@@ -158,11 +173,16 @@
       height: 28px;
       border-radius: 50%;
       background: var(--accent-blue);
-      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.9rem;
+      padding: 4px;
+    }
+
+    .stat-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
     .card-body {
@@ -188,7 +208,6 @@
       border: 1px dashed #a3957a;
     }
 
-    /* Interactive Vital Trackers (Health & Mind) */
     .vital-trackers {
       display: flex;
       justify-content: space-around;
@@ -252,13 +271,27 @@
       border-radius: 4px;
       cursor: pointer;
       font-weight: bold;
-      text-align: center;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .skill-btn img {
+      width: 14px;
+      height: 14px;
+      object-fit: contain;
     }
 
     .skill-btn.active {
       background: var(--accent-blue);
       color: white;
+    }
+
+    /* Filter active icon states to show neatly against light or dark tabs */
+    .skill-btn.active img, .stat-badge.selected-stat .stat-circle img {
+      filter: brightness(1) invert(1);
     }
 
     .calc-row {
@@ -287,7 +320,6 @@
       cursor: pointer;
     }
 
-    /* Styled Inline Chaos Token */
     .token-display-badge {
       padding: 4px 10px;
       border-radius: 12px;
@@ -296,6 +328,9 @@
       background: #e2d7be;
       color: var(--text-dark);
       font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .token-display-badge.token-positive {
@@ -344,6 +379,8 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      min-width: 26px;
+      height: 24px;
     }
 
     .mini-token-badge.token-positive {
@@ -373,7 +410,25 @@
       border-color: #8b6e4e;
     }
 
-    /* Scenario Special Token Rules Inspector */
+    /* Icon Legend Key */
+    .token-key-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      font-size: 0.72rem;
+      margin-top: 4px;
+      background: #f2ebd9;
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #c0b298;
+    }
+
+    .token-key-grid div {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     .special-tokens-reference {
       margin-top: 8px;
       border-top: 1px dashed var(--border-color);
@@ -384,7 +439,7 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
-      max-height: 100px;
+      max-height: 90px;
       overflow-y: auto;
       margin-top: 4px;
     }
@@ -396,10 +451,13 @@
       padding: 4px 6px;
       border-radius: 4px;
       border: 1px solid #c0b298;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .action-btn {
-      width: 100%;
+      width: auto;
       padding: 9px;
       background: var(--accent-blue);
       color: white;
@@ -511,6 +569,36 @@
       gap: 12px;
     }
 
+    .scrubber-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: #e2d7be;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #c0b298;
+    }
+
+    .scrubber-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .music-scrubber {
+      flex: 1;
+      accent-color: var(--accent-blue);
+      cursor: pointer;
+    }
+
+    .time-display {
+      font-size: 0.75rem;
+      font-weight: bold;
+      font-family: monospace;
+      min-width: 32px;
+      text-align: center;
+    }
+
     .track-list {
       list-style: none;
       padding: 0;
@@ -579,8 +667,15 @@
       font-weight: bold;
     }
 
-    .nav-icon {
-      font-size: 1.2rem;
+    .nav-icon-img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      filter: opacity(0.6);
+    }
+
+    .nav-btn.active .nav-icon-img {
+      filter: none; /* Shows full color tint when active */
     }
   </style>
 </head>
@@ -604,6 +699,7 @@
       <option value="easy">Easy</option>
       <option value="standard" selected>Standard</option>
       <option value="hard">Hard</option>
+      <option value="expert">Expert</option>
     </select>
 
     <select id="investigator-select">
@@ -631,19 +727,18 @@
           <span id="card-class" style="font-weight: bold; color: var(--accent-blue);">Guardian</span>
         </div>
 
-        <!-- Interactive Stats Row (Clicking selects test & populates base skill) -->
         <div class="stats-row">
-          <div id="badge-will" class="stat-badge" onclick="selectSkill('will')" title="Willpower (🗣️): Resist treacheries">
-            <div class="stat-circle">🗣️</div> <span id="stat-will">3</span>
+          <div id="badge-will" class="stat-badge" onclick="selectSkill('will')" title="Willpower: Resist treacheries">
+            <div class="stat-circle"><img src="images/icons/invest_willpower.png" alt="Willpower"></div> <span id="stat-will">3</span>
           </div>
-          <div id="badge-intellect" class="stat-badge selected-stat" onclick="selectSkill('intellect')" title="Intellect (📖): Investigate clues">
-            <div class="stat-circle">📖</div> <span id="stat-intellect">3</span>
+          <div id="badge-intellect" class="stat-badge selected-stat" onclick="selectSkill('intellect')" title="Intellect: Investigate clues">
+            <div class="stat-circle"><img src="images/icons/invest_intellect.png" alt="Intellect"></div> <span id="stat-intellect">3</span>
           </div>
-          <div id="badge-combat" class="stat-badge" onclick="selectSkill('combat')" title="Combat (👊): Fight enemies">
-            <div class="stat-circle">👊</div> <span id="stat-combat">4</span>
+          <div id="badge-combat" class="stat-badge" onclick="selectSkill('combat')" title="Combat: Fight enemies">
+            <div class="stat-circle"><img src="images/icons/invest_combat.png" alt="Combat"></div> <span id="stat-combat">4</span>
           </div>
-          <div id="badge-agility" class="stat-badge" onclick="selectSkill('agility')" title="Agility (👟): Evade enemies">
-            <div class="stat-circle">👟</div> <span id="stat-agility">2</span>
+          <div id="badge-agility" class="stat-badge" onclick="selectSkill('agility')" title="Agility: Evade enemies">
+            <div class="stat-circle"><img src="images/icons/invest_agility.png" alt="Agility"></div> <span id="stat-agility">2</span>
           </div>
         </div>
 
@@ -651,20 +746,19 @@
           <img id="card-portrait" class="portrait" src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=300&q=80" alt="Investigator Portrait">
           <div class="ability-box">
             <p id="card-ability"><b>Reaction:</b> After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)</p>
-            <p id="card-elder"><b>⭐ Effect:</b> +1 for each clue on your location.</p>
+            <p id="card-elder"><b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1 for each clue on your location.</p>
           </div>
         </div>
 
-        <!-- Health & Mind / Sanity Dynamic Counter Trackers -->
         <div class="vital-trackers">
           <div class="vital-btn">
             <button class="vital-adjust-btn" onclick="adjustVital('health', -1)" title="Reduce Health">-</button>
-            <span>🩸 <span id="card-health">9</span></span>
+            <span><img src="images/icons/investigator_hp.png" class="token-icon-lg" alt="Health"> <span id="card-health">9</span></span>
             <button class="vital-adjust-btn" onclick="adjustVital('health', 1)" title="Increase Health">+</button>
           </div>
           <div class="vital-btn">
             <button class="vital-adjust-btn" onclick="adjustVital('sanity', -1)" title="Reduce Mind/Sanity">-</button>
-            <span>🧠 <span id="card-sanity">5</span></span>
+            <span><img src="images/icons/investigator_mind.png" class="token-icon-lg" alt="Sanity"> <span id="card-sanity">5</span></span>
             <button class="vital-adjust-btn" onclick="adjustVital('sanity', 1)" title="Increase Mind/Sanity">+</button>
           </div>
         </div>
@@ -676,13 +770,12 @@
         
         <label style="font-size: 0.85rem; font-weight: bold;">Test Type</label>
         <div class="skill-selector">
-          <div id="btn-will" class="skill-btn" onclick="selectSkill('will')">🗣️ Willpower</div>
-          <div id="btn-intellect" class="skill-btn active" onclick="selectSkill('intellect')">📖 Intellect</div>
-          <div id="btn-combat" class="skill-btn" onclick="selectSkill('combat')">👊 Combat</div>
-          <div id="btn-agility" class="skill-btn" onclick="selectSkill('agility')">👟 Agility</div>
+          <div id="btn-will" class="skill-btn" onclick="selectSkill('will')"><img src="images/icons/invest_willpower.png" alt="Willpower"> Willpower</div>
+          <div id="btn-intellect" class="skill-btn active" onclick="selectSkill('intellect')"><img src="images/icons/invest_intellect.png" alt="Intellect"> Intellect</div>
+          <div id="btn-combat" class="skill-btn" onclick="selectSkill('combat')"><img src="images/icons/invest_combat.png" alt="Combat"> Combat</div>
+          <div id="btn-agility" class="skill-btn" onclick="selectSkill('agility')"><img src="images/icons/invest_agility.png" alt="Agility"> Agility</div>
         </div>
 
-        <!-- Explicit Base Skill Field -->
         <div class="calc-row">
           <span>Base Skill Value:</span>
           <span id="val-base-skill" style="font-weight: bold; font-size: 1.1rem; color: var(--accent-blue);">3</span>
@@ -706,13 +799,11 @@
           </div>
         </div>
 
-        <!-- Inline Drawn Chaos Token Line -->
         <div class="calc-row" style="background: #ebdcc3; padding: 6px 8px; border-radius: 4px; margin-top: 2px;">
-          <span>Chaos Token Drawn:</span>
+          <button class="action-btn" onclick="drawChaosToken()">Draw Chaos Token</button>
+		  <span>Chaos Token Drawn:</span>
           <span id="token-display-inline" class="token-display-badge">Not Drawn</span>
         </div>
-
-        <button class="action-btn" onclick="drawChaosToken()">🎲 Draw Chaos Token</button>
 
         <!-- Current Bag Inspector List -->
         <div class="chaos-bag-container">
@@ -722,6 +813,18 @@
           </div>
           <div id="bag-tokens-list" class="bag-tokens-grid">
             <!-- Badges rendered via JavaScript -->
+          </div>
+
+          <!-- Token Key / Icon Legend -->
+          <div style="margin-top: 8px; border-top: 1px dashed var(--border-color); padding-top: 6px;">
+            <div style="font-weight: bold; font-size: 0.78rem;">Chaos Token Icon Key:</div>
+            <div class="token-key-grid">
+              <div><img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> <b>Elder Sign</b></div>
+              <div><img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull</b></div>
+              <div><img src="images/icons/chaos_cultist.png" class="token-icon" alt="Cultist"> <b>Cultist</b></div>
+              <div><img src="images/icons/chaos_tablet.png" class="token-icon" alt="Tablet"> <b>Tablet</b></div>
+              <div style="grid-column: span 2;"><img src="images/icons/chaos_fail.png" class="token-icon" alt="Auto-fail"> <b>Auto-fail</b></div>
+            </div>
           </div>
 
           <!-- Scenario Special Token Rules Reference -->
@@ -756,19 +859,19 @@
     <!-- Tab 2: Round Turns -->
     <div id="tab-turns" class="tab-content">
       <div class="turn-column">
-        <h3>👁️ Mythos Phase</h3>
+        <h3>Mythos Phase</h3>
         <div class="turn-step"><div class="step-num"><span>1</span></div> <div>Place 1 doom on main scheme / check threshold.</div></div>
-        <div class="turn-step"><div class="step-num"><span>2</span></div> <div>Each investigator draws 1 encounter card. Resisted with Willpower (🗣️).</div></div>
+        <div class="turn-step"><div class="step-num"><span>2</span></div> <div>Each investigator draws 1 encounter card. Resisted with Willpower.</div></div>
       </div>
 
       <div class="turn-column">
-        <h3>🕵️ Investigator Phase</h3>
-        <div class="turn-step"><div class="step-num"><span>3</span></div> <div>Perform 3 actions per investigator (Investigate 📖, Move, Fight 👊, Evade 👟, Play, Draw, Resource).</div></div>
+        <h3>Investigator Phase</h3>
+        <div class="turn-step"><div class="step-num"><span>3</span></div> <div>Perform 3 actions per investigator (Investigate, Move, Fight, Evade, Play, Draw, Resource).</div></div>
         <div class="turn-step"><div class="step-num"><span>4</span></div> <div>Enemy Phase: Ready enemies attack / Hunter enemies move.</div></div>
       </div>
 
       <div class="turn-column">
-        <h3>🎒 Upkeep Phase</h3>
+        <h3>Upkeep Phase</h3>
         <div class="turn-step"><div class="step-num"><span>5</span></div> <div>Reset/ready exhausted cards.</div></div>
         <div class="turn-step"><div class="step-num"><span>6</span></div> <div>Each investigator draws 1 card & gains 1 resource.</div></div>
         <div class="turn-step"><div class="step-num"><span>7</span></div> <div>Check hand size (limit 8 cards).</div></div>
@@ -780,23 +883,40 @@
       <div class="music-controls">
         <h3 style="margin:0; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">Music Player</h3>
         
-        <audio id="audio-player" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lovecraftian-dark-ambient-112191.mp3" preload="auto"></audio>
+        <audio id="audio-player" src="music/music01.mp4" preload="auto"></audio>
 
         <div style="display:flex; justify-content: space-around; align-items: center; margin: 10px 0;">
           <button class="action-btn" style="width: 100px;" onclick="togglePlay()" id="play-btn">▶️ Play</button>
         </div>
 
+        <!-- Dynamic Scrubber Control -->
+        <div class="scrubber-container">
+          <div class="scrubber-row">
+            <span id="time-current" class="time-display">0:00</span>
+            <input type="range" id="track-scrubber" class="music-scrubber" value="0" min="0" max="100" step="1" oninput="scrubAudio()">
+            <span id="time-duration" class="time-display">0:00</span>
+          </div>
+        </div>
+
         <ul class="track-list">
-          <li class="track-item active" onclick="loadTrack(this, 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lovecraftian-dark-ambient-112191.mp3')">
-            <span>Arkham Noir Ambient</span>
+          <li class="track-item active" onclick="loadTrack(this, 'music/music01.mp4')">
+            <span>Music Track 01</span>
             <span>🎵</span>
           </li>
-          <li class="track-item" onclick="loadTrack(this, 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73211.mp3?filename=dark-mystery-10282.mp3')">
-            <span>The Gathering - Mystery</span>
+          <li class="track-item" onclick="loadTrack(this, 'music/music02.mp4')">
+            <span>Music Track 02</span>
             <span>🎵</span>
           </li>
-          <li class="track-item" onclick="loadTrack(this, 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_3d191d9047.mp3?filename=creepy-hollow-8249.mp3')">
-            <span>Mythos Encounter</span>
+          <li class="track-item" onclick="loadTrack(this, 'music/music03.mp4')">
+            <span>Music Track 03</span>
+            <span>🎵</span>
+          </li>
+          <li class="track-item" onclick="loadTrack(this, 'music/music04.mp4')">
+            <span>Music Track 04</span>
+            <span>🎵</span>
+          </li>
+          <li class="track-item" onclick="loadTrack(this, 'music/music05.mp4')">
+            <span>Music Track 05</span>
             <span>🎵</span>
           </li>
         </ul>
@@ -812,20 +932,37 @@
   <!-- Bottom Navigation Bar -->
   <nav>
     <button class="nav-btn active" onclick="switchTab('tab-investigator', this)">
-      <span class="nav-icon">👤</span>
+      <img src="images/icons/tab_investigator.png" class="nav-icon-img" alt="Investigator Tab">
       <span>Investigator Card</span>
     </button>
     <button class="nav-btn" onclick="switchTab('tab-turns', this)">
-      <span class="nav-icon">🔄</span>
+      <img src="images/icons/tab_round_order.png" class="nav-icon-img" alt="Round Order Tab">
       <span>Round Turns</span>
     </button>
     <button class="nav-btn" onclick="switchTab('tab-music', this)">
-      <span class="nav-icon">🎵</span>
+      <img src="images/icons/tab_music.png" class="nav-icon-img" alt="Music Player Tab">
       <span>Music Player</span>
     </button>
   </nav>
 
   <script>
+    // Token image mapping based on images/icons/ directory
+    const tokenImageMap = {
+      '0': 'images/icons/chaos_0.png',
+      '-2': 'images/icons/chaos_minus2.png',
+      '-3': 'images/icons/chaos_minus3.png',
+      '-4': 'images/icons/chaos_minus4.png',
+      '-5': 'images/icons/chaos_minus5.png',
+      '-6': 'images/icons/chaos_minus6.png',
+      '-7': 'images/icons/chaos_minus7.png',
+      '-8': 'images/icons/chaos_minus8.png',
+      '💀': 'images/icons/chaos_skull.png',
+      '👹': 'images/icons/chaos_cultist.png',
+      '📜': 'images/icons/chaos_tablet.png',
+      'AUTO-FAIL': 'images/icons/chaos_fail.png',
+      '🌟': 'images/icons/chaos_elder.png'
+    };
+
     // Campaign & Scenario Dropdown Data
     const campaignScenarios = {
       notz: [
@@ -845,22 +982,25 @@
       ]
     };
 
-    // Preset Chaos Bag configurations based on Campaign and Difficulty
+    // Preset Chaos Bag configurations
     const chaosBagPresets = {
       notz: {
-        easy: ['+1', '+1', '0', '0', '0', '-1', '-1', '-1', '-2', '-2', '💀', '💀', '👹', '🌟', 'AUTO-FAIL'],
-        standard: ['+1', '0', '0', '-1', '-1', '-1', '-2', '-2', '-3', '-4', '💀', '💀', '👹', '👾', '🌟', 'AUTO-FAIL'],
-        hard: ['0', '0', '0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-5', '💀', '💀', '👹', '👾', '🌟', 'AUTO-FAIL']
+        easy: ['+1', '+1', '0', '0', '0', '-1', '-1', '-1', '-2', '-2', '💀', '💀', '👹', '📜', 'AUTO-FAIL', '🌟'],
+        standard: ['+1', '0', '0', '-1', '-1', '-1', '-2', '-2', '-3', '-4', '💀', '💀', '👹', '📜', 'AUTO-FAIL', '🌟'],
+        hard: ['0', '0', '0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-5', '💀', '💀', '👹', '📜', 'AUTO-FAIL', '🌟'],
+        expert: ['0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-4', '-5', '-6', '-8', '💀', '💀', '👹', '📜', 'AUTO-FAIL', '🌟']
       },
       dunwich: {
         easy: ['+1', '+1', '0', '0', '0', '-1', '-1', '-1', '-2', '-2', '💀', '💀', '👹', '🌟', 'AUTO-FAIL'],
-        standard: ['+1', '0', '0', '-1', '-1', '-1', '-2', '-2', '-3', '-4', '💀', '💀', '👾', '🌟', 'AUTO-FAIL'],
-        hard: ['0', '0', '0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-5', '💀', '💀', '👹', '👾', '🌟', 'AUTO-FAIL']
+        standard: ['+1', '0', '0', '-1', '-1', '-1', '-2', '-2', '-3', '-4', '💀', '💀', '👹', '📜', '🌟', 'AUTO-FAIL'],
+        hard: ['0', '0', '0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-5', '💀', '💀', '👹', '📜', '🌟', 'AUTO-FAIL'],
+        expert: ['0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-4', '-5', '-6', '-8', '💀', '💀', '👹', '📜', '🌟', 'AUTO-FAIL']
       },
       carcosa: {
         easy: ['+1', '+1', '0', '0', '0', '-1', '-1', '-1', '-2', '-2', '💀', '💀', '👹', '👹', '🌟', 'AUTO-FAIL'],
         standard: ['+1', '0', '0', '-1', '-1', '-1', '-2', '-2', '-3', '-4', '💀', '💀', '👹', '👹', '🌟', 'AUTO-FAIL'],
-        hard: ['0', '0', '0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-5', '💀', '💀', '👹', '👹', '👾', '👾', '🌟', 'AUTO-FAIL']
+        hard: ['0', '0', '0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-5', '💀', '💀', '👹', '👹', '📜', '📜', '🌟', 'AUTO-FAIL'],
+        expert: ['0', '-1', '-1', '-2', '-2', '-3', '-3', '-4', '-4', '-5', '-6', '-8', '💀', '💀', '👹', '👹', '📜', '📜', '🌟', 'AUTO-FAIL']
       }
     };
 
@@ -868,47 +1008,47 @@
     const specialTokenEffects = {
       notz: {
         gathering: {
-          '💀': "<b>💀 Skull:</b> -X (X = Ghoul enemies at your location).",
-          '👹': "<b>👹 Cultist:</b> -1 (-2 on Hard). If fail, take 1 horror.",
-          '👾': "<b>👾 Tablet:</b> -2 (-3 on Hard). If fail, take 1 damage."
+          '💀': '<img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull:</b> -X (X = Ghoul enemies at your location).',
+          '👹': '<img src="images/icons/chaos_cultist.png" class="token-icon" alt="Cultist"> <b>Cultist:</b> -1 (-2 on Hard/Expert). If fail, take 1 horror.',
+          '📜': '<img src="images/icons/chaos_tablet.png" class="token-icon" alt="Tablet"> <b>Tablet:</b> -2 (-3 on Hard/Expert). If fail, take 1 damage.'
         },
         masks: {
-          '💀': "<b>💀 Skull:</b> -X (X = highest doom count on any location in play).",
-          '👹': "<b>👹 Cultist:</b> -2. Place 1 doom on nearest Cultist enemy.",
-          '👾': "<b>👾 Tablet:</b> -3. If fail, lose 1 clue from your location."
+          '💀': '<img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull:</b> -X (X = highest doom count on any location in play).',
+          '👹': '<img src="images/icons/chaos_cultist.png" class="token-icon" alt="Cultist"> <b>Cultist:</b> -2. Place 1 doom on nearest Cultist enemy.',
+          '📜': '<img src="images/icons/chaos_tablet.png" class="token-icon" alt="Tablet"> <b>Tablet:</b> -3. If fail, lose 1 clue from your location.'
         },
         devourer: {
-          '💀': "<b>💀 Skull:</b> -X (X = Monster enemies in play).",
-          '👹': "<b>👹 Cultist:</b> -4. Reveal another chaos token.",
-          '👾': "<b>👾 Tablet:</b> -5. If fail, discard 1 asset you control."
+          '💀': '<img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull:</b> -X (X = Monster enemies in play).',
+          '👹': '<img src="images/icons/chaos_cultist.png" class="token-icon" alt="Cultist"> <b>Cultist:</b> -4. Reveal another chaos token.',
+          '📜': '<img src="images/icons/chaos_tablet.png" class="token-icon" alt="Tablet"> <b>Tablet:</b> -5. If fail, discard 1 asset you control.'
         }
       },
       dunwich: {
         extracurricular: {
-          '💀': "<b>💀 Skull:</b> -X (X = cards in discard pile ÷ 5, rounded down).",
-          '👾': "<b>👾 Tablet:</b> -3 (-5 on Hard). If fail, discard top 3 cards of deck."
+          '💀': '<img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull:</b> -X (X = cards in discard pile ÷ 5, rounded down).',
+          '📜': '<img src="images/icons/chaos_tablet.png" class="token-icon" alt="Tablet"> <b>Tablet:</b> -3 (-5 on Hard). If fail, discard top 3 cards of deck.'
         },
         house: {
-          '💀': "<b>💀 Skull:</b> -1 (-3 on Hard).",
-          '👾': "<b>👾 Tablet:</b> -2 (-4 on Hard). Pay 2 resources if fail."
+          '💀': '<img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull:</b> -1 (-3 on Hard).',
+          '📜': '<img src="images/icons/chaos_tablet.png" class="token-icon" alt="Tablet"> <b>Tablet:</b> -2 (-4 on Hard). Pay 2 resources if fail.'
         },
         museum: {
-          '💀': "<b>💀 Skull:</b> -1 (-3 if Hunting Horror is at your location).",
-          '👾': "<b>👾 Tablet:</b> -3 (-5 on Hard). Spawn Hunting Horror if in void."
+          '💀': '<img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull:</b> -1 (-3 if Hunting Horror is at your location).',
+          '📜': '<img src="images/icons/chaos_tablet.png" class="token-icon" alt="Tablet"> <b>Tablet:</b> -3 (-5 on Hard). Spawn Hunting Horror if in void.'
         }
       },
       carcosa: {
         curtain: {
-          '💀': "<b>💀 Skull:</b> -1 (-3 on Hard).",
-          '👹': "<b>👹 Cultist:</b> -2 (-4 on Hard). If fail, take 1 horror."
+          '💀': '<img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull:</b> -1 (-3 on Hard).',
+          '👹': '<img src="images/icons/chaos_cultist.png" class="token-icon" alt="Cultist"> <b>Cultist:</b> -2 (-4 on Hard). If fail, take 1 horror.'
         },
         last_king: {
-          '💀': "<b>💀 Skull:</b> -X (X = Clues on location).",
-          '👹': "<b>👹 Cultist:</b> -3. If fail, remove 1 Clue from your card."
+          '💀': '<img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull:</b> -X (X = Clues on location).',
+          '👹': '<img src="images/icons/chaos_cultist.png" class="token-icon" alt="Cultist"> <b>Cultist:</b> -3. If fail, remove 1 Clue from your card.'
         },
         echoes: {
-          '💀': "<b>💀 Skull:</b> -1 (-2 on Hard).",
-          '👹': "<b>👹 Cultist:</b> -2 (-4 on Hard). Place 1 doom on nearest Cultist."
+          '💀': '<img src="images/icons/chaos_skull.png" class="token-icon" alt="Skull"> <b>Skull:</b> -1 (-2 on Hard).',
+          '👹': '<img src="images/icons/chaos_cultist.png" class="token-icon" alt="Cultist"> <b>Cultist:</b> -2 (-4 on Hard). Place 1 doom on nearest Cultist.'
         }
       }
     };
@@ -946,7 +1086,6 @@
       renderBagList();
       renderSpecialTokenReference();
 
-      // Reset inline drawn token display when bag updates
       currentChaosToken = null;
       const tokenBadge = document.getElementById('token-display-inline');
       tokenBadge.innerText = "Not Drawn";
@@ -963,15 +1102,16 @@
         const badge = document.createElement('span');
         badge.className = 'mini-token-badge';
 
-        if (token === 'AUTO-FAIL') {
-          badge.classList.add('token-fail');
-          badge.innerText = '💀 FAIL';
-        } else if (token === '🌟') {
-          badge.classList.add('token-star');
-          badge.innerText = '🌟 +2';
-        } else if (['💀', '👹', '👾', '🐙'].includes(token)) {
-          badge.classList.add('token-special');
-          badge.innerText = token;
+        if (tokenImageMap[token]) {
+          badge.innerHTML = `<img src="${tokenImageMap[token]}" class="token-icon" alt="${token}">`;
+          if (token === 'AUTO-FAIL') badge.classList.add('token-fail');
+          else if (token === '🌟') badge.classList.add('token-star');
+          else if (['💀', '👹', '📜'].includes(token)) badge.classList.add('token-special');
+          else {
+            const num = parseInt(token);
+            if (num > 0) badge.classList.add('token-positive');
+            else if (num < 0) badge.classList.add('token-negative');
+          }
         } else {
           const num = parseInt(token);
           if (num > 0) badge.classList.add('token-positive');
@@ -1006,7 +1146,6 @@
       }
     }
 
-    // Investigators Database
     const investigators = {
       roland: {
         name: "Roland Banks",
@@ -1015,7 +1154,7 @@
         will: 3, intellect: 3, combat: 4, agility: 2,
         health: 9, sanity: 5,
         ability: "<b>Reaction:</b> After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)",
-        elder: "<b>⭐ Effect:</b> +1 for each clue on your location.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1 for each clue on your location.',
         img: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=300&q=80"
       },
       daisy: {
@@ -1025,7 +1164,7 @@
         will: 3, intellect: 5, combat: 2, agility: 2,
         health: 5, sanity: 9,
         ability: "You may take 1 additional action during your turn, which can only be used on <b>Tome</b> abilities.",
-        elder: "<b>⭐ Effect:</b> +0. Draw 1 card for each Tome you control.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +0. Draw 1 card for each Tome you control.',
         img: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=300&q=80"
       },
       agnes: {
@@ -1035,8 +1174,8 @@
         will: 5, intellect: 2, combat: 2, agility: 3,
         health: 6, sanity: 8,
         ability: "<b>Reaction:</b> When 1 or more horror is placed on Agnes Baker: Deal 1 damage to an enemy at your location.",
-        elder: "<b>⭐ Effect:</b> +1 for each horror on Agnes Baker.",
-        img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +1 for each horror on Agnes Baker.',
+        img: "https://images.unsplash.com/photo-153452741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
       },
       skids: {
         name: '"Skids" O\'Toole',
@@ -1045,7 +1184,7 @@
         will: 2, intellect: 3, combat: 3, agility: 4,
         health: 8, sanity: 6,
         ability: "<b>Free Trigger:</b> Spend 2 resources: Take 1 additional action during your turn. (Limit once per turn.)",
-        elder: "<b>⭐ Effect:</b> +2. Gain 2 resources if successful.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +2. Gain 2 resources if successful.',
         img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80"
       },
       wendy: {
@@ -1055,12 +1194,11 @@
         will: 4, intellect: 3, combat: 1, agility: 4,
         health: 7, sanity: 7,
         ability: "<b>Reaction:</b> When you reveal a chaos token, discard 1 card from your hand: Cancel that token and draw a new one.",
-        elder: "<b>⭐ Effect:</b> +0. Automatically succeed if Wendy's Amulet is in play.",
+        elder: '<b>Effect:</b> <img src="images/icons/chaos_elder.png" class="token-icon" alt="Elder Sign"> +0. Automatically succeed if Wendy\'s Amulet is in play.',
         img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80"
       }
     };
 
-    // State Variables
     let currentInvestigator = investigators.roland;
     let currentHealth = currentInvestigator.health;
     let currentSanity = currentInvestigator.sanity;
@@ -1069,7 +1207,6 @@
     let commitVal = 1;
     let currentChaosToken = null;
 
-    // Investigator Selector Listener
     document.getElementById('investigator-select').addEventListener('change', (e) => {
       currentInvestigator = investigators[e.target.value];
       currentHealth = currentInvestigator.health;
@@ -1091,11 +1228,9 @@
       document.getElementById('card-elder').innerHTML = currentInvestigator.elder;
       document.getElementById('card-portrait').src = currentInvestigator.img;
 
-      // Refresh currently selected skill's base value
       selectSkill(selectedSkill);
     }
 
-    // Health & Mind/Sanity Adjustments
     function adjustVital(type, delta) {
       if (type === 'health') {
         currentHealth = Math.max(0, currentHealth + delta);
@@ -1106,21 +1241,17 @@
       }
     }
 
-    // Dynamic Skill Selection (Works from both Card Badges & Panel Buttons)
     function selectSkill(skill) {
       selectedSkill = skill;
 
-      // Update Panel Skill Buttons
       document.querySelectorAll('.skill-btn').forEach(btn => btn.classList.remove('active'));
       const activeBtn = document.getElementById(`btn-${skill}`);
       if (activeBtn) activeBtn.classList.add('active');
 
-      // Update Card Badges
       document.querySelectorAll('.stat-badge').forEach(badge => badge.classList.remove('selected-stat'));
       const activeBadge = document.getElementById(`badge-${skill}`);
       if (activeBadge) activeBadge.classList.add('selected-stat');
 
-      // Update Base Skill Field automatically
       const baseValue = currentInvestigator[skill];
       document.getElementById('val-base-skill').innerText = baseValue;
     }
@@ -1135,17 +1266,15 @@
       }
     }
 
-    // Convert raw token text to calculation value
     function parseTokenValue(rawToken) {
       if (rawToken === 'AUTO-FAIL') return -8;
-      if (rawToken === '🌟') return 2; // Default Elder Sign bonus (+2)
-      if (rawToken === '💀') return -2; // Default Skull modifier
-      if (rawToken === '👹') return -3; // Default Cultist modifier
-      if (rawToken === '👾') return -4; // Default Tablet modifier
+      if (rawToken === '🌟') return 2;
+      if (rawToken === '💀') return -2;
+      if (rawToken === '👹') return -3;
+      if (rawToken === '📜') return -4;
       return parseInt(rawToken) || 0;
     }
 
-    // Chaos Bag Drawing (Inline Display)
     function drawChaosToken() {
       if (!currentBag || currentBag.length === 0) return;
 
@@ -1156,34 +1285,40 @@
       currentChaosToken = numericVal;
 
       const tokenBadge = document.getElementById('token-display-inline');
+      const imgSrc = tokenImageMap[rawToken];
+
+      if (imgSrc) {
+        let label = '';
+        if (rawToken === 'AUTO-FAIL') label = ' AUTO-FAIL';
+        else if (rawToken === '🌟') label = ' Elder Sign (+2)';
+        else if (['💀', '👹', '📜'].includes(rawToken)) label = ` Special (${numericVal})`;
+        else label = ` (${rawToken})`;
+
+        tokenBadge.innerHTML = `<img src="${imgSrc}" class="token-icon-lg" alt="${rawToken}">${label}`;
+      } else {
+        if (numericVal > 0) tokenBadge.innerText = `+${numericVal}`;
+        else tokenBadge.innerText = `${numericVal}`;
+      }
 
       if (rawToken === 'AUTO-FAIL') {
-        tokenBadge.innerText = "AUTO-FAIL 💀";
         tokenBadge.className = "token-display-badge token-fail";
       } else if (rawToken === '🌟') {
-        tokenBadge.innerText = "🌟 Elder Sign (+2)";
         tokenBadge.className = "token-display-badge token-positive";
-      } else if (['💀', '👹', '👾'].includes(rawToken)) {
-        tokenBadge.innerText = `${rawToken} Special (${numericVal})`;
+      } else if (['💀', '👹', '📜'].includes(rawToken)) {
         tokenBadge.className = "token-display-badge token-negative";
       } else if (numericVal > 0) {
-        tokenBadge.innerText = `+${numericVal}`;
         tokenBadge.className = "token-display-badge token-positive";
       } else if (numericVal < 0) {
-        tokenBadge.innerText = `${numericVal}`;
         tokenBadge.className = "token-display-badge token-negative";
       } else {
-        tokenBadge.innerText = "0";
         tokenBadge.className = "token-display-badge";
       }
     }
 
-    // Skill Calculation Logic
     function calculateOutcome() {
       const baseStat = currentInvestigator[selectedSkill];
       const playerTotal = baseStat + commitVal;
       
-      // Default token to 0 if not drawn yet
       const tokenVal = currentChaosToken !== null ? currentChaosToken : 0;
       const finalTotal = Math.max(0, playerTotal + tokenVal);
       const succeeded = finalTotal >= targetVal && tokenVal !== -8;
@@ -1215,7 +1350,6 @@
       document.getElementById('outcome-modal').style.display = 'none';
     }
 
-    // Navigation Tab Switching
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
@@ -1231,9 +1365,41 @@
       btn.classList.add('active');
     }
 
-    // Music Player Audio Controls
     const audioPlayer = document.getElementById('audio-player');
     const playBtn = document.getElementById('play-btn');
+    const trackScrubber = document.getElementById('track-scrubber');
+    const timeCurrent = document.getElementById('time-current');
+    const timeDuration = document.getElementById('time-duration');
+
+    function formatTime(secs) {
+      if (isNaN(secs)) return "0:00";
+      const minutes = Math.floor(secs / 60);
+      const seconds = Math.floor(secs % 60);
+      return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
+    // Keep range scrubber slider synced with track progression
+    audioPlayer.addEventListener('timeupdate', () => {
+      if (!isNaN(audioPlayer.duration) && audioPlayer.duration > 0) {
+        const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+        trackScrubber.value = percent;
+        timeCurrent.innerText = formatTime(audioPlayer.currentTime);
+      }
+    });
+
+    // Populate duration once metadata loads
+    audioPlayer.addEventListener('loadedmetadata', () => {
+      timeDuration.innerText = formatTime(audioPlayer.duration);
+    });
+
+    // Handle manual timeline manipulation
+    function scrubAudio() {
+      if (!isNaN(audioPlayer.duration) && audioPlayer.duration > 0) {
+        const newTime = (trackScrubber.value / 100) * audioPlayer.duration;
+        audioPlayer.currentTime = newTime;
+        timeCurrent.innerText = formatTime(newTime);
+      }
+    }
 
     function togglePlay() {
       if (audioPlayer.paused) {
@@ -1249,11 +1415,12 @@
       document.querySelectorAll('.track-item').forEach(item => item.classList.remove('active'));
       element.classList.add('active');
       audioPlayer.src = src;
+      trackScrubber.value = 0;
+      timeCurrent.innerText = "0:00";
       audioPlayer.play();
       playBtn.innerText = "⏸️ Pause";
     }
 
-    // Initial load sync
     renderInvestigatorCard();
     updateChaosBag();
   </script>
