@@ -111,7 +111,7 @@ const specialTokenDescriptors = {
     skull: "Apply -X, where X is the number of Ghoul enemies in play.",
     cultist: "Reveal another token. If you fail, place 1 doom on the nearest Cultist enemy.",
     tablet: "Apply -X. If you fail, take 1 horror.",
-    eldersign: "Resolve this investigator's Elder Sign effect shown in the dossier header.",
+    eldersign: "Resolve this investigator's Elder Sign effect.",
     autofail: "This test automatically fails. Do not calculate a final skill value."
   },
   default: {
@@ -120,7 +120,7 @@ const specialTokenDescriptors = {
     tablet: "Resolve the Tablet effect on the current scenario reference card.",
     elderthing: "Resolve the Elder Thing effect on the current scenario reference card.",
     eye: "Resolve the Eye effect on the current scenario reference card.",
-    eldersign: "Resolve this investigator's Elder Sign effect shown in the dossier header.",
+    eldersign: "Resolve this investigator's Elder Sign effect.",
     autofail: "This test automatically fails. Do not calculate a final skill value."
   }
 };
@@ -247,7 +247,7 @@ function drawSimpleToken(forcedToken) {
     outcomeMsg.style.color = "var(--fail-red)";
     tokenTheater.classList.add('test-failure');
   } else {
-    outcomeMsg.innerText = isElderSign ? 'Elder Sign! Automatic Success!' : 'Success!';
+    outcomeMsg.innerText = isElderSign ? 'Auto Success!' : 'Success!';
     outcomeMsg.style.color = "var(--success-green)";
     tokenTheater.classList.add('test-success');
   }
