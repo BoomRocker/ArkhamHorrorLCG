@@ -1,0 +1,20 @@
+{
+  "name": "Arkham Horror Companion",
+  "short_name": "Arkham Companion",
+  "description": "A companion app for Arkham Horror: The Card Game.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#140f0c",
+  "theme_color": "#140f0c",
+  "icons": [
+    {
+      "src": "images/icons/favicon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

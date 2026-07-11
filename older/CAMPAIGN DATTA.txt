@@ -1,0 +1,158 @@
+{
+  "token_icons": {
+    "+1": "icons/chaos_plus1.png",
+    "0": "icons/chaos_0.png",
+    "-1": "icons/chaos_minus1.png",
+    "-2": "icons/chaos_minus2.png",
+    "-3": "icons/chaos_minus3.png",
+    "-4": "icons/chaos_minus4.png",
+    "-5": "icons/chaos_minus5.png",
+    "-6": "icons/chaos_minus6.png",
+    "-7": "icons/chaos_minus7.png",
+    "-8": "icons/chaos_minus8.png",
+
+    "skull": "icons/chaos_skull.png",
+    "cultist": "icons/chaos_cultist.png",
+    "tablet": "icons/chaos_tablet.png",
+    "elder thing": "icons/chaos_elder_thing.png",
+    "eye": "icons/chaos_eye.png",
+    "elder sign": "icons/chaos_elder_sign.png",
+
+    "auto-fail": "icons/chaos_auto_fail.png",
+    "bless": "icons/chaos_bless.png",
+    "curse": "icons/chaos_curse.png"
+  },
+
+  "campaigns": [
+    {
+      "name": "Night Zealot",
+      "token_effects": {
+        "skull": "−X where X is the number of Ghoul enemies in play.",
+        "cultist": "Reveal another token. If you fail, place 1 doom on the nearest cultist enemy.",
+        "tablet": "−X. If you fail, take 1 horror.",
+        "elder sign": "Investigator-specific positive effect."
+      },
+      "difficulties": [
+        {
+          "label": "Easy",
+          "tagline": "I want to experience the story",
+          "modifiers": [
+            {"value": +1, "icon_file": "icons/chaos_plus1.png"},
+            {"value": +1, "icon_file": "icons/chaos_plus1.png"},
+            {"value": 0, "icon_file": "icons/chaos_0.png"},
+            {"value": 0, "icon_file": "icons/chaos_0.png"},
+            {"value": 0, "icon_file": "icons/chaos_0.png"},
+            {"value": -1, "icon_file": "icons/chaos_minus1.png"},
+            {"value": -1, "icon_file": "icons/chaos_minus1.png"},
+            {"value": -2, "icon_file": "icons/chaos_minus2.png"},
+            {"value": -2, "icon_file": "icons/chaos_minus2.png"}
+          ],
+          "tokens": [
+            {
+              "type": "skull",
+              "effect": "−X where X is the number of Ghoul enemies in play.",
+              "icon_file": "icons/chaos_skull.png"
+            },
+            {
+              "type": "skull",
+              "effect": "−X where X is the number of Ghoul enemies in play.",
+              "icon_file": "icons/chaos_skull.png"
+            },
+            {
+              "type": "cultist",
+              "effect": "Reveal another token. If you fail, place 1 doom on the nearest cultist enemy.",
+              "icon_file": "icons/chaos_cultist.png"
+            },
+            {
+              "type": "tablet",
+              "effect": "−X. If you fail, take 1 horror.",
+              "icon_file": "icons/chaos_tablet.png"
+            },
+            {
+              "type": "elder sign",
+              "effect": "Investigator-specific positive effect.",
+              "icon_file": "icons/chaos_elder_sign.png"
+            }
+          ]
+        },
+
+        {
+          "label": "Standard",
+          "tagline": "I want a challenge",
+          "modifiers": [
+            {"value": +1, "icon_file": "icons/chaos_plus1.png"},
+            {"value": 0, "icon_file": "icons/chaos_0.png"},
+            {"value": 0, "icon_file": "icons/chaos_0.png"},
+            {"value": -1, "icon_file": "icons/chaos_minus1.png"},
+            {"value": -1, "icon_file": "icons/chaos_minus1.png"},
+            {"value": -1, "icon_file": "icons/chaos_minus1.png"},
+            {"value": -2, "icon_file": "icons/chaos_minus2.png"},
+            {"value": -2, "icon_file": "icons/chaos_minus2.png"},
+            {"value": -3, "icon_file": "icons/chaos_minus3.png"},
+            {"value": -4, "icon_file": "icons/chaos_minus4.png"}
+          ],
+          "tokens": [
+            {"type": "skull", "effect": "−X where X is the number of Ghoul enemies in play.", "icon_file": "icons/chaos_skull.png"},
+            {"type": "skull", "effect": "−X where X is the number of Ghoul enemies in play.", "icon_file": "icons/chaos_skull.png"},
+            {"type": "cultist", "effect": "Reveal another token. If you fail, place 1 doom on the nearest cultist enemy.", "icon_file": "icons/chaos_cultist.png"},
+            {"type": "tablet", "effect": "−X. If you fail, take 1 horror.", "icon_file": "icons/chaos_tablet.png"},
+            {"type": "elder sign", "effect": "Investigator-specific positive effect.", "icon_file": "icons/chaos_elder_sign.png"}
+          ]
+        },
+
+        {
+          "label": "Hard",
+          "tagline": "I want a true nightmare",
+          "modifiers": [
+            {"value": 0, "icon_file": "icons/chaos_0.png"},
+            {"value": 0, "icon_file": "icons/chaos_0.png"},
+            {"value": 0, "icon_file": "icons/chaos_0.png"},
+            {"value": -1, "icon_file": "icons/chaos_minus1.png"},
+            {"value": -1, "icon_file": "icons/chaos_minus1.png"},
+            {"value": -2, "icon_file": "icons/chaos_minus2.png"},
+            {"value": -2, "icon_file": "icons/chaos_minus2.png"},
+            {"value": -3, "icon_file": "icons/chaos_minus3.png"},
+            {"value": -3, "icon_file": "icons/chaos_minus3.png"},
+            {"value": -4, "icon_file": "icons/chaos_minus4.png"},
+            {"value": -5, "icon_file": "icons/chaos_minus5.png"}
+          ],
+          "tokens": [
+            {"type": "skull", "effect": "−X where X is the number of Ghoul enemies in play.", "icon_file": "icons/chaos_skull.png"},
+            {"type": "skull", "effect": "−X where X is the number of Ghoul enemies in play.", "icon_file": "icons/chaos_skull.png"},
+            {"type": "cultist", "effect": "Reveal another token. If you fail, place 1 doom on the nearest cultist enemy.", "icon_file": "icons/chaos_cultist.png"},
+            {"type": "tablet", "effect": "−X. If you fail, take 1 horror.", "icon_file": "icons/chaos_tablet.png"},
+            {"type": "elder sign", "effect": "Investigator-specific positive effect.", "icon_file": "icons/chaos_elder_sign.png"}
+          ]
+        },
+
+        {
+          "label": "Expert",
+          "tagline": "I want Arkham Horror",
+          "modifiers": [
+            {"value": 0, "icon_file": "icons/chaos_0.png"},
+            {"value": -1, "icon_file": "icons/chaos_minus1.png"},
+            {"value": -1, "icon_file": "icons/chaos_minus1.png"},
+            {"value": -2, "icon_file": "icons/chaos_minus2.png"},
+            {"value": -2, "icon_file": "icons/chaos_minus2.png"},
+            {"value": -3, "icon_file": "icons/chaos_minus3.png"},
+            {"value": -3, "icon_file": "icons/chaos_minus3.png"},
+            {"value": -4, "icon_file": "icons/chaos_minus4.png"},
+            {"value": -4, "icon_file": "icons/chaos_minus4.png"},
+            {"value": -5, "icon_file": "icons/chaos_minus5.png"},
+            {"value": -6, "icon_file": "icons/chaos_minus6.png"},
+            {"value": -8, "icon_file": "icons/chaos_minus8.png"}
+          ],
+          "tokens": [
+            {"type": "skull", "effect": "−X where X is the number of Ghoul enemies in play.", "icon_file": "icons/chaos_skull.png"},
+            {"type": "skull", "effect": "−X where X is the number of Ghoul enemies in play.", "icon_file": "icons/chaos_skull.png"},
+            {"type": "cultist", "effect": "Reveal another token. If you fail, place 1 doom on the nearest cultist enemy.", "icon_file": "icons/chaos_cultist.png"},
+            {"type": "tablet", "effect": "−X. If you fail, take 1 horror.", "icon_file": "icons/chaos_tablet.png"},
+            {"type": "elder sign", "effect": "Investigator-specific positive effect.", "icon_file": "icons/chaos_elder_sign.png"}
+          ]
+        }
+      ]
+    }
+
+    /* Dunwich, Carcosa, Brethren of Ash continue in same structure */
+  ]
+}
