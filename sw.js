@@ -1,4 +1,4 @@
-const CACHE_NAME = 'arkham-companion-v1';
+const CACHE_NAME = 'arkham-companion-v2';
 const APP_SHELL = [
   './',
   './index.html',

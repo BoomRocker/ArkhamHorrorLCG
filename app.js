@@ -161,17 +161,31 @@ function syncDifficultyBagLayout() {
     img.className = 'actual-mini-token';
     img.src = tokenImagePaths[token] || "images/icons/chaos_unknown.png";
     img.alt = token;
+    img.tabIndex = 0;
+    img.setAttribute('role', 'button');
+    img.setAttribute('aria-label', `Use ${specialTokenLabels[token] || token} for this test`);
+    img.addEventListener('click', () => {
+      toggleBagPopover(false);
+      drawSimpleToken(token);
+    });
+    img.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleBagPopover(false);
+        drawSimpleToken(token);
+      }
+    });
     grid.appendChild(img);
   });
 }
 
-function drawSimpleToken() {
+function drawSimpleToken(forcedToken) {
   if (activeBagContents.length === 0) syncDifficultyBagLayout();
 
   playSfx('sfx/card.mp3');
   
   const randIndex = Math.floor(Math.random() * activeBagContents.length);
-  const drawnToken = activeBagContents[randIndex];
+  const drawnToken = forcedToken || activeBagContents[randIndex];
   
   const graphicEl = document.getElementById('token-graphic');
   graphicEl.classList.remove('spin-roll');
@@ -194,7 +208,7 @@ function drawSimpleToken() {
     const elderEffect = investigator?.elder
       .replace(/<[^>]*>/g, '')
       .replace(/^Effect:\s*/i, '') || 'Resolve your investigator\'s Elder Sign effect.';
-    elderFlash.textContent = `ELDER SIGN — AUTOMATIC SUCCESS! ${elderEffect}`;
+    elderFlash.textContent = elderEffect;
     void elderFlash.offsetWidth;
     elderFlash.classList.add('is-visible');
   }
@@ -229,11 +243,11 @@ function drawSimpleToken() {
   void tokenTheater.offsetWidth;
   
   if (drawnToken === 'autofail' || (!isElderSign && finalTotal < target)) {
-    outcomeMsg.innerText = drawnToken === 'autofail' ? "Tentacles! Fail" : `Failed (${finalTotal} vs ${target})`;
+    outcomeMsg.innerText = drawnToken === 'autofail' ? "Tentacles! Fail" : 'Failed';
     outcomeMsg.style.color = "var(--fail-red)";
     tokenTheater.classList.add('test-failure');
   } else {
-    outcomeMsg.innerText = isElderSign ? 'Elder Sign! Automatic Success!' : `Success! (${finalTotal} vs ${target})`;
+    outcomeMsg.innerText = isElderSign ? 'Elder Sign! Automatic Success!' : 'Success!';
     outcomeMsg.style.color = "var(--success-green)";
     tokenTheater.classList.add('test-success');
   }
@@ -245,6 +259,46 @@ function drawSimpleToken() {
     tokenTheater.classList.add('autofail-result');
     playSfx('sfx/dmg.mp3');
   }
+
+  if (isElderSign || drawnToken === 'autofail') {
+    document.getElementById('test-score-counters').replaceChildren();
+  } else {
+    renderTestScoreCounters(target, finalTotal, activeSkillType);
+  }
+}
+
+function renderTestScoreCounters(shroud, skillTotal, skill) {
+  const container = document.getElementById('test-score-counters');
+  const frameFilters = {
+    shroud: 'invert(18%) sepia(72%) saturate(2025%) hue-rotate(342deg) brightness(83%) contrast(96%)',
+    will: 'invert(28%) sepia(31%) saturate(1430%) hue-rotate(164deg) brightness(87%) contrast(91%)',
+    intellect: 'invert(26%) sepia(22%) saturate(1776%) hue-rotate(243deg) brightness(88%) contrast(91%)',
+    combat: 'invert(31%) sepia(29%) saturate(1458%) hue-rotate(336deg) brightness(87%) contrast(88%)',
+    agility: 'invert(33%) sepia(18%) saturate(1699%) hue-rotate(113deg) brightness(86%) contrast(88%)'
+  };
+  const makeCounter = (value, color, label, frameFilter) => {
+    const counter = document.createElement('div');
+    counter.className = `test-score-counter ${label === 'Shroud' ? 'shroud-score-counter' : 'skill-score-counter'}`;
+    counter.style.setProperty('--counter-color', color);
+    counter.style.setProperty('--counter-filter', frameFilter);
+    counter.setAttribute('aria-label', `${label}: ${value}`);
+
+    const frame = document.createElement('img');
+    frame.className = 'counter-frame-shape';
+    frame.src = 'images/icons/counter-frame.svg';
+    frame.alt = '';
+    const number = document.createElement('span');
+    number.className = 'counter-frame-number';
+    number.textContent = value;
+    counter.append(frame, number);
+    return counter;
+  };
+
+  container.replaceChildren(
+    makeCounter(shroud, '#9d2828', 'Shroud', frameFilters.shroud),
+    Object.assign(document.createElement('span'), { className: 'test-score-vs', textContent: 'vs' }),
+    makeCounter(skillTotal, skillVisuals[skill]?.color || '#1a4f78', 'Skill', frameFilters[skill] || frameFilters.will)
+  );
 }
 
 function loadInvestigatorProfileManual() {
@@ -262,6 +316,7 @@ function loadInvestigatorProfileManual() {
   document.getElementById('elder-sign-flash').classList.remove('is-visible');
   
   document.getElementById('class-mood-badge').src = "images/icons/class_" + data.classId + ".png";
+  document.getElementById('dossier-start-class-icon').src = "images/icons/class_" + data.classId + ".png";
   activeClassId = data.classId;
   renderActionIcons();
   
@@ -345,16 +400,40 @@ function togglePhaseCard(event, index) {
 }
 
 function checkSubtaskProgress(index) {
-  playSfx('sfx/click3.wav');
-  const card = document.getElementById(`phase-card-${index}`);
-  const tasks = Array.from(card.querySelectorAll('input[type="checkbox"]'));
-  // Upkeep ends with Reset round. Keep that row available after the three
-  // checkable tasks so the player can complete the round in its proper order.
-  if (card.querySelector('.phase-reset-item')) return;
+  playSfx('sfx/press5.mp3');
+  const tasks = Array.from(document.querySelectorAll(`.phase-flow-step.phase-${index} input[type="checkbox"]`));
+  const phaseSteps = document.querySelectorAll(`.phase-flow-step.phase-${index}`);
+  // Upkeep ends with Reset round, so do not dim it before its final action.
+  if (index === 3) {
+    updatePhaseFlowGuidance();
+    return;
+  }
   const complete = tasks.length > 0 && tasks.every(task => task.checked);
+  phaseSteps.forEach(step => step.classList.toggle('phase-complete', complete));
+  updatePhaseFlowGuidance();
+}
 
-  card.classList.toggle('completed', complete);
-  if (complete) tasks.forEach(task => task.disabled = true);
+function updatePhaseFlowGuidance() {
+  const steps = Array.from(document.querySelectorAll('.phase-flow-step'));
+  // The visual track doubles back across row two, so its DOM order differs
+  // from the arrow order at that turn in the round.
+  const roundOrder = [0, 1, 2, 3, 7, 6, 5, 4, 8, 9];
+  steps.forEach(step => step.classList.remove('next-action'));
+
+  const nextIndex = roundOrder.find(index => {
+    const checkbox = steps[index]?.querySelector('input[type="checkbox"]');
+    return checkbox ? !checkbox.checked : false;
+  });
+  (nextIndex === undefined ? steps[9] : steps[nextIndex])?.classList.add('next-action');
+}
+
+function selectPhaseForPhone(index) {
+  document.querySelectorAll('.phase-column-card').forEach((card, cardIndex) => {
+    card.classList.toggle('phone-active', cardIndex === index);
+  });
+  document.querySelectorAll('.phase-phone-tab').forEach((tab, tabIndex) => {
+    tab.classList.toggle('active', tabIndex === index);
+  });
 }
 
 function togglePhaseActivation(index) {
@@ -388,11 +467,12 @@ function renderActionIcons() {
 
 function resetRoundMatrix() {
   playSfx('sfx/symbol.mp3');
-  document.querySelectorAll('.phase-column-card').forEach(c => c.classList.remove('completed'));
-  document.querySelectorAll('.subtask-box input').forEach(i => {
+  document.querySelectorAll('.phase-flow-step').forEach(step => step.classList.remove('phase-complete'));
+  document.querySelectorAll('.phase-flow-board input').forEach(i => {
     i.checked = false;
     i.disabled = false;
   });
+  updatePhaseFlowGuidance();
   renderActionIcons();
 }
 
@@ -446,6 +526,7 @@ window.addEventListener('DOMContentLoaded', () => {
   syncDifficultyBagLayout();
   selectSkillManual(activeSkillType, 0, false);
   renderActionIcons();
+  updatePhaseFlowGuidance();
   const player = document.getElementById('audio-player');
   player.addEventListener('timeupdate', syncAudioScrubber);
   player.addEventListener('loadedmetadata', syncAudioScrubber);

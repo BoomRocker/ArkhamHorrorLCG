@@ -34,7 +34,6 @@
     
     <!-- TAB 1: SETUP -->
     <div id="view-setup" class="view-panel active-view">
-      <h3 class="dossier-title">Dossier</h3>
       <div class="setup-grid">
         
         <div class="form-group">
@@ -93,10 +92,6 @@
           </select>
         </div>
       </div>
-      <button class="dossier-start-trial" type="button" onclick="switchActiveTab('arena')">
-        <img id="dossier-start-class-icon" src="images/icons/class_guardian.png" alt="">
-        <span>Start a Trial</span>
-      </button>
     </div>
 
     <!-- TAB 2: TRIALS -->
@@ -105,7 +100,7 @@
         <div class="arena-left">
           
           <div class="calc-row shroud-row">
-            <span class="shroud-label"><img src="images/icons/shroud.png" alt="">Shroud value:</span>
+            <span class="shroud-label">Shroud value:</span>
             <div class="counter-control bonus-skill-control">
               <button onclick="adjustCounter('val-target', -1)">-</button>
               <span id="val-target" style="font-family:'Teutonic'; font-size: 1.5rem; min-width: 20px; text-align: center; color:var(--fail-red);">2</span>
@@ -146,7 +141,7 @@
           </div>
           <hr class="skills-divider">
           <div class="chaos-draw-controls">
-            <button class="btn bag-button" onclick="toggleBagPopover(true)" aria-label="Show chaos bag"><img src="images/icons/bag.png" alt=""></button>
+            <button class="btn bag-button" onclick="toggleBagPopover(true)" aria-label="Show chaos bag">👜</button>
             <button class="btn draw-chaos-button" onclick="drawSimpleToken()">Draw Chaos Token</button>
           </div>
         </div>
@@ -155,7 +150,6 @@
           <div class="token-theater">
             <div id="token-graphic" class="animated-token"></div>
             <div id="test-outcome-msg" class="result-banner"></div>
-            <div id="test-score-counters" class="test-score-counters" aria-label="Test totals"></div>
             <div id="token-effect-msg" class="token-effect-text"></div>
           </div>
         </div>
@@ -164,19 +158,62 @@
 
     <!-- TAB 3: PHASES -->
     <div id="view-rounds" class="view-panel">
-      <div class="phase-flow-board" aria-label="Round sequence">
-        <label class="phase-flow-step phase-0 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img class="phase-flow-badge" src="images/icons/phase_mythos.png" alt="Mythos"><img class="phase-flow-icon" src="images/icons/phase_step_horror.png" alt=""><span>+1 Doom</span></label>
-        <label class="phase-flow-step phase-0 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img class="phase-flow-badge" src="images/icons/phase_mythos.png" alt="Mythos"><img class="phase-flow-icon" src="images/icons/phase_step_doomthreshold.png" alt=""><span>Doom Limit</span></label>
-        <label class="phase-flow-step phase-0 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img class="phase-flow-badge" src="images/icons/phase_mythos.png" alt="Mythos"><img class="phase-flow-icon" src="images/icons/phase_step_encounter.png" alt=""><span>Encounter</span></label>
-        <label class="phase-flow-step phase-1 flow-down"><input type="checkbox" onclick="checkSubtaskProgress(1)"><img class="phase-flow-badge" src="images/icons/phase_investigation.png" alt="Investigation"><img class="phase-flow-icon" src="images/icons/phase_step_spendactions.png" alt=""><span>Actions</span></label>
+      <div class="phase-columns-board">
+        <div id="phase-card-0" class="phase-column-card">
+          <div class="phase-header-wrapper" onclick="togglePhaseActivation(0)">
+            <img src="images/icons/phase_mythos.png" class="phase-icon" alt="Mythos">
+            <div class="phase-header-text">
+              <h4>I. Mythos</h4>
+            </div>
+          </div>
+          <div class="subtask-box" onclick="event.stopPropagation()">
+            <label class="subtask-item"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img src="images/icons/phase_step_horror.png" class="step-icon" alt=""><span>Place 1 doom on agenda</span></label>
+            <label class="subtask-item"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img src="images/icons/phase_step_doomthreshold.png" class="step-icon" alt=""><span>Check doom threshold limit</span></label>
+            <label class="subtask-item"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img src="images/icons/phase_step_encounter.png" class="step-icon" alt=""><span>Draw encounter card per player</span></label>
+          </div>
+        </div>
 
-        <label class="phase-flow-step phase-3 flow-down"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_resources.png" alt=""><span>+1 Card+Rsrc.</span></label>
-        <label class="phase-flow-step phase-3 flow-left"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_reset.png" alt=""><span>Ready Cards</span></label>
-        <label class="phase-flow-step phase-2 flow-left"><input type="checkbox" onclick="checkSubtaskProgress(2)"><img class="phase-flow-badge" src="images/icons/phase_enemy.png" alt="Enemy"><img class="phase-flow-icon" src="images/icons/phase_step_enemy.png" alt=""><span>Enemy Attack</span></label>
-        <label class="phase-flow-step phase-2 flow-left"><input type="checkbox" onclick="checkSubtaskProgress(2)"><img class="phase-flow-badge" src="images/icons/phase_enemy.png" alt="Enemy"><img class="phase-flow-icon" src="images/icons/phase_step_enemy2.png" alt=""><span>Hunter Move</span></label>
+        <div id="phase-card-1" class="phase-column-card">
+          <div class="phase-header-wrapper" onclick="togglePhaseActivation(1)">
+            <img src="images/icons/phase_investigation.png" class="phase-icon" alt="Investigation">
+            <div class="phase-header-text">
+              <h4>II. Investigation</h4>
+            </div>
+          </div>
+          <div class="subtask-box" onclick="event.stopPropagation()">
+            <label class="subtask-item"><input type="checkbox" onclick="checkSubtaskProgress(1)"><img src="images/icons/phase_step_investigator.png" class="step-icon" alt=""><span>Active investigator turn</span></label>
+            <label class="subtask-item"><input type="checkbox" onclick="checkSubtaskProgress(1)"><img src="images/icons/phase_step_spendactions.png" class="step-icon" alt=""><span>Spend actions (Draw / Play / Move / Fight)</span></label>
+            <label class="subtask-item"><input type="checkbox" onclick="checkSubtaskProgress(1)"><img src="images/icons/phase_step_next.png" class="step-icon" alt=""><span>Pass turn to next investigator</span></label>
+          </div>
+        </div>
 
-        <label class="phase-flow-step phase-3 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_hand.png" alt=""><span>8 Card Hand</span></label>
-        <div class="phase-flow-step phase-reset-flow" role="button" tabindex="0" onclick="resetRoundMatrix()" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); resetRoundMatrix(); }"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_reset2.png" alt=""><span>Reset</span></div>
+        <div id="phase-card-2" class="phase-column-card">
+          <div class="phase-header-wrapper" onclick="togglePhaseActivation(2)">
+            <img src="images/icons/phase_enemy.png" class="phase-icon" alt="Enemy">
+            <div class="phase-header-text">
+              <h4>III. Enemy</h4>
+            </div>
+          </div>
+          <div class="subtask-box" onclick="event.stopPropagation()">
+            <label class="subtask-item"><input type="checkbox" onclick="checkSubtaskProgress(2)"><img src="images/icons/phase_step_enemy2.png" class="step-icon" alt=""><span>Move hunter enemies</span></label>
+            <label class="subtask-item"><input type="checkbox" onclick="checkSubtaskProgress(2)"><img src="images/icons/phase_step_enemy.png" class="step-icon" alt=""><span>Engaged enemies attack</span></label>
+          </div>
+        </div>
+
+        <div id="phase-card-3" class="phase-column-card">
+          <div class="phase-header-wrapper" onclick="togglePhaseActivation(3)">
+            <img src="images/icons/phase_upkeep.png" class="phase-icon" alt="Upkeep">
+            <div class="phase-header-text">
+              <h4>IV. Upkeep</h4>
+            </div>
+          </div>
+          <div class="subtask-box" onclick="event.stopPropagation()">
+            <label class="subtask-item"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img src="images/icons/phase_step_reset.png" class="step-icon" alt=""><span>Ready all exhausted cards</span></label>
+            <label class="subtask-item"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img src="images/icons/phase_step_resources.png" class="step-icon" alt=""><span>Each investigator draws 1 card & gains 1 resource</span></label>
+            <label class="subtask-item"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img src="images/icons/phase_step_hand.png" class="step-icon" alt=""><span>Check hand size limits (Max 8)</span></label>
+            <div class="subtask-item phase-reset-item" role="button" tabindex="0" onclick="resetRoundMatrix()" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); resetRoundMatrix(); }"><img src="images/icons/phase_step_reset2.png" class="step-icon" alt=""><span>Reset round</span></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -224,8 +261,8 @@
   <!-- MODAL BAG TRAY -->
   <div id="bag-popover" class="popover-overlay" onclick="toggleBagPopover(false)">
     <div class="popover-container" onclick="event.stopPropagation()">
-      <div class="bag-popover-heading">
-        <div class="bag-popover-title"><img src="images/icons/bag.png" alt=""><label id="bag-headline">Bag contents array</label></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid var(--panel-border); padding-bottom:4px;">
+        <label id="bag-headline">Bag contents array</label>
         <button style="border:none; background:none; font-size:1.4rem; cursor:pointer;" onclick="toggleBagPopover(false)">✕</button>
       </div>
       <div id="bag-contents-grid" class="bag-token-grid">
