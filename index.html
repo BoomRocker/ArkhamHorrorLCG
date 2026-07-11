@@ -17,14 +17,10 @@
 
   <!-- PROFILE BANNER -->
   <div class="investigator-sticky-header" id="dynamic-class-skin">
-    <div class="header-portrait-frame investigator-profile-trigger" role="button" tabindex="0" aria-label="Open investigator profile" onclick="toggleInvestigatorModal(true)">
-      <img id="card-portrait" class="header-portrait" src="images/investigators/roland.png" alt="Portrait">
-    </div>
     <div class="header-meta">
       <div class="header-top-row">
         <h2 id="card-name">Roland Banks</h2>
       </div>
-      <div id="elder-sign-flash" class="elder-sign-flash" role="status" aria-live="assertive"></div>
     </div>
     <img id="class-mood-badge" class="class-mood-icon" src="images/icons/class_guardian.png" alt="Class Badge">
   </div>
@@ -93,9 +89,11 @@
           </select>
         </div>
       </div>
+	   <p id="profile-flavor" class="profile-flavor-main">A federal agent who left the FBI's books behind to hunt the unnatural in Arkham.</p>
+      
       <button class="dossier-start-trial" type="button" onclick="switchActiveTab('arena')">
         <img id="dossier-start-class-icon" src="images/icons/class_guardian.png" alt="">
-        <span>Start a Trial</span>
+        <span>Start a Skill Trial</span>
       </button>
     </div>
 
@@ -203,6 +201,9 @@
 
   <!-- FIXED BOTTOM NAVIGATION -->
   <div class="pwa-navbar-tabs">
+    <div class="nav-investigator-photo investigator-profile-trigger" role="button" tabindex="0" aria-label="Open investigator profile" onclick="toggleInvestigatorModal(true)">
+      <img id="card-portrait" class="header-portrait" src="images/investigators/roland.png" alt="Portrait">
+    </div>
     <div id="tab-btn-setup" class="nav-tab-item active-tab" onclick="switchActiveTab('setup')">
       <img src="images/icons/tab_investigator.png" alt="Setup">
       <span>Dossier</span>
@@ -237,14 +238,26 @@
   <div id="investigator-modal" class="popover-overlay" onclick="toggleInvestigatorModal(false)">
     <div class="popover-container investigator-profile-modal" onclick="event.stopPropagation()">
       <div class="profile-modal-heading">
-        <h2 id="profile-name">Roland Banks</h2>
+        <div class="profile-name-controls">
+          <button class="profile-nav-button" type="button" onclick="cycleInvestigator(-1)" aria-label="Previous investigator"><img src="images/icons/arrow-left.svg" alt=""></button>
+          <h2 id="profile-name">Roland Banks</h2>
+          <button class="profile-nav-button" type="button" onclick="cycleInvestigator(1)" aria-label="Next investigator"><img src="images/icons/arrow-right.svg" alt=""></button>
+        </div>
         <button class="modal-close" onclick="toggleInvestigatorModal(false)" aria-label="Close profile">×</button>
       </div>
-      <img id="profile-portrait" class="profile-portrait" src="images/investigators/roland.png" alt="Investigator portrait">
-      <h3>Ability</h3>
-      <p id="profile-ability">Reaction: After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)</p>
-      <h3>Elder Sign</h3>
-      <div id="profile-elder">Effect: <img src="images/icons/chaos_eldersign.png" class="token-icon" alt="Elder Sign"> +1 for each clue on your location.</div>
+      <div class="profile-id-card">
+        <div class="profile-id-photo">
+          <img id="profile-portrait" class="profile-portrait" src="images/investigators/roland.png" alt="Investigator portrait">
+          <img id="profile-class-icon" class="profile-class-icon" src="images/icons/class_guardian.png" alt="Investigator class">
+        </div>
+        <p id="profile-flavor" class="profile-flavor">A federal agent who left the FBI's books behind to hunt the unnatural in Arkham.</p>
+      </div>
+      <div class="profile-case-notes">
+        <h3>Ability</h3>
+        <p id="profile-ability"><b>Reaction:</b> After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)</p>
+        <h3>Elder Sign</h3>
+        <div id="profile-elder"><b>Effect:</b> <img src="images/icons/chaos_eldersign.png" class="token-icon" alt="Elder Sign"> +1 for each clue on your location.</div>
+      </div>
     </div>
   </div>
 
