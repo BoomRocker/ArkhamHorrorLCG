@@ -44,8 +44,7 @@ html {
 
 body {
   background-color: var(--bg-dark);
-  background-image: radial-gradient(circle at 50% 50%, transparent 50%, rgba(0,0,0,0.5)),
-                    url('images/textures/paper01.png');
+  background-image: url('images/textures/paper01.png');
   background-size: cover;
   background-attachment: fixed;
   color: var(--text-dark);
@@ -458,13 +457,13 @@ body {
 
 /* Main Viewport Content */
 .main-viewport {
-  flex: 1;
+ /* flex: 1;
   background-image: url('images/textures/paper01.png');
   background-repeat: no-repeat;
-  background-size: 120%; /* makes movement visible */
-  background-position: -300px -300px; /* stronger shift */
-  background-attachment: fixed; /* ensures movement */
-  min-height: 0;
+  background-size: 120%; /* makes movement visible 
+  background-position: -300px -300px; /* stronger shift 
+  background-attachment: fixed; /* ensures movement 
+  min-height: 0;*/
 }
 
 
@@ -495,9 +494,11 @@ body {
   
   /* Your background image properties */
   background-image: url(images/textures/music02.png);
-  background-size: 85%;
-  background-position: right;
+  background-position: top center;
   background-repeat: no-repeat;
+  background-size:135%;
+  height:800px;
+  
   
   /* Adjust this value to control the exact transparency (0.0 to 1.0) */
   opacity: 0.5; 
@@ -718,15 +719,15 @@ select option {
 }
 
 .arena-split::before {
-  content: '';
+  /*content: '';
   position: absolute;
   inset: 0;
   z-index: 0;
   background-image: linear-gradient(rgba(251, 248, 240, 0.96), rgba(251, 248, 240, 0.96)), var(--investigator-watermark, url('images/investigators/roland.png'));
   background-repeat: no-repeat;
-  background-position: -200px center; /* move watermark farther left */
+  background-position: -200px center; /* move watermark farther left 
   background-size: cover, contain;
-  opacity: 2;
+  opacity: 2; */
 }
 
 
@@ -762,6 +763,9 @@ select option {
 .skills-row {
   display: flex;
   gap: 4px;
+  padding: 4px;
+  background: rgba(248, 243, 224, 0.55) url('images/textures/paper01.png') center / cover;
+  border: 1px solid rgba(49, 42, 35, 0.18);
 }
 
 .stat-badge {
@@ -847,13 +851,16 @@ select option {
   border-radius: 4px;
   border: 1px solid rgba(0,0,0,0.08);
   min-height: 60px;
-      background: url(images/textures/paper01.png);
+  background-image: url('images/textures/paper01.png');
+  background-size: cover;
+  background-position: center;
 }
 
 .calc-row.shroud-row {
-  background: rgba(139, 38, 62, 0.21);
+  background:
+    linear-gradient(rgba(139, 38, 62, 0.21), rgba(139, 38, 62, 0.21)),
+    url('images/textures/paper01.png') center / cover;
   border: 2px solid #6b1d2e;
-    background: url(images/textures/papellow.jpg);
 }
 
 .calc-row span {
@@ -907,6 +914,9 @@ select option {
 .chaos-draw-controls {
   display: flex;
   gap: 6px;
+  padding: 5px;
+  background: rgba(248, 243, 224, 0.48) url('images/textures/paper01.png') center / cover;
+  border: 1px solid rgba(49, 42, 35, 0.2);
 }
 
 .chaos-draw-controls .btn {
