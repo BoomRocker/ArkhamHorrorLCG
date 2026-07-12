@@ -22,7 +22,7 @@
         <h2 id="card-name">Roland Banks</h2>
       </div>
     </div>
-    <img id="class-mood-badge" class="class-mood-icon" src="images/icons/class_guardian.png" alt="Class Badge">
+    <img id="class-mood-badge" class="class-mood-icon" src="images/icons/class_guardian.png" alt="Refresh app" role="button" tabindex="0" title="Refresh app" onclick="refreshApp()" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); refreshApp(); }">
   </div>
 
   <!-- PANELS VIEWPORT -->
@@ -89,7 +89,7 @@
           </select>
         </div>
       </div>
-	   <p id="profile-flavor" class="profile-flavor-main">A federal agent who left the FBI's books behind to hunt the unnatural in Arkham.</p>
+	   <p id="dossier-flavor" class="profile-flavor-main">A federal agent who left the FBI's books behind to hunt the unnatural in Arkham.</p>
       
       <button class="dossier-start-trial" type="button" onclick="switchActiveTab('arena')">
         <img id="dossier-start-class-icon" src="images/icons/class_guardian.png" alt="">

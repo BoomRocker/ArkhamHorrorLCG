@@ -220,7 +220,7 @@ body {
   }
 
   .header-meta h2 {
-    font-size: 1.25rem;
+    font-size: 36px;
   }
 
   .header-meta .ability-snippet,
@@ -894,7 +894,7 @@ select option {
   background: transparent;
   color: var(--panel-border);
   border-color: var(--panel-border);
-  border:none;
+
 }
 
 .chaos-draw-controls .bag-button img {
@@ -1103,8 +1103,8 @@ select option {
 .token-theater .token-effect-text {
   color: var(--text-dark);
   font-family: 'Special Elite', 'Courier New', monospace;
-  font-size: 16px;
-  font-weight: normal;
+  font-size: 17px;
+  font-weight: bold;
   max-width: 300px;
   background: url(images/textures/paper01.png);
   box-shadow: 3px 5px 12px rgba(0, 0, 0, 0.35);
@@ -1114,6 +1114,7 @@ select option {
 /* Dynamically hides the box completely if there is no text or content inside */
 .token-theater .token-effect-text:empty {
   display: none !important;
+
 }
 
 .token-theater.test-success {
@@ -1136,11 +1137,13 @@ select option {
 .token-theater.test-success .result-banner {
   animation: successResultStamp 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-shadow: 0 1px 1px #e8ffe7, 0 0 10px rgba(44, 145, 54, 0.72);
+      margin:10px 0 10px 0;
 }
 
 .token-theater.test-failure .result-banner {
   animation: failureResultStamp 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-shadow: 0 1px 1px #ffe8e8, 0 0 10px rgba(150, 21, 21, 0.65);
+      margin:10px 0 10px 0;
 }
 
 .token-theater.test-success .animated-token {
@@ -2244,16 +2247,16 @@ select option {
 }
 
 .profile-flavor-main {
-  margin: 65px 0 0 0;
-  padding: 5px 5px 5px 5px;
+  margin: 70px 0 0 -70px;
+  padding: 10px 7px 7px 35px;
   color: var(--class-color);
   font-family: 'Special Elite', 'Courier New', monospace;
-  font-size: 14px;
+  font-size: 18px;
   font-style: normal;
-  line-height: 1.35;
+  line-height: 1.1;
   font-weight: bold;
-  transform: rotate(-7deg);
-  max-width: 270px;
+  transform: rotate(-3deg);
+  max-width: 350px;
   background: url(images/textures/paper01.png);
   
   /* Adds a realistic, soft drop shadow */

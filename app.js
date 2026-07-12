@@ -366,7 +366,9 @@ function loadInvestigatorProfileManual() {
   document.getElementById('profile-name').innerText = data.name;
   document.getElementById('profile-portrait').src = data.img;
   document.getElementById('profile-portrait').alt = `${data.name} portrait`;
-  document.getElementById('profile-flavor').innerText = investigatorFlavor[select.value] || '';
+  const flavor = investigatorFlavor[select.value] || '';
+  document.getElementById('dossier-flavor').innerText = flavor;
+  document.getElementById('profile-flavor').innerText = flavor;
   document.getElementById('profile-ability').innerText = data.ability;
   document.getElementById('profile-elder').innerHTML = data.elder;
   
@@ -446,11 +448,29 @@ function adjustCounter(id, delta) {
   }
 }
 
+const sfxPlayers = new Map();
+
+function getSfxPlayer(src) {
+  if (!sfxPlayers.has(src)) {
+    const sound = new Audio(src);
+    sound.preload = 'auto';
+    sound.setAttribute('playsinline', '');
+    sound.volume = 0.45;
+    sound.load();
+    sfxPlayers.set(src, sound);
+  }
+  return sfxPlayers.get(src);
+}
+
 function playSfx(src) {
-  const sound = new Audio(src);
-  sound.volume = 0.45;
+  const sound = getSfxPlayer(src);
+  sound.pause();
+  sound.currentTime = 0;
   sound.play().catch(() => {});
 }
+
+// Preload the phase/reset sound so iOS can play it immediately from the tap handler.
+getSfxPlayer('sfx/symbol.mp3');
 
 function switchActiveTab(target) {
   document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active-view'));
@@ -463,6 +483,10 @@ function toggleBagPopover(show) {
   document.getElementById('bag-popover').style.display = show ? 'flex' : 'none';
 }
 
+function refreshApp() {
+  window.location.reload();
+}
+
 function toggleInvestigatorModal(show) {
   document.getElementById('investigator-modal').style.display = show ? 'flex' : 'none';
 }
@@ -473,7 +497,7 @@ function togglePhaseCard(event, index) {
 }
 
 function checkSubtaskProgress(index) {
-  playSfx('sfx/press3.mp3');
+  playSfx('sfx/symbol.mp3');
   const tasks = Array.from(document.querySelectorAll(`.phase-flow-step.phase-${index} input[type="checkbox"]`));
   const phaseSteps = document.querySelectorAll(`.phase-flow-step.phase-${index}`);
   // Upkeep ends with Reset round, so do not dim it before its final action.
@@ -539,7 +563,7 @@ function renderActionIcons() {
 }
 
 function resetRoundMatrix() {
-  playSfx('sfx/symbol.mp3');
+  playSfx('sfx/flip.mp3');
   document.querySelectorAll('.phase-flow-step').forEach(step => step.classList.remove('phase-complete'));
   document.querySelectorAll('.phase-flow-board input').forEach(i => {
     i.checked = false;
