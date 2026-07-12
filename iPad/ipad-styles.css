@@ -459,11 +459,14 @@ body {
 /* Main Viewport Content */
 .main-viewport {
   flex: 1;
-  background: var(--panel-bg);
   background-image: url('images/textures/paper01.png');
-  /*background-color: var(--class-color);*/
+  background-repeat: no-repeat;
+  background-size: 120%; /* makes movement visible */
+  background-position: -300px -300px; /* stronger shift */
+  background-attachment: fixed; /* ensures movement */
   min-height: 0;
 }
+
 
 .view-panel {
   display: none;
@@ -561,8 +564,6 @@ select option {
   background-color: #cdb98e;
   background-image: url('images/textures/dossier3.png');
   background-repeat: no-repeat;
-  background-size: 100% auto;
-  background-position: center -100px;
   padding: 0 50px 0 55px;
 }
 
@@ -574,6 +575,7 @@ select option {
   font-weight: normal;
   letter-spacing: 0.06em;
   line-height: 0.9;
+  padding-top:10px;
 }
 
 #view-setup .form-group label {
@@ -2497,7 +2499,10 @@ select option {
   #view-setup {
     position: relative;
     padding: 4px 84px 0 70px;
-    background-position: center -72px;
+    /* Adjust these two values to nudge the dossier art left/right and up/down. */
+    --dossier-background-x: center;
+    --dossier-background-y: -72px;
+    background-position: var(--dossier-background-x) var(--dossier-background-y);
   }
 
   .dossier-title {
@@ -2657,7 +2662,7 @@ select option {
 /* Investigator reference card placed on the open notebook in the iPad dossier. */
 @media (min-width: 768px) and (max-width: 1366px) and (orientation: landscape) {
   .profile-flavor-main {
-    top: 63%;
+    top: 75%;
     left: 82%;
     width: 51%;
     font-size: 1.2rem;
@@ -2762,7 +2767,7 @@ select option {
     font-size: 1.25rem;
     font-weight: bold;
     line-height: 1.18;
-	width:85%;
+	width:350px;
   }
 
   .ipad-investigator-rule .token-icon {
@@ -2772,8 +2777,8 @@ select option {
   }
 
   .dossier-start-trial {
-    top: 58%;
-    right: -10%;
+    top: 460px;
+	left:650px;
     min-height: 63px;
     padding: 0 0 0 10px;
 	background-image: url(images/textures/clipperFlip.png);
@@ -2782,10 +2787,8 @@ select option {
   }
   
   .dossier-start-trial span {
-    width: 100%;
-    padding: 10% 35% 10px 0;
-	margin: 0 0 0 -15px;
+    width: 150px;
+    padding: 10px 0 0 0;
     font-size: 2rem;
-	height:auto;
   }
 }
