@@ -465,7 +465,6 @@ body {
   background-position: -300px -300px; /* stronger shift */
   background-attachment: fixed; /* ensures movement */
   min-height: 0;
-  background-color: var(--class-color);
 }
 
 
