@@ -562,12 +562,10 @@ select option {
 
 /* Investigator dossier: a typed private-investigator case sheet. */
 #view-setup {
-  background-color: #cdb98e;
-  background-image: url('images/textures/dossier3.png');
-  background-repeat: no-repeat;
+  background-color: transparent;
   padding: 0 50px 0 55px;
-  background-color: var(--class-color);
 }
+
 
 .dossier-title {
   margin: 0 0 5px;
