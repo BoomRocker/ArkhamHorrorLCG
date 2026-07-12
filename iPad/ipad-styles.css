@@ -80,6 +80,25 @@ body {
   box-shadow: 0 3px 8px rgba(0,0,0,0.45);
   color: #f4edd9;
   transition: background-color 0.3s ease;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Safari can let an opaque texture hide the header's background-color. */
+.investigator-sticky-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--class-color);
+  opacity: 0.82;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.investigator-sticky-header > * {
+  position: relative;
+  z-index: 1;
 }
 
 .header-portrait-frame {
