@@ -1,0 +1,13 @@
+{
+  "name": "Arkham Horror Companion Omni",
+  "short_name": "Arkham Omni",
+  "description": "Responsive Arkham Horror LCG companion.",
+  "start_url": "./omni.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#140f0c",
+  "theme_color": "#140f0c",
+  "icons": [{ "src": "images/icons/favicon.png", "sizes": "any", "type": "image/png", "purpose": "any maskable" }]
+}
