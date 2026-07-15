@@ -283,7 +283,6 @@ body {
   background-position: center;
   background-blend-mode: multiply;
   border: 2px solid var(--panel-border);
-  border-radius: 6px 6px 0 0;
   padding: 0px 12px 0px 12px;
   display: flex;
   align-items: center;
