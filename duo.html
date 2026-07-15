@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Arkham Horror Companion App - Duo Dossier</title>
+  <meta name="theme-color" content="#140f0c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Arkham Companion">
+  <link rel="icon" type="image/png" href="images/icons/favicon.png">
+  <link rel="apple-touch-icon" href="images/icons/favicon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="duo.css">
+</head>
+<body>
+
+  <!-- PROFILE BANNER -->
+  <div class="investigator-sticky-header" id="dynamic-class-skin">
+    <div class="header-meta">
+      <div class="header-top-row">
+        <h2 id="card-name" class="sr-only">Roland Banks</h2>
+        <div class="duo-investigator-tabs" role="tablist" aria-label="Active investigator">
+          <button id="header-primary-tab" class="duo-investigator-tab active" type="button" role="tab" aria-selected="true" onclick="activateInvestigatorSlot('primary')">Roland Banks</button>
+          <span class="duo-tab-divider" aria-hidden="true"></span>
+          <button id="header-secondary-tab" class="duo-investigator-tab" type="button" role="tab" aria-selected="false" onclick="activateInvestigatorSlot('secondary')">Daisy Walker</button>
+        </div>
+      </div>
+    </div>
+    <img id="class-mood-badge" class="class-mood-icon" src="images/icons/class_guardian.png" alt="Refresh app" role="button" tabindex="0" title="Refresh app" onclick="refreshApp()" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); refreshApp(); }">
+  </div>
+
+  <!-- PANELS VIEWPORT -->
+  <div class="main-viewport">
+    
+    <!-- TAB 1: SETUP -->
+    <div id="view-setup" class="view-panel active-view">
+      <div class="setup-grid">
+        
+        <div class="form-group">
+          <label>First investigator</label>
+          <select id="investigator-select" onchange="setInvestigatorForSlot('primary')">
+            <option value="roland">Roland Banks [Guardian] — Core</option>
+            <option value="daisy">Daisy Walker [Seeker] — Core</option>
+            <option value="skids">"Skids" O'Toole [Rogue] — Core</option>
+            <option value="agnes">Agnes Baker [Mystic] — Core</option>
+            <option value="wendy">Wendy Adams [Survivor] — Core</option>
+            <option value="zoey">Zoey Samaras [Guardian] — Dunwich</option>
+            <option value="rex">Rex Murphy [Seeker] — Dunwich</option>
+            <option value="jenny">Jenny Barnes [Rogue] — Dunwich</option>
+            <option value="jim">Jim Culver [Mystic] — Dunwich</option>
+            <option value="pete">"Ashcan" Pete [Survivor] — Dunwich</option>
+            <option value="mark">Mark Harrigan [Guardian] — Carcosa</option>
+            <option value="minh">Minh Thi Phan [Seeker] — Carcosa</option>
+            <option value="sefina">Sefina Rousseau [Rogue] — Carcosa</option>
+            <option value="akachi">Akachi Onyele [Mystic] — Carcosa</option>
+            <option value="yorick">William Yorick [Survivor] — Carcosa</option>
+            <option value="lola">Lola Hayes [Neutral] — Carcosa</option>
+            <option value="daniela">Daniela Reyes [Guardian] — Edge of the Earth</option>
+            <option value="joe">Joe Diamond [Seeker] — Circle Undone</option>
+            <option value="trish">Trish Scarborough [Rogue] — Innsmouth</option>
+            <option value="dexter">Dexter Drake [Mystic] — Innsmouth</option>
+            <option value="isabelle">Isabelle Barnes [Survivor] — Custom</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Second investigator</label>
+          <select id="co-investigator-select" onchange="setInvestigatorForSlot('secondary')" aria-label="Second investigator">
+            <!-- Options are kept in sync with the first investigator list by duo.js. -->
+          </select>
+        </div>
+
+		<div class="form-group">
+          <label>Campaign log chronology</label>
+          <select id="campaign-select" onchange="updateCampaignScenario()">
+            <option value="notz">Night of the Zealot</option>
+            <option value="dunwich">The Dunwich Legacy</option>
+            <option value="carcosa">Path to Carcosa</option>
+            <option value="ash">Brethren of Ash (2026)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Scenario logs</label>
+          <select id="scenario-select" onchange="syncDifficultyBagLayout()">
+            <option value="scen1">The Gathering / Intro</option>
+            <option value="scen2">Midnight Masks / Chapter II</option>
+            <option value="scen3">The Devourer Below</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Chaos bag difficulty tier</label>
+          <select id="difficulty-select" onchange="syncDifficultyBagLayout()">
+            <option value="easy" selected>Easy</option>
+            <option value="standard">Standard</option>
+            <option value="hard">Hard</option>
+            <option value="expert">Expert</option>
+          </select>
+        </div>
+
+        <div class="form-group dossier-start-group">
+          <label>Skill trial</label>
+          <button class="dossier-start-trial" type="button" onclick="switchActiveTab('arena')">
+            <img id="dossier-start-class-icon" src="images/icons/class_guardian.png" alt="">
+            <span>Start a Skill Trial</span>
+          </button>
+        </div>
+
+      </div>
+
+      <section class="ipad-investigator-card" aria-label="Investigator case card">
+        <div class="ipad-investigator-card-heading">
+          <button class="ipad-investigator-nav" type="button" aria-label="Previous investigator" onclick="cycleInvestigator(-1)"><img src="images/icons/arrow-left.svg" alt=""></button>
+          <h4 id="ipad-investigator-name">Roland Banks</h4>
+          <button class="ipad-investigator-nav" type="button" aria-label="Next investigator" onclick="cycleInvestigator(1)"><img src="images/icons/arrow-right.svg" alt=""></button>
+        </div>
+        <div class="ipad-investigator-card-body">
+          <div class="ipad-investigator-photo-wrap">
+            <img id="ipad-investigator-portrait" class="ipad-investigator-portrait" src="images/investigators/roland.png" alt="Roland Banks portrait">
+            <img id="ipad-card-class-icon" class="ipad-card-class-icon" src="images/icons/class_guardian.png" alt="Guardian class">
+          </div>
+          <div class="ipad-investigator-details">
+            <div class="ipad-investigator-rule">
+              <span>Ability</span>
+              <p id="ipad-investigator-ability">Reaction: After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)</p>
+            </div>
+            <div class="ipad-investigator-rule">
+              <span>Elder Sign</span>
+              <p id="ipad-investigator-elder">+1 for each clue on your location.</p>
+            </div>
+				<p id="dossier-flavor" class="profile-flavor-main">A federal agent who left the FBI's books behind to hunt the unnatural in Arkham.</p>
+
+          </div>
+        </div>
+	
+      </section>
+
+      <section class="dossier-vitals" aria-label="Investigator health and sanity">
+        <div class="dossier-vital">
+          <div class="dossier-vital-label"><img src="images/icons/investigator_hp.png" alt=""><span>Health</span></div>
+          <div class="dossier-vital-control">
+            <button type="button" onclick="adjustVital('health', -1)" aria-label="Reduce health">−</button>
+            <span id="vital-health">9</span>
+            <button class="bonus-skill-control" type="button" onclick="adjustVital('health', 1)" aria-label="Increase health">+</button>
+          </div>
+        </div>
+        <div class="dossier-vital">
+          <div class="dossier-vital-label"><img src="images/icons/investigator_sanity.png" alt=""><span>Sanity</span></div>
+          <div class="dossier-vital-control">
+            <button type="button" onclick="adjustVital('sanity', -1)" aria-label="Reduce sanity">−</button>
+            <span id="vital-sanity">5</span>
+            <button type="button" onclick="adjustVital('sanity', 1)" aria-label="Increase sanity">+</button>
+          </div>
+
+        </div>
+				 <div id="dossier-vital-reset"><button type="button" onclick="resetDossierVitals()">Reset</button></div>
+      </section>
+      
+    </div>
+
+    <!-- TAB 2: TRIALS -->
+    <div id="view-arena" class="view-panel">
+      <div class="arena-split">
+        <div class="arena-left">
+          <div id="active-scenario-context" class="active-scenario-context" aria-live="polite">Night of the Zealot — The Gathering</div>
+          <div class="calc-row shroud-row">
+            <span class="shroud-label"><img src="images/icons/shroud.png" alt="">Test Difficulty:</span>
+            <div class="counter-control bonus-skill-control">
+              <button onclick="adjustCounter('val-target', -1)">-</button>
+              <span id="val-target" style="font-family:'Teutonic'; font-size: 32px; min-width: 20px; text-align: center; color:var(--fail-red);">2</span>
+              <button onclick="adjustCounter('val-target', 1)">+</button>
+            </div>
+          </div>
+
+         <!-- <hr class="skills-divider">-->
+          <div class="skills-row">
+            <div id="badge-will" class="stat-badge active-test" onclick="selectSkillManual('will', 3)">
+              <div class="stat-circle"><img src="images/icons/invest_willpower.png" alt="W"></div>
+              <span id="stat-will">3</span>
+            </div>
+            <div id="badge-intellect" class="stat-badge" onclick="selectSkillManual('intellect', 3)">
+              <div class="stat-circle"><img src="images/icons/invest_intellect.png" alt="I"></div>
+              <span id="stat-intellect">3</span>
+            </div>
+            <div id="badge-combat" class="stat-badge" onclick="selectSkillManual('combat', 4)">
+              <div class="stat-circle"><img src="images/icons/invest_combat.png" alt="C"></div>
+              <span id="stat-combat">4</span>
+            </div>
+            <div id="badge-agility" class="stat-badge" onclick="selectSkillManual('agility', 2)">
+              <div class="stat-circle"><img src="images/icons/invest_agility.png" alt="A"></div>
+              <span id="stat-agility">2</span>
+            </div>
+          </div>
+
+  
+		  <div class="calc-row bonus-skills-row">
+            <div class="bonus-skill-label">
+              <img id="bonus-skill-icon" class="bonus-skill-icon" src="images/icons/invest_willpower.png" alt="Selected skill">
+              <span>Committed:</span>
+            </div>
+            <div class="counter-control bonus-skill-control">
+              <button onclick="adjustCounter('val-commit', -1)">-</button>
+              <span id="val-commit" style="font-family:'Teutonic'; font-size: 32px; min-width: 20px; text-align: center;">0</span>
+              <button onclick="adjustCounter('val-commit', 1)">+</button>
+            </div>
+          </div>
+		  
+		  
+		            <div class="calc-row bonus-skills-row">
+            <div class="bonus-skill-label">
+              <img id="bonus-skill-icon" class="bonus-skill-icon" src="images/icons/invest_willpower.png" alt="Selected skill">
+              <span>Events:</span>
+            </div>
+            <div class="counter-control bonus-skill-control">
+              <button onclick="adjustCounter('val-events', -1)">-</button>
+              <span id="val-events" style="font-family:'Teutonic'; font-size: 32px; min-width: 20px; text-align: center;">0</span>
+              <button onclick="adjustCounter('val-events', 1)">+</button>
+            </div>
+          </div>
+		  
+		  
+		  
+		            <div class="calc-row bonus-skills-row">
+            <div class="bonus-skill-label">
+              <img id="bonus-skill-icon" class="bonus-skill-icon" src="images/icons/invest_willpower.png" alt="Selected skill">
+              <span>Assets:</span>
+            </div>
+            <div class="counter-control bonus-skill-control">
+              <button onclick="adjustCounter('val-assets', -1)">-</button>
+              <span id="val-assets" style="font-family:'Teutonic'; font-size: 32px; min-width: 20px; text-align: center;">0</span>
+              <button onclick="adjustCounter('val-assets', 1)">+</button>
+            </div>
+          </div>
+		  
+		  		  
+          <div class="calc-row bonus-skills-row">
+            <div class="bonus-skill-label">
+              <img id="bonus-skill-icon" class="bonus-skill-icon" src="images/icons/invest_willpower.png" alt="Selected skill">
+              <span>Other:</span>
+            </div>
+            <div class="counter-control bonus-skill-control">
+              <button onclick="adjustCounter('val-other', -1)">-</button>
+              <span id="val-other" style="font-family:'Teutonic'; font-size: 32px; min-width: 20px; text-align: center;">0</span>
+              <button onclick="adjustCounter('val-other', 1)">+</button>
+            </div>
+          </div>
+         <!-- <hr class="skills-divider">-->
+          <div class="chaos-draw-controls">
+            <button class="btn bag-button" onclick="toggleBagPopover(true)" aria-label="Show chaos bag"><img src="images/icons/bag.png" alt=""></button>
+            <button class="btn draw-chaos-button" onclick="drawSimpleToken()">Draw Chaos Token</button>
+          </div>
+        </div>
+
+        <div class="arena-right">
+          <div class="token-theater">
+            <div id="token-graphic" class="animated-token"></div>
+            <div id="test-outcome-msg" class="result-banner"></div>
+            <div id="test-score-counters" class="test-score-counters" aria-label="Test totals"></div>
+            <div id="token-effect-msg" class="token-effect-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: PHASES -->
+    <div id="view-rounds" class="view-panel">
+      <div class="phase-flow-board" aria-label="Round sequence">
+        <label class="phase-flow-step phase-0 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img class="phase-flow-badge" src="images/icons/phase_mythos.png" alt="Mythos"><img class="phase-flow-icon" src="images/icons/phase_step_horror.png" alt=""><span>+1 Doom</span></label>
+        <label class="phase-flow-step phase-0 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img class="phase-flow-badge" src="images/icons/phase_mythos.png" alt="Mythos"><img class="phase-flow-icon" src="images/icons/phase_step_doomthreshold.png" alt=""><span>Doom Limit</span></label>
+        <label class="phase-flow-step phase-0 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img class="phase-flow-badge" src="images/icons/phase_mythos.png" alt="Mythos"><img class="phase-flow-icon" src="images/icons/phase_step_encounter.png" alt=""><span>Encounter</span></label>
+        <label class="phase-flow-step phase-1 flow-down"><input type="checkbox" onclick="checkSubtaskProgress(1)"><img class="phase-flow-badge" src="images/icons/phase_investigation.png" alt="Investigation"><img class="phase-flow-icon" src="images/icons/phase_step_spendactions.png" alt=""><span>Actions</span></label>
+
+        <label class="phase-flow-step phase-3 flow-down"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_resources.png" alt=""><span>+1 Card+Rsrc.</span></label>
+        <label class="phase-flow-step phase-3 flow-left"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_reset.png" alt=""><span>Ready Cards</span></label>
+        <label class="phase-flow-step phase-2 flow-left"><input type="checkbox" onclick="checkSubtaskProgress(2)"><img class="phase-flow-badge" src="images/icons/phase_enemy.png" alt="Enemy"><img class="phase-flow-icon" src="images/icons/phase_step_enemy.png" alt=""><span>Enemy Attack</span></label>
+        <label class="phase-flow-step phase-2 flow-left"><input type="checkbox" onclick="checkSubtaskProgress(2)"><img class="phase-flow-badge" src="images/icons/phase_enemy.png" alt="Enemy"><img class="phase-flow-icon" src="images/icons/phase_step_enemy2.png" alt=""><span>Hunter Move</span></label>
+
+        <label class="phase-flow-step phase-3 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_hand.png" alt=""><span>8 Card Hand</span></label>
+        <div class="phase-flow-step phase-reset-flow" role="button" tabindex="0" onclick="resetRoundMatrix()" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); resetRoundMatrix(); }"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_reset2.png" alt=""><span>Reset</span></div>
+      </div>
+    </div>
+
+    <!-- TAB 4: ATMOSPHERE -->
+    <div id="view-music" class="view-panel">
+      <div class="audio-core-view">
+        <audio id="audio-player" src="music/Beyond%20Arkham.mp3" loop preload="metadata"></audio>
+
+        <div class="music-player-card">
+        <div class="now-playing" aria-live="polite">
+          <span class="now-playing-label">Now playing</span>
+          <strong id="current-track-name">Beyond Arkham</strong>
+        </div>
+
+        <div class="transport-controls" aria-label="Playback controls">
+          <button class="transport-button" type="button" onclick="previousTrack()" aria-label="Previous track"><img src="images/icons/music_back.png" alt=""></button>
+          <button id="transport-toggle" class="transport-button" type="button" onclick="togglePlay()" aria-label="Play"><img src="images/icons/music_play.png" alt=""></button>
+          <button class="transport-button" type="button" onclick="nextTrack()" aria-label="Next track"><img src="images/icons/music_forward.png" alt=""></button>
+        </div>
+
+        <div class="audio-dashboard">
+          <div class="player-slider-row">
+            <span id="current-time" class="audio-time">0:00</span>
+            <input type="range" id="track-scrubber" class="scrubber" value="0" min="0" max="100" aria-label="Track position" oninput="scrubAudio()">
+            <span id="duration-time" class="audio-time">0:00</span>
+          </div>
+          <div class="player-slider-row">
+            <img class="volume-icon" src="images/icons/music_quiet.png" alt="Quiet">
+            <input type="range" id="volume-slider" class="volume-slider" value="80" min="0" max="100" aria-label="Volume" oninput="setVolume()">
+            <img class="volume-icon" src="images/icons/music_loud.png" alt="Loud">
+          </div>
+        </div>
+
+        </div>
+        <div class="track-list">
+          <button class="track-item active" type="button" data-src="music/Beyond%20Arkham.mp3" data-title="Beyond Arkham" onclick="loadTrack(this)"><span>Beyond Arkham</span><span>2:00:14</span></button>
+          <button class="track-item" type="button" data-src="music/Dark%20Mystery.mp3" data-title="Dark Mystery" onclick="loadTrack(this)"><span>Dark Mystery</span><span>2:00:14</span></button>
+          <button class="track-item" type="button" data-src="music/Eldritch%20Nightmare.mp3" data-title="Eldritch Nightmare" onclick="loadTrack(this)"><span>Eldritch Nightmare</span><span>1:02:00</span></button>
+          <button class="track-item" type="button" data-src="music/The%20Dream-Quest%20of%20Unknown.mp3" data-title="The Dream-Quest of Unknown" onclick="loadTrack(this)"><span>The Dream-Quest of Unknown</span><span>26:59</span></button>
+          <button class="track-item" type="button" data-src="music/The%20King%20in%20Yellow%20%20.mp3" data-title="The King in Yellow" onclick="loadTrack(this)"><span>The King in Yellow</span><span>1:09:10</span></button>
+          <button class="track-item" type="button" data-src="music/The%20Miskatonic%20Museum.mp3" data-title="The Miskatonic Museum" onclick="loadTrack(this)"><span>The Miskatonic Museum</span><span>1:00:27</span></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FIXED BOTTOM NAVIGATION -->
+  <div class="pwa-navbar-tabs">
+    <div class="nav-investigator-photo investigator-profile-trigger" role="button" tabindex="0" aria-label="Open investigator profile" onclick="toggleInvestigatorModal(true)">
+      <img id="card-portrait" class="header-portrait" src="images/investigators/roland.png" alt="Portrait">
+    </div>
+    <div id="tab-btn-setup" class="nav-tab-item active-tab" onclick="switchActiveTab('setup')">
+      <img src="images/icons/tab_investigator.png" alt="Setup">
+      <span>Dossier</span>
+    </div>
+    <div id="tab-btn-arena" class="nav-tab-item" onclick="switchActiveTab('arena')">
+      <img src="images/icons/tab_trials.png" alt="Arena">
+      <span>Trials</span>
+    </div>
+    <div id="tab-btn-rounds" class="nav-tab-item" onclick="switchActiveTab('rounds')">
+      <img src="images/icons/tab_round_order.png" alt="Rounds">
+      <span>Phases</span>
+    </div>
+    <div id="tab-btn-music" class="nav-tab-item" onclick="switchActiveTab('music')">
+      <img src="images/icons/tab_music.png" alt="Music">
+      <span>Ambient</span>
+    </div>
+  </div>
+
+  <!-- MODAL BAG TRAY -->
+  <div id="bag-popover" class="popover-overlay" onclick="toggleBagPopover(false)">
+    <div class="popover-container" onclick="event.stopPropagation()">
+      <div class="bag-popover-heading">
+        <div class="bag-popover-title"><img src="images/icons/bag.png" alt=""><label id="bag-headline">Bag contents array</label></div>
+        <button style="border:none; background:none; font-size:1.4rem; cursor:pointer;" onclick="toggleBagPopover(false)">✕</button>
+      </div>
+      <div id="bag-contents-grid" class="bag-token-grid">
+        <!-- Filled dynamically by JavaScript execution below -->
+      </div>
+    </div>
+  </div>
+
+  <div id="investigator-modal" class="popover-overlay" onclick="toggleInvestigatorModal(false)">
+    <div class="popover-container investigator-profile-modal" onclick="event.stopPropagation()">
+      <div class="profile-modal-heading">
+        <div class="profile-name-controls">
+          <button class="profile-nav-button" type="button" onclick="cycleInvestigator(-1)" aria-label="Previous investigator"><img src="images/icons/arrow-left.svg" alt=""></button>
+          <h2 id="profile-name">Roland Banks</h2>
+          <button class="profile-nav-button" type="button" onclick="cycleInvestigator(1)" aria-label="Next investigator"><img src="images/icons/arrow-right.svg" alt=""></button>
+        </div>
+        <button class="modal-close" onclick="toggleInvestigatorModal(false)" aria-label="Close profile">×</button>
+      </div>
+      <div class="profile-id-card">
+        <div class="profile-id-photo">
+          <img id="profile-portrait" class="profile-portrait" src="images/investigators/roland.png" alt="Investigator portrait">
+          <img id="profile-class-icon" class="profile-class-icon" src="images/icons/class_guardian.png" alt="Investigator class">
+        </div>
+        <p id="profile-flavor" class="profile-flavor">A federal agent who left the FBI's books behind to hunt the unnatural in Arkham.</p>
+      </div>
+      <div class="profile-case-notes">
+        <h3>Ability</h3>
+        <p id="profile-ability"><b>Reaction:</b> After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)</p>
+        <h3>Elder Sign</h3>
+        <div id="profile-elder"><b>Effect:</b> <img src="images/icons/chaos_eldersign.png" class="token-icon" alt="Elder Sign"> +1 for each clue on your location.</div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="tokendata.js"></script>
+  <script src="duo.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+    }
+  </script>
+</body>
+</html>

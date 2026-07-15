@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Arkham Horror LCG — Skill Test Calculator</title>
+  <link rel="icon" type="image/png" href="images/icons/favicon.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;600;700&family=Special+Elite&display=swap');
+    @font-face { font-family: Teutonic; src: url('fonts/Teutonic.woff2') format('woff2'), url('fonts/Teutonic.woff') format('woff'); font-display:swap; }
+    :root { --paper:#eee6cf; --ink:#16110d; --line:#3a2e23; --blue:#1a334d; --gold:#bd9a50; --green:#1c6a39; --red:#8b2025; --muted:#675846; }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html { min-height:100%; -webkit-text-size-adjust:100%; }
+    body { margin:0; min-width:320px; height:100dvh; overflow:hidden; color:var(--ink); font:500 18px/1.2 'Alegreya Sans', sans-serif; background:#0a0b0d radial-gradient(circle at center, transparent 30%, rgba(0,0,0,.58)), url('images/textures/paper01.png') center / cover fixed; }
+    button,input,select { font:inherit; }
+    button { cursor:pointer; touch-action:manipulation; }
+    .app { max-width:1500px; height:100dvh; margin:auto; padding:clamp(7px,1vw,16px); display:flex; flex-direction:column; overflow:hidden; }
+    .masthead { display:none; }
+    .save-bar { display:grid; grid-template-columns:minmax(140px,1fr) auto minmax(150px,1fr) auto auto; gap:7px; align-items:center; margin-top:10px; padding:8px; color:#f8f0dc; background:rgba(10,12,16,.78) url('images/textures/leather.png') center / cover; border:1px solid rgba(245,231,196,.35); }
+    .save-bar input,.save-bar select { min-height:42px; border:1px solid rgba(245,231,196,.55); color:#fff8e7; background:rgba(0,0,0,.38); font:normal .82rem 'Special Elite',monospace; }
+    .save-bar button { min-height:42px; padding:6px 11px; border:1px solid rgba(245,231,196,.55); color:#fff8e7; background:rgba(0,0,0,.32); font:normal .82rem 'Special Elite',monospace; }
+    .layout { flex:1; min-height:0; display:grid; grid-template-columns:minmax(390px,1.08fr) minmax(320px,.92fr); gap:14px; margin-top:10px; overflow:hidden; }
+    .panel { min-width:0; min-height:0; padding:clamp(11px,1.4vw,18px); overflow:hidden; background:rgba(245,240,224,.96) url('images/textures/paper01.png') 0 0 / cover; border:2px solid var(--line); box-shadow:3px 5px 14px rgba(0,0,0,.35); }
+    .panel h2 { margin:0 0 12px; font:normal clamp(1.35rem,2.3vw,2rem) Teutonic,serif; }
+    .panel h3 { margin:14px 0 7px; font:normal clamp(1.25rem,1.8vw,1.6rem) Teutonic,serif; letter-spacing:.02em; text-transform:uppercase; }
+    .investigators { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .investigator { --investigator-color:var(--blue); padding:10px; border:2px solid var(--investigator-color); background:rgba(255,252,239,.62); }
+    .investigator.selected { border-width:4px; outline:3px solid color-mix(in srgb,var(--investigator-color) 48%,#f9efd5); outline-offset:3px; box-shadow:inset 0 0 0 2px rgba(255,255,255,.7),0 0 15px color-mix(in srgb,var(--investigator-color) 60%,transparent); }
+    .investigator-select { width:100%; min-height:58px; border:0; color:#fff8e7; background:var(--investigator-color); font:normal 1.32rem Teutonic,serif; }
+    .investigator-summary { width:100%; min-height:132px; padding:10px; border:0; color:#fff8e7; background:linear-gradient(rgba(0,0,0,.27),rgba(0,0,0,.27)),color-mix(in srgb,var(--investigator-color) 88%,#10100d); text-align:left; text-shadow:0 1px 2px #000; }
+    .investigator-summary-top { display:grid; grid-template-columns:1fr 48px; gap:7px; align-items:center; }
+    .investigator-summary-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:normal clamp(1.45rem,2.4vw,2rem) Teutonic,serif; }
+    .investigator-summary-badge { width:48px; height:48px; object-fit:contain; filter:drop-shadow(0 2px 2px rgba(0,0,0,.45)); }
+    .investigator-summary-skills { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; margin-top:9px; }
+    .investigator-summary-skill { display:grid; grid-template-columns:25px 1fr; align-items:center; gap:2px; min-width:0; padding:3px; border:1px solid rgba(255,245,215,.42); background:rgba(0,0,0,.35); }
+    .investigator-summary-skill img { width:24px; height:24px; object-fit:contain; }
+    .investigator-summary-skill strong { text-align:center; font:normal 1.35rem Teutonic,serif; }
+    .investigator-summary:active { transform:scale(.985); }
+    .investigator-details { display:grid; grid-template-columns:1fr; gap:7px; margin-top:8px; }
+    .investigator-name { min-width:0; min-height:42px; padding:5px 8px; border:1px solid var(--investigator-color); color:var(--ink); background:rgba(255,255,255,.68); font:600 1rem 'Alegreya Sans',Arial,sans-serif; }
+    .investigator-color { width:48px; height:42px; padding:3px; border:1px solid var(--investigator-color); background:#fffaf0; }
+    .class-picker { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:4px; }
+    .class-choice { display:grid; place-items:center; min-height:39px; padding:3px; border:1px solid rgba(58,46,35,.55); background:rgba(255,255,255,.6); }
+    .class-choice img { width:30px; height:30px; object-fit:contain; }
+    .class-choice.selected { border:2px solid var(--investigator-color); background:color-mix(in srgb,var(--investigator-color) 22%,#fff8e9); box-shadow:inset 0 0 7px color-mix(in srgb,var(--investigator-color) 48%,transparent); }
+    .stat-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:10px; }
+    .stat-input { display:grid; grid-template-columns:31px 42px minmax(30px,1fr) 42px; align-items:center; gap:5px; min-height:58px; padding:5px 6px; border:1px solid #80715e; background:rgba(255,255,255,.48); }
+    .stat-input img { width:31px; height:31px; object-fit:contain; }
+    .stat-input input { width:100%; min-width:0; border:0; outline:0; color:var(--ink); background:transparent; text-align:center; font:normal 1.75rem Teutonic,serif; }
+    .stat-input button { width:42px; height:42px; border:1px solid var(--line); border-radius:4px; color:var(--ink); background:rgba(255,250,240,.88) url('images/textures/paper01.png') center / cover; font:bold 1.35rem Arial,sans-serif; }
+    .skill-will { border-color:#1a4f78 !important; background-color:rgba(26,79,120,.15) !important; } .skill-intellect { border-color:#693b73 !important; background-color:rgba(105,59,115,.15) !important; } .skill-combat { border-color:#7a4027 !important; background-color:rgba(122,64,39,.15) !important; } .skill-agility { border-color:#1f6b52 !important; background-color:rgba(31,107,82,.15) !important; }
+    .skill-buttons { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+    .skill-button { min-height:76px; border:2px solid #231c17; background:rgba(25,22,18,.82) url('images/textures/paper01.png') center / cover; background-blend-mode:multiply; display:flex; align-items:center; justify-content:center; gap:7px; color:#fff8e7; text-shadow:0 1px 2px #000; font:normal 1.65rem Teutonic,serif; }
+    .skill-button img { width:39px; height:39px; object-fit:contain; }
+    .skill-button.selected { box-shadow:inset 0 0 0 3px rgba(255,255,255,.64),inset 0 0 16px rgba(0,0,0,.35),0 0 12px rgba(0,0,0,.25); filter:saturate(1.4); transform:translateY(-1px); }
+    .skill-button.skill-will { background-color:#123d61; } .skill-button.skill-intellect { background-color:#482558; } .skill-button.skill-combat { background-color:#602e1c; } .skill-button.skill-agility { background-color:#0f503b; }
+    .skill-button.skill-will.selected { background-color:#1b5d8d !important; color:#fff8e7; } .skill-button.skill-intellect.selected { background-color:#673a78 !important; color:#fff8e7; } .skill-button.skill-combat.selected { background-color:#7c442a !important; color:#fff8e7; } .skill-button.skill-agility.selected { background-color:#1a7659 !important; color:#fff8e7; }
+    .counter-line { display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; min-height:58px; padding:7px 10px; border:1px solid rgba(58,46,35,.4); background:rgba(255,255,255,.42); }
+    .counter-line label { font:normal 1.34rem 'Special Elite','Courier New',monospace; }
+    .counter { display:flex; align-items:center; gap:10px; }
+    .counter button { width:48px; height:48px; border:2px solid var(--line); border-radius:4px; color:var(--ink); background:#faf7ee url('images/textures/clipperFlip.png') center / cover; font:bold 1.7rem Arial,sans-serif; }
+    .counter output { min-width:36px; color:var(--blue); text-align:center; font:normal 2rem Teutonic,serif; }
+    .test-math { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:8px; align-items:center; margin-top:14px; padding:12px; border:2px solid var(--blue); background:rgba(26,51,77,.1); text-align:center; }
+    .test-math span { display:block; color:var(--muted); font:normal .72rem 'Special Elite',monospace; text-transform:uppercase; }
+    .test-math strong { display:block; font:normal 2rem Teutonic,serif; }
+    .test-math .operator { color:var(--blue); font:normal 1.8rem Teutonic,serif; }
+    .draw-button { width:100%; min-height:74px; margin-top:16px; border:2px solid #7542a1; color:#f4edd9; background:linear-gradient(rgba(8,19,30,.2),rgba(8,19,30,.2)),url('images/textures/cosmic2.png') 0 0 / cover; box-shadow:inset 0 0 20px rgba(0,0,0,.5),0 3px 8px rgba(0,0,0,.32); font:normal clamp(1.45rem,3vw,2.15rem) Teutonic,serif; }
+    .draw-button:active,.counter button:active,.skill-button:active,.investigator-select:active { transform:scale(.98); filter:brightness(.85); }
+    .result { min-height:285px; display:grid; grid-template-columns:145px 1fr; gap:18px; align-items:center; padding:18px; overflow:hidden; border:2px solid var(--line); background:linear-gradient(rgba(255,255,255,.38),rgba(255,255,255,.38)),url('images/textures/notebookpaper.png') center / cover; box-shadow:inset 0 0 32px rgba(76,59,36,.18); }
+    .result-token { width:min(145px,24vw); aspect-ratio:1; background:center / contain no-repeat; filter:drop-shadow(0 4px 5px rgba(0,0,0,.45)); }
+    .result-token.empty { background-image:url('images/icons/bag.png'); opacity:.52; }
+    .result-copy { min-width:0; }
+    .result-title { margin:0; font:normal clamp(2rem,3.8vw,3.35rem) Teutonic,serif; text-shadow:0 1px 0 rgba(255,255,255,.75),0 2px 4px rgba(0,0,0,.2); }
+    .result-title.success { color:var(--green); } .result-title.failure { color:var(--red); } .result-title.resolve { color:var(--blue); }
+    .result-effect { margin:10px 0 0; font:normal clamp(1rem,1.8vw,1.22rem)/1.38 'Special Elite',Courier New,monospace; }
+    .result-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin-top:12px; }
+    .result-grid div { padding:7px 4px; background:rgba(255,255,255,.63); border:1px solid rgba(58,46,35,.35); text-align:center; }
+    .result-grid span { display:block; color:var(--muted); font:normal .82rem Teutonic,serif; text-transform:uppercase; } .result-grid strong { font:normal 1.55rem Teutonic,serif; }
+    #test-result.revealed .result-token { animation:token-reveal .68s cubic-bezier(.175,.885,.32,1.275); } #test-result.revealed .result-copy { animation:result-copy-in .45s ease-out; }
+    @keyframes token-reveal { 0%{transform:scale(.15) rotate(-150deg);opacity:0} 65%{transform:scale(1.16) rotate(12deg);opacity:1} 100%{transform:scale(1) rotate(0)} } @keyframes result-copy-in { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .campaign-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(110px,.55fr) auto; gap:8px; align-items:center; }
+    select { width:100%; min-height:52px; padding:7px 10px; border:2px solid var(--line); border-radius:0; color:var(--ink); background:#f8f2df; font-family:'Special Elite',monospace; }
+    .small-button { min-height:52px; padding:8px 12px; border:2px solid var(--line); background:#e8dcc1; color:var(--ink); font-family:'Special Elite',monospace; }
+    .bag-help { margin:10px 0 0; color:var(--muted); font-size:.9rem; }
+    .bag-editor { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:12px; }
+    .token-row { display:grid; grid-template-columns:35px 1fr auto; gap:6px; align-items:center; min-height:48px; padding:4px 6px; border:1px solid rgba(58,46,35,.32); background:rgba(255,255,255,.45); }
+    .token-row img { width:31px; height:31px; object-fit:contain; } .token-fallback { display:grid; place-items:center; width:31px; height:31px; border-radius:50%; background:#5d5144; color:white; font:normal .6rem 'Special Elite',monospace; }
+    .token-row label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:normal .82rem 'Special Elite',monospace; }
+    .token-row input { width:46px; min-height:36px; border:1px solid var(--line); background:#fffaf0; text-align:center; font:normal 1.25rem Teutonic,serif; }
+    .bag-count { margin:10px 0 0; color:var(--blue); font:normal 1rem 'Special Elite',monospace; }
+    .bag-open { width:100%; min-height:62px; margin-top:12px; border:2px solid var(--blue); color:#fff8e7; background:var(--blue) url('images/textures/paper01.png') center / cover; font:normal 1.3rem Teutonic,serif; }
+    .bag-modal { position:fixed; inset:0; z-index:20; display:none; place-items:center; padding:14px; background:rgba(0,0,0,.72); }
+    .bag-modal.open { display:grid; }
+    .bag-dialog { width:min(760px,100%); max-height:min(92dvh,900px); overflow:auto; padding:clamp(14px,3vw,26px); border:2px solid var(--line); background:#eee6cf url('images/textures/notebookpaper.png') center / cover; box-shadow:0 14px 40px #000; }
+    .bag-dialog-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom:2px solid var(--line); padding-bottom:8px; }
+    .bag-dialog-heading h2 { margin:0; font:normal clamp(1.5rem,3vw,2.2rem) Teutonic,serif; }
+    .bag-close { width:46px; height:46px; border:0; color:var(--ink); background:transparent; font:normal 2rem Arial,sans-serif; }
+    .bag-dialog .bag-editor { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .mobile-nav { display:none; }
+    .top-actions { display:flex; align-items:stretch; justify-content:flex-end; gap:4px; padding:5px 7px; border:2px solid #16110d; background:#0d0907 url('images/textures/leather.png') 0 0 / cover; box-shadow:0 3px 10px rgba(0,0,0,.48); }
+    .top-actions button { display:flex; align-items:center; justify-content:center; gap:6px; min-height:42px; padding:5px 12px; border:1px solid rgba(247,232,195,.42); color:#fff8e7; background:rgba(8,6,5,.52); text-shadow:0 1px 2px #000; font:normal .92rem 'Special Elite','Courier New',monospace; }
+    .top-actions button:hover,.top-actions button:focus-visible { background:rgba(122,84,42,.45); outline:0; }
+    .top-actions img { width:25px; height:25px; object-fit:contain; filter:drop-shadow(0 1px 1px #000); }
+    .music-status.on { border-color:#6cab79; color:#e7ffe9; box-shadow:inset 0 0 0 1px rgba(77,175,93,.42); }
+    .settings-modal,.music-modal { position:fixed; inset:0; z-index:30; display:none; place-items:center; padding:14px; background:rgba(0,0,0,.74); }
+    .settings-modal.open,.music-modal.open,.investigator-modal.open { display:grid; }
+    .settings-dialog,.music-dialog { width:min(620px,100%); max-height:90dvh; overflow:auto; padding:18px; border:2px solid #111; color:var(--ink); background:#eee6cf url('images/textures/notebookpaper.png') center / cover; box-shadow:0 14px 40px #000; }
+    .dialog-heading { display:flex; justify-content:space-between; align-items:center; gap:10px; padding-bottom:8px; border-bottom:2px solid var(--line); }
+    .dialog-heading h2 { margin:0; font:normal 1.7rem Teutonic,serif; }
+    .dialog-close { width:44px; height:44px; border:0; background:transparent; color:var(--ink); font-size:2rem; }
+    .track-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin-top:14px; }
+    .track-list button { min-height:60px; border:2px solid var(--line); color:var(--ink); background:rgba(255,255,255,.64) url('images/textures/paper01.png') center / cover; font:normal 1rem 'Special Elite',monospace; }
+    .track-list button.active { border-color:var(--green); background-color:rgba(65,143,83,.22); }
+    .music-controls { display:grid; grid-template-columns:auto auto 1fr; gap:10px; align-items:center; margin-top:13px; }
+    .music-controls button { min-height:50px; padding:6px 18px; border:2px solid var(--blue); color:#fff8e7; background:var(--blue); font:normal 1.2rem Teutonic,serif; }
+    .music-controls input { width:100%; }
+    .music-timeline { display:grid; grid-template-columns:48px 1fr 48px; gap:8px; align-items:center; margin-top:12px; font:normal .8rem 'Special Elite',monospace; }
+    .music-timeline input { width:100%; accent-color:var(--blue); }
+    .music-timeline span { text-align:center; white-space:nowrap; }
+    .investigator-modal { position:fixed; inset:0; z-index:32; display:none; place-items:center; padding:12px; background:rgba(0,0,0,.74); }
+    .investigator-dialog { width:min(670px,100%); padding:18px; border:2px solid var(--line); background:#eee6cf url('images/textures/notebookpaper.png') 0 0 / cover; box-shadow:0 14px 40px #000; }
+    .editor-name { width:100%; min-height:55px; margin:14px 0 10px; padding:8px 10px; border:2px solid var(--editor-color,var(--blue)); color:var(--ink); background:rgba(255,255,255,.68); font:normal clamp(1.5rem,3vw,2.1rem) Teutonic,serif; }
+    .editor-section-title { margin:10px 0 6px; font:normal 1.2rem Teutonic,serif; }
+    .editor-stat-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+    .bag-modal-controls { display:grid; grid-template-columns:minmax(0,1fr) minmax(115px,.55fr) auto; gap:8px; margin:12px 0 4px; }
+    @media (max-width:820px) { body { font-size:16px; } .app { padding:6px; } .top-actions { justify-content:stretch; gap:3px; } .top-actions button { flex:1; min-width:0; padding:4px; font-size:.9rem; } .top-actions img { width:22px; height:22px; } .save-bar { grid-template-columns:1fr auto auto; margin-top:0; } .save-bar select { grid-column:1 / -1; } .mobile-nav { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:5px; } .mobile-nav button { min-height:42px; border:2px solid var(--blue); color:var(--ink); background:#f7f0df url('images/textures/paper01.png') 0 0 / cover; font:normal 1.05rem Teutonic,serif; } .layout { position:relative; display:block; margin-top:5px; overflow:hidden; } .layout > .panel { height:100%; overflow:hidden; } #result-panel { display:none; position:absolute; inset:0; z-index:4; } .layout.show-result > #result-panel { display:block; } .layout.show-result > section.panel { display:none; } .panel { padding:8px; } .panel h2 { margin-bottom:5px; } .panel h3 { margin:7px 0 4px; } .investigator-select { min-height:43px; } .investigator-details { margin-top:4px; } .investigator-name { min-height:34px; font-size:1rem; } .class-choice { min-height:30px; } .class-choice img { width:23px; height:23px; } .stat-input { min-height:42px; } .counter-line { min-height:43px; padding:3px 7px; } .counter-line label { font-size:.88rem; } .counter button { width:38px; height:38px; } .draw-button { min-height:55px; margin-top:8px; } .result { min-height:225px; grid-template-columns:100px 1fr; padding:11px; } .result-token { width:98px; } .result-title { font-size:2rem; } .result-grid strong { font-size:1.35rem; } .bag-dialog .bag-editor { grid-template-columns:repeat(2,minmax(0,1fr)); } .back-to-test { display:block; width:100%; min-height:42px; margin-bottom:6px; border:2px solid var(--blue); color:var(--ink); background:#f7f0df; font:normal 1.05rem Teutonic,serif; } }
+    @media (min-width:821px) { .back-to-test { display:none; } }
+    @media (max-width:480px) { .top-actions button { flex-direction:column; gap:1px; min-height:48px; font-size:.64rem; white-space:nowrap; } .top-actions img { width:23px; height:23px; } .investigators { gap:6px; } .investigator { padding:4px; } .investigator-summary { min-height:103px; padding:5px; } .investigator-summary-top { grid-template-columns:1fr 36px; } .investigator-summary-name { font-size:1.1rem; } .investigator-summary-badge { width:36px; height:36px; } .investigator-summary-skills { margin-top:4px; gap:2px; } .investigator-summary-skill { grid-template-columns:20px 1fr; padding:2px; } .investigator-summary-skill img { width:20px; height:20px; } .investigator-summary-skill strong { font-size:1.05rem; } .investigator-select { min-height:42px; font-size:1rem; } .stat-grid { gap:4px; margin-top:5px; } .stat-input { grid-template-columns:23px 34px minmax(23px,1fr) 34px; min-height:40px; padding:2px; } .stat-input img { width:23px; height:23px; } .stat-input button { width:34px; height:34px; } .skill-button { min-height:52px; padding:3px; font-size:1.05rem; gap:3px; } .skill-button img { width:27px; height:27px; } .counter-line { display:inline-grid; width:calc(50% - 3px); grid-template-columns:1fr; gap:1px; min-height:59px; margin:0 2px 4px 0; padding:3px; text-align:center; vertical-align:top; } .counter-line label { font-size:.66rem; white-space:nowrap; } .counter { justify-content:center; gap:5px; } .counter button { width:32px; height:32px; font-size:1.25rem; } .counter output { min-width:22px; font-size:1.35rem; } .test-math strong { font-size:1.3rem; } .test-math { margin-top:6px; padding:5px 3px; gap:2px; } .test-math span { font-size:.56rem; } .test-math .operator { font-size:1.1rem; } .draw-button { min-height:48px; margin-top:5px; font-size:1.25rem; } .bag-editor { gap:5px; } .token-row { grid-template-columns:28px 1fr 39px; min-height:42px; padding:3px; } .token-row img,.token-fallback { width:26px; height:26px; } .token-row input { width:39px; min-height:32px; } .editor-stat-grid { gap:5px; } .bag-modal-controls { grid-template-columns:1fr 1fr; } .bag-modal-controls .small-button { grid-column:1 / -1; } }
+    @media (max-width:820px) { .counter-line { min-height:47px; } .counter-line label { font-size:1.04rem; } }
+    @media (max-width:480px) { .counter-line label { font-size:.84rem; } }
+    .investigator-summary-top { grid-template-columns:64px 1fr 48px; }
+    .investigator-photo { width:58px; height:68px; padding:3px; border:2px solid #2d251b; background:#e9dfc8; object-fit:cover; box-shadow:2px 3px 5px rgba(0,0,0,.55); transform:rotate(-2deg); }
+    .portrait-picker { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; }
+    .portrait-choice { min-height:78px; padding:3px; border:2px solid #5c4d3c; background:#f4eddb url('images/textures/paper01.png') 0 0 / cover; }
+    .portrait-choice img { width:100%; height:66px; object-fit:cover; }
+    .portrait-choice.selected { border-color:var(--editor-color); box-shadow:inset 0 0 0 2px #fff4d4,0 0 8px var(--editor-color); }
+    .editor-stat-grid .stat-input { background:rgba(255,253,243,.94) url('images/textures/paper01.png') 0 0 / cover; box-shadow:inset 0 0 10px rgba(77,55,30,.15); }
+    .result { min-height:360px; display:flex; flex-direction:column; justify-content:center; gap:8px; padding:20px; text-align:center; background:linear-gradient(rgba(255,255,255,.48),rgba(255,255,255,.48)),url('images/textures/notebookpaper.png') 0 0 / cover; }
+    .result-token { width:min(168px,31vw); margin:0 auto; }
+    .result-token.empty { display:none; background-image:none; }
+    .result-title { font-size:clamp(2.25rem,4vw,3.7rem); }
+    .result-effect { max-width:540px; margin:8px auto 0; padding:12px 16px; background:rgba(239,230,208,.9) url('images/textures/paper01.png') 0 0 / cover; box-shadow:2px 4px 8px rgba(0,0,0,.27); transform:rotate(-1deg); }
+    .result-grid { width:min(440px,100%); margin:8px auto 0; }
+    .result.success .result-token { filter:drop-shadow(0 0 12px rgba(27,120,67,.7)) drop-shadow(0 4px 5px rgba(0,0,0,.45)); }
+    .result.failure .result-token { filter:drop-shadow(0 0 12px rgba(160,30,30,.7)) drop-shadow(0 4px 5px rgba(0,0,0,.45)); }
+    .result.eldersign { color:#eaf7ff; border-color:#3f8bd8; background:linear-gradient(rgba(8,30,68,.38),rgba(9,20,57,.58)),url('images/textures/cosmic2.png') 0 0 / cover; }
+    .result.eldersign .result-title { color:#f5dc72; text-shadow:0 0 14px #6cbaff,0 2px 4px #000; }
+    .result.eldersign .result-token { width:min(205px,37vw); filter:drop-shadow(0 0 20px #76c9ff) drop-shadow(0 4px 6px #000); }
+    .result.autofail { color:#fff0e9; border-color:#9d2727; background:linear-gradient(rgba(68,5,7,.38),rgba(25,3,5,.78)),url('images/textures/cosmic2.png') 0 0 / cover; }
+    .result.autofail .result-title { color:#ffb0a5; text-shadow:0 0 14px #e62f2f,0 2px 4px #000; }
+    .result.autofail .result-token { width:min(205px,37vw); filter:drop-shadow(0 0 20px #ee3b3b) drop-shadow(0 4px 6px #000); }
+    .result.eldersign .result-grid,.result.autofail .result-grid,.result.eldersign .result-effect,.result.autofail .result-effect { color:var(--ink); }
+    #test-result.revealed.eldersign { animation:elder-reveal 1.05s ease-out; } #test-result.revealed.autofail { animation:autofail-reveal .82s ease-out; }
+    #test-result.revealed.eldersign .result-token { animation:elder-token 1.1s cubic-bezier(.16,.88,.25,1.35); } #test-result.revealed.autofail .result-token { animation:autofail-token .78s cubic-bezier(.25,.1,.3,1.4); }
+    @keyframes elder-reveal { 0%,100%{filter:brightness(1)} 18%{filter:brightness(2.3)} 45%{filter:brightness(1.15)} } @keyframes elder-token { 0%{transform:scale(.05) rotate(-240deg);opacity:0} 65%{transform:scale(1.3) rotate(18deg);opacity:1} 100%{transform:scale(1) rotate(0)} } @keyframes autofail-reveal { 0%,100%{filter:brightness(1)} 25%,60%{filter:brightness(1.65) saturate(1.65)} } @keyframes autofail-token { 0%{transform:scale(.1) rotate(210deg);opacity:0} 55%{transform:scale(1.38) rotate(-17deg);opacity:1} 100%{transform:scale(1) rotate(0)} }
+    @media (max-width:480px) { .investigator-summary-top { grid-template-columns:42px 1fr 36px; } .investigator-photo { width:38px; height:45px; } .portrait-choice { min-height:62px; } .portrait-choice img { height:50px; } .result { min-height:260px; padding:10px; } .result-effect { font-size:.86rem; padding:8px; } .result.eldersign .result-token,.result.autofail .result-token { width:132px; } }
+    .investigator { position:relative; }
+    .investigator-edit { position:absolute; top:6px; right:6px; z-index:2; min-height:31px; padding:4px 8px; border:1px solid rgba(255,247,222,.72); color:#fff8e7; background:rgba(0,0,0,.62); font:normal .72rem 'Special Elite','Courier New',monospace; }
+    .investigator-summary { padding-right:56px; }
+    .investigator-summary-skill { color:var(--ink); text-shadow:none; border-color:#74604b; background:rgba(251,247,233,.94) url('images/textures/paper01.png') 0 0 / cover; box-shadow:inset 0 0 7px rgba(88,59,31,.14); }
+    .investigator-dialog { max-height:calc(100dvh - 24px); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+    .bag-open { background:linear-gradient(rgba(12,34,53,.28),rgba(12,34,53,.38)),url('images/textures/notebookpaper.png') 0 0 / cover; box-shadow:inset 0 0 18px rgba(0,0,0,.34),0 3px 7px rgba(0,0,0,.3); }
+    .token-row img,.token-fallback { cursor:pointer; }
+    .token-row img:active,.token-fallback:active { transform:scale(.9); filter:brightness(1.35); }
+    @media (max-width:480px) { .investigator-edit { top:4px;right:4px;min-height:26px;font-size:.58rem;padding:3px 5px; } .investigator-summary { padding-right:42px; } }
+    .investigators { gap:14px; padding:5px 0 12px; }
+    .investigator { border:0; background:transparent; transition:transform .2s ease,filter .2s ease; }
+    .investigator.selected { outline:0; border:0; transform:scale(1.045) rotate(-5deg); z-index:3; box-shadow:0 8px 16px rgba(0,0,0,.5); }
+    .investigator-summary { min-height:150px; padding:12px 58px 12px 12px; }
+    .investigator-photo { width:69px; height:82px; }
+    .investigator-summary-top { grid-template-columns:76px 1fr 54px; }
+    .investigator-summary-badge { width:54px; height:54px; }
+    .investigator-summary-skill { grid-template-columns:31px 1fr; min-height:38px; }
+    .investigator-summary-skill img { width:30px; height:30px; }
+    .investigator-summary-skill strong { font-size:1.55rem; }
+    .layout > section.panel .counter-line { display:inline-grid; width:calc(50% - 4px); grid-template-columns:1fr auto; margin:0 4px 7px 0; vertical-align:top; }
+    .result { background-position:0 -150px; }
+    .token-row.selected-token { border:2px solid #2f7b45; background:rgba(61,145,80,.23) url('images/textures/paper01.png') 0 0 / cover; box-shadow:inset 0 0 10px rgba(37,116,55,.32); }
+    @media (max-width:820px) { .layout > section.panel .counter-line { width:calc(50% - 4px); } }
+    @media (max-width:480px) { .investigators { gap:10px; padding:4px 0 8px; } .investigator.selected { transform:scale(1.025) rotate(-3deg); } .investigator-summary { min-height:112px; padding:5px 43px 5px 5px; } .investigator-summary-top { grid-template-columns:44px 1fr 38px; } .investigator-photo { width:42px; height:52px; } .investigator-summary-badge { width:38px; height:38px; } .investigator-summary-skill { grid-template-columns:22px 1fr; min-height:26px; } .investigator-summary-skill img { width:21px; height:21px; } .investigator-summary-skill strong { font-size:1.12rem; } .layout > section.panel .counter-line { margin-bottom:4px; } }
+    body { background:#342b20 linear-gradient(rgba(49,39,27,.82),rgba(49,39,27,.82)),url('images/textures/paper01.png') 0 0 / 520px 520px fixed; }
+    .app { max-width:none; padding:4px 6px 6px; }
+    .top-actions { padding:3px 5px; }
+    .layout { gap:8px; margin-top:6px; }
+    .panel { padding:8px; box-shadow:2px 3px 9px rgba(0,0,0,.34); }
+    .token-row { opacity:.55; transition:background .15s ease,border-color .15s ease,box-shadow .15s ease,opacity .15s ease; }
+    .token-row.populated-token { opacity:1; border:2px solid #2e7945; background:linear-gradient(rgba(65,142,78,.2),rgba(65,142,78,.2)),url('images/textures/paper01.png') 0 0 / cover; box-shadow:inset 0 0 12px rgba(30,106,49,.32),0 0 7px rgba(57,126,65,.22); }
+    .token-row.populated-token img { filter:drop-shadow(0 0 4px rgba(80,177,91,.55)); }
+    .token-row.selected-token { border-color:#a9d86a; box-shadow:inset 0 0 14px rgba(115,184,74,.5),0 0 10px rgba(126,190,76,.5); }
+    @media (min-width:768px) and (orientation:landscape) { body { font-size:17px; } .app { padding:3px 5px 5px; } .top-actions { min-height:43px; } .top-actions button { min-height:35px; padding:3px 10px; } .top-actions img { width:21px; height:21px; } .layout { grid-template-columns:minmax(0,1.16fr) minmax(390px,.84fr); gap:7px; margin-top:5px; } .panel { padding:7px; } .investigators { gap:8px; padding:2px 0 7px; } .investigator-summary { min-height:118px; padding:7px 49px 7px 7px; } .investigator-summary-top { grid-template-columns:58px 1fr 44px; } .investigator-photo { width:53px; height:63px; } .investigator-summary-badge { width:44px; height:44px; } .investigator-summary-skills { margin-top:5px; } .investigator-summary-skill { grid-template-columns:25px 1fr; min-height:31px; } .investigator-summary-skill img { width:24px; height:24px; } .investigator-summary-skill strong { font-size:1.28rem; } .skill-button { min-height:58px; font-size:1.35rem; } .skill-button img { width:31px; height:31px; } .layout > section.panel .counter-line { min-height:46px; margin-bottom:5px; padding:3px 7px; } .counter-line label { font-size:1rem; } .counter button { width:39px; height:39px; } .test-math { margin-top:5px; padding:7px; } .draw-button { min-height:55px; margin-top:7px; font-size:1.55rem; } .result { min-height:0; height:calc(100% - 120px); padding:10px; gap:5px; } .result-token { width:min(118px,14vw); } .result-title { font-size:2.2rem; } .result-effect { margin-top:4px; padding:8px 12px; font-size:.9rem; } .result-grid { margin-top:4px; } .bag-open { min-height:48px; margin-top:6px; } .bag-help { margin:5px 0 0; font-size:.8rem; } .bag-dialog { width:min(1100px,96vw); max-height:94dvh; padding:14px; } .bag-dialog .bag-editor { grid-template-columns:repeat(4,minmax(0,1fr)); } .token-row { min-height:43px; } }
+    @media (max-width:480px) { .app { padding:3px 4px 4px; } .layout { margin-top:4px; gap:4px; } .panel { padding:6px; } .token-row.populated-token { border-width:1px; } }
+    body { background:#333 linear-gradient(rgba(51,51,51,.74),rgba(51,51,51,.74)),url('images/textures/paper01.png') 0 0 / 520px 520px fixed; }
+    .top-actions { border-color:#101820; background:#263746 linear-gradient(rgba(255,255,255,.035),rgba(0,0,0,.12)),url('images/textures/paper01.png') 0 0 / 360px 360px; box-shadow:0 2px 7px rgba(0,0,0,.48); }
+    .top-actions button { background:rgba(8,16,23,.28); }
+    .result { background-image:linear-gradient(rgba(255,255,255,.31),rgba(255,255,255,.31)),url('images/textures/notePad.png'); background-position:0 0; }
+    .bonus-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin-top:6px; }
+    .bonus-grid .counter-line { display:grid; width:auto; min-height:51px; margin:0; grid-template-columns:1fr auto; }
+    .layout > section.panel > .counter-line { display:grid; width:100%; margin:6px 0 0; }
+    @media (min-width:768px) and (orientation:landscape) { .bonus-grid { gap:5px; margin-top:5px; } .bonus-grid .counter-line { min-height:44px; margin:0; } .layout > section.panel > .counter-line { min-height:44px; margin-top:5px; } }
+    @media (max-width:480px) { .bonus-grid { gap:4px; margin-top:4px; } .bonus-grid .counter-line { min-height:55px; } .bonus-grid .counter-line label { font-size:.72rem; white-space:normal; } }
+    body { background:#333 radial-gradient(ellipse at center,rgba(102,82,58,.18),transparent 58%),url('images/textures/leather.png') 0 0 / 500px 500px fixed; }
+    .layout { align-items:stretch; }
+    .panel { border:0; box-shadow:none; background-color:transparent; }
+    .layout > section.panel { background:linear-gradient(rgba(250,247,235,.88),rgba(250,247,235,.88)),url('images/textures/paper01.png') 0 0 / cover; box-shadow:0 5px 18px rgba(0,0,0,.35); }
+    #result-panel { padding:0; background:transparent; }
+    .result { height:100%; min-height:0; border:0; border-radius:0; box-shadow:none; background-image:linear-gradient(rgba(255,255,255,.22),rgba(255,255,255,.22)),url('images/textures/notePad.png'); background-position:0 0; background-size:cover; }
+    .top-actions { border:0; border-bottom:2px solid #0a1118; border-radius:0; background:#101c28 linear-gradient(rgba(255,255,255,.03),rgba(0,0,0,.2)); box-shadow:0 3px 10px rgba(0,0,0,.55); }
+    .top-actions button { background:transparent; border-color:rgba(238,224,190,.22); }
+    .investigator-modal { background:rgba(12,10,8,.8); }
+    .investigator-dialog { width:min(980px,96vw); border:0; border-radius:4px; background:url('images/textures/notebookpaper.png') 0 0 / cover; box-shadow:0 16px 44px rgba(0,0,0,.75); }
+    .editor-card { display:grid; grid-template-columns:260px 1fr; gap:24px; padding-top:14px; }
+    .editor-portrait-preview { width:100%; max-height:410px; min-height:280px; padding:7px; border:2px solid #2d251d; background:#eee2c7; object-fit:cover; box-shadow:5px 6px 12px rgba(0,0,0,.42); transform:rotate(-2deg); }
+    .editor-details { min-width:0; }
+    .editor-section-title { display:none; }
+    .editor-name { margin:0 0 10px; background:transparent; border:0; border-bottom:2px solid #31291e; color:#183251; font-family:'Special Elite','Courier New',monospace; }
+    .editor-details .class-picker { margin-bottom:10px; }
+    .portrait-picker { grid-template-columns:repeat(6,minmax(0,1fr)); max-height:180px; overflow-y:auto; padding:3px; }
+    .portrait-choice { min-height:60px; border-width:1px; }
+    .portrait-choice img { height:52px; }
+    .editor-stat-grid { grid-template-columns:repeat(4,minmax(0,1fr)); margin-top:12px; }
+    .editor-stat-grid .stat-input { grid-template-columns:28px 1fr; min-height:74px; padding:5px; }
+    .editor-stat-grid .stat-input button { display:none; }
+    .editor-stat-grid .stat-input img { width:30px; height:30px; }
+    .editor-stat-grid .stat-input input { font-size:2rem; }
+    @media (max-width:680px) { .editor-card { grid-template-columns:105px 1fr; gap:12px; } .editor-portrait-preview { min-height:145px; max-height:220px; padding:4px; } .portrait-picker { grid-template-columns:repeat(5,minmax(0,1fr)); max-height:150px; } .editor-stat-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .editor-stat-grid .stat-input button { display:block; } .editor-stat-grid .stat-input { grid-template-columns:25px 34px 1fr 34px; min-height:48px; } }
+    #result-panel { background:#12100e; }
+    .result { background-color:#15120e; background-image:linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,.16)),url('images/textures/notePad.png'); background-size:100% 100%; background-repeat:no-repeat; }
+    .result-copy { width:min(100%,530px); }
+    .result-comparison { display:flex; align-items:center; justify-content:center; gap:14px; min-height:88px; margin:7px auto 0; }
+    .result-comparison[hidden] { display:none; }
+    .result-score-counter { position:relative; display:grid; place-items:center; width:78px; height:78px; }
+    .result-score-counter img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 2px 2px rgba(0,0,0,.45)); }
+    .result-score-counter span { position:relative; z-index:1; font:normal 2.25rem Teutonic,serif; text-shadow:0 1px 1px #fff7df,0 1px 3px rgba(0,0,0,.35); }
+    .result-score-vs { color:#1d1712; font:normal 1.55rem Teutonic,serif; }
+    .bonus-grid { align-items:stretch; }
+    .bonus-grid .counter-line,.layout > section.panel > .counter-line { grid-template-columns:minmax(0,1fr) 144px; }
+    .bonus-grid .counter { display:grid; grid-template-columns:44px 1fr 44px; justify-items:center; gap:8px; width:144px; }
+    .bonus-grid .counter button { width:44px; height:44px; }
+    .bonus-grid .counter output { min-width:30px; }
+    @media (max-width:480px) { .result-comparison { min-height:65px; gap:8px; } .result-score-counter { width:58px; height:58px; } .result-score-counter span { font-size:1.65rem; } .result-score-vs { font-size:1.15rem; } .bonus-grid .counter-line { grid-template-columns:minmax(0,1fr) 112px; } .bonus-grid .counter { grid-template-columns:34px 1fr 34px; width:112px; gap:4px; } .bonus-grid .counter button { width:34px; height:34px; } }
+    .app { --active-class-color:#1a334d; background:#202b30 radial-gradient(ellipse at 70% 35%,rgba(125,153,144,.12),transparent 52%),url('images/textures/leather.png') 0 0 / 650px 650px; }
+    .notebook-class-pin { position:absolute; top:18px; right:20px; z-index:3; width:62px; height:62px; object-fit:contain; filter:drop-shadow(2px 3px 3px rgba(0,0,0,.5)); transform:rotate(7deg); }
+    .test-math { border:2px solid var(--active-class-color); background:linear-gradient(100deg,color-mix(in srgb,var(--active-class-color) 24%,#f1e9d5),rgba(255,255,255,.54)),url('images/textures/paper01.png') 0 0 / cover; box-shadow:inset 0 0 12px color-mix(in srgb,var(--active-class-color) 25%,transparent); }
+    .test-math strong { color:var(--active-class-color); font-size:2.25rem; text-shadow:0 1px 0 #fff6df; }
+    .test-math .operator { color:var(--active-class-color); }
+    .investigator-summary { min-height:142px; background:linear-gradient(rgba(0,0,0,.23),rgba(0,0,0,.23)),color-mix(in srgb,var(--investigator-color) 92%,#0b1011); box-shadow:inset 0 0 22px rgba(0,0,0,.34),0 3px 8px rgba(0,0,0,.28); }
+    .investigator-summary-skills { grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+    .investigator-summary-skill { grid-template-columns:1fr; justify-items:center; gap:2px; min-height:52px; padding:5px 3px; }
+    .investigator-summary-skill img { width:31px; height:31px; }
+    .investigator-summary-skill strong { font-size:1.6rem; }
+    @media (min-width:821px) { .app { display:grid; grid-template-columns:112px minmax(0,1fr); grid-template-rows:minmax(0,1fr); gap:7px; padding:4px; } .top-actions { grid-column:1; grid-row:1; display:flex; flex-direction:column; justify-content:flex-start; gap:0; min-height:0; padding:7px 5px; border:2px solid rgba(0,0,0,.68); border-radius:0; background:linear-gradient(rgba(0,0,0,.16),rgba(0,0,0,.34)),var(--active-class-color) url('images/textures/leather.png') 0 0 / cover; box-shadow:4px 0 12px rgba(0,0,0,.58); } .top-actions button { flex:0 0 auto; min-height:86px; padding:8px 4px; border:0; border-bottom:1px solid rgba(240,221,178,.2); background:rgba(0,0,0,.15); flex-direction:column; font-size:.78rem; } .top-actions button:first-child { border-top:1px solid rgba(240,221,178,.2); } .top-actions img { width:34px; height:34px; } .layout { grid-column:2; grid-row:1; min-height:0; margin-top:0; } }
+    @media (max-width:480px) { .notebook-class-pin { top:9px;right:9px;width:39px;height:39px; } .investigator-summary { min-height:116px; } .investigator-summary-skills { gap:3px; } .investigator-summary-skill { min-height:36px;padding:2px; } .investigator-summary-skill img { width:23px;height:23px; } .investigator-summary-skill strong { font-size:1.18rem; } }
+    .track-heading { margin:14px 0 4px; font:normal 1.15rem Teutonic,serif; }
+    .skill-buttons { grid-template-columns:1fr; gap:6px; }
+    .skill-button { min-height:58px; justify-content:flex-start; padding:8px 16px; }
+    @media (max-width:480px) { .skill-buttons { gap:4px; } .skill-button { min-height:48px; padding:5px 9px; } }
+    .investigator { overflow:visible; border:3px solid var(--investigator-color); background:transparent; box-shadow:0 3px 9px rgba(0,0,0,.34); }
+    .investigator-summary { min-height:150px; padding:10px 14px; color:var(--ink); text-shadow:none; background:rgba(250,247,235,.91) url('images/textures/paper01.png') 0 0 / cover; box-shadow:inset 0 0 16px rgba(72,51,30,.2); }
+    .investigator-summary-top { grid-template-columns:88px 1fr; align-items:center; padding-right:35px; }
+    .investigator-photo { width:78px; height:94px; padding:4px; border-color:var(--investigator-color); }
+    .investigator-summary-name { color:#17120d; font-size:clamp(1.55rem,3vw,2.35rem); text-shadow:0 1px 0 #fff8e8; }
+    .investigator-summary-skills { margin-top:8px; }
+    .investigator-summary-skill { background:rgba(255,252,241,.84) url('images/textures/paper01.png') 0 0 / cover; }
+    .investigator-class-badge { position:absolute; top:-24px; right:-22px; z-index:5; width:64px; height:64px; padding:0; border:0; background:transparent; filter:drop-shadow(2px 3px 3px rgba(0,0,0,.55)); transform:rotate(6deg); }
+    .investigator-class-badge img { width:100%; height:100%; object-fit:contain; }
+    .investigator-edit { display:none; }
+    @media (max-width:480px) { .investigator-summary { min-height:120px;padding:6px 8px; } .investigator-summary-top { grid-template-columns:57px 1fr;padding-right:25px; } .investigator-photo { width:51px;height:62px; } .investigator-summary-name { font-size:1.32rem; } .investigator-class-badge { width:44px;height:44px;top:-15px;right:-13px; } }
+    .difficulty-line { border:2px solid #7e2830; background:linear-gradient(100deg,rgba(135,34,42,.22),rgba(249,235,213,.72)),url('images/textures/paper01.png') 0 0 / cover; }
+    .difficulty-line label { display:flex; align-items:center; gap:9px; color:#5e1f27; font-size:1.35rem; }
+    .difficulty-line label img { width:34px; height:34px; object-fit:contain; }
+    @media (min-width:821px) { .layout > section.panel { display:grid; grid-template-columns:minmax(235px,.76fr) minmax(350px,1.24fr); grid-template-rows:auto auto auto auto; column-gap:10px; row-gap:6px; overflow:visible; } .investigators { grid-column:1 / -1; grid-row:1; padding:20px 22px 10px; overflow:visible; } .skill-buttons { grid-column:1; grid-row:2 / span 2; align-content:start; } .layout > section.panel > .difficulty-line { grid-column:2;grid-row:2;margin:0; } .bonus-grid { grid-column:2;grid-row:3;margin:0; } .test-math { grid-column:1 / -1;grid-row:4; } .draw-button { grid-column:1 / -1;grid-row:5; } }
+    @media (max-width:820px) { .difficulty-line label img { width:26px;height:26px; } }
+    .investigator-class-badge { pointer-events:auto !important; cursor:pointer; touch-action:manipulation; }
+    .bonus-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+    .bonus-grid .counter-line { grid-template-columns:minmax(0,1fr) auto; min-width:0; padding:5px 7px; }
+    .bonus-grid .counter { width:132px; grid-template-columns:40px 1fr 40px; gap:6px; }
+    .bonus-grid .counter button { width:40px; height:40px; }
+    .skill-button { color:#fff5dc; background-blend-mode:multiply; text-shadow:0 2px 2px rgba(0,0,0,.78); }
+    .skill-button.skill-will { background-color:#0b314f; } .skill-button.skill-intellect { background-color:#351a45; } .skill-button.skill-combat { background-color:#482014; } .skill-button.skill-agility { background-color:#0a392b; }
+    @media (min-width:821px) { .layout > section.panel { grid-template-columns:minmax(180px,.48fr) minmax(420px,1.52fr); } .skill-buttons { width:100%; } }
+    @media (max-width:480px) { .bonus-grid { gap:5px; } .bonus-grid .counter { width:106px; grid-template-columns:32px 1fr 32px; gap:3px; } .bonus-grid .counter button { width:32px;height:32px; } }
+    /* Final tablet polish: keep every control inside its own paper field. */
+    .investigator { position:relative; min-width:0; }
+    .investigator.selected { border-width:4px; box-shadow:0 0 0 3px color-mix(in srgb,var(--investigator-color) 34%,transparent),0 7px 18px rgba(0,0,0,.38); transform:translateY(-3px) rotate(-1deg); }
+    .investigator-summary { display:block; width:100%; min-width:0; overflow:hidden; }
+    .investigator-summary-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .investigator-class-badge { z-index:20; pointer-events:auto; }
+    .bonus-grid .counter-line { min-width:0; grid-template-columns:minmax(0,1fr) 116px; gap:5px; padding:7px 8px; background:rgba(255,252,241,.68) url('images/textures/paper01.png') 0 0 / cover; }
+    .bonus-grid .counter-line label { min-width:0; overflow-wrap:anywhere; line-height:1.02; font-size:1rem; }
+    .bonus-grid .counter { width:116px; grid-template-columns:36px 1fr 36px; gap:4px; }
+    .bonus-grid .counter button { width:36px; height:36px; min-width:36px; }
+    .bonus-grid .counter output { min-width:24px; font-size:1.45rem; }
+    @media (min-width:821px) {
+      .layout { grid-template-columns:minmax(630px,1.18fr) minmax(470px,.82fr); gap:10px; }
+      .layout > section.panel { grid-template-columns:minmax(220px,.42fr) minmax(0,1.58fr); column-gap:12px; row-gap:8px; padding:14px; }
+      .investigators { padding:22px 28px 14px; gap:18px; }
+      .investigator-summary { min-height:178px; padding:12px 16px; }
+      .investigator-summary-top { grid-template-columns:96px minmax(0,1fr); }
+      .investigator-photo { width:88px; height:106px; }
+      .investigator-summary-name { font-size:2.1rem; }
+      .investigator-summary-skill { min-height:58px; }
+      .investigator-summary-skill img { width:35px; height:35px; }
+      .investigator-summary-skill strong { font-size:1.85rem; }
+      .skill-button { min-height:63px; padding:8px 13px; font-size:1.45rem; }
+      .difficulty-line { min-height:62px; }
+      .bonus-grid { gap:9px; }
+      .bonus-grid .counter-line { min-height:58px; grid-template-columns:minmax(0,1fr) 126px; }
+      .bonus-grid .counter { width:126px; grid-template-columns:40px 1fr 40px; }
+      .bonus-grid .counter button { width:40px; height:40px; min-width:40px; }
+    }
+    @media (max-width:480px) {
+      .bonus-grid .counter-line { grid-template-columns:minmax(0,1fr) 100px; padding:5px; }
+      .bonus-grid .counter { width:100px; grid-template-columns:30px 1fr 30px; }
+      .bonus-grid .counter button { width:30px; height:30px; min-width:30px; }
+      .bonus-grid .counter-line label { font-size:.82rem; }
+    }
+    /* iPad binder board — the main play surface. */
+    body { background:#34312d url('images/textures/notebookpapergrey.jpg') 0 0 / 680px auto; }
+    .masthead,.mobile-nav { display:none !important; }
+    .app { min-height:100dvh; background:linear-gradient(90deg,rgba(255,255,255,.1),transparent 20%),url('images/textures/notebookpaper.png') 0 0 / 980px auto; }
+    .layout > .panel { border:0; border-radius:0; box-shadow:none; }
+    .top-actions { z-index:10; }
+    .top-actions button { color:#f4ebd6; text-shadow:0 2px 2px #000; font-family:'Special Elite','Courier New',monospace; }
+    .top-actions button:hover,.top-actions button:focus-visible { background:rgba(255,220,154,.14); outline:0; }
+    .layout > section.panel { position:relative; background:transparent; }
+    .layout > section.panel::before { content:''; position:absolute; z-index:0; left:5%; top:2%; bottom:4%; width:74%; border:8px solid transparent; border-image:linear-gradient(135deg,#58412b,#c5a569,#4a3322) 1; background:rgba(255,250,231,.72) url('images/textures/notebookpaper.png') 0 0 / cover; box-shadow:8px 10px 14px rgba(0,0,0,.28); transform:rotate(-.5deg); }
+    .layout > section.panel > * { position:relative; z-index:1; }
+    .investigators { padding:32px 8% 18px 9%; gap:18px; }
+    .investigator { background:#e8bd69 url('images/textures/papellow.jpg') 0 0 / cover; border:0; padding:9px 10px 13px; box-shadow:4px 8px 13px rgba(0,0,0,.35); transform:rotate(-1.2deg); }
+    .investigator:nth-child(2) { transform:rotate(1.1deg); }
+    .investigator.selected { transform:translateY(-5px) rotate(-1.4deg); box-shadow:0 0 0 4px var(--investigator-color),7px 12px 18px rgba(0,0,0,.45); }
+    .investigator-summary { min-height:176px; padding:8px 10px; background:transparent; box-shadow:none; }
+    .investigator-summary-top { grid-template-columns:86px minmax(0,1fr); align-items:start; padding-right:15px; }
+    .investigator-photo { width:78px; height:101px; background:#f7f0dc; padding:5px; border:3px solid #352d26; box-shadow:2px 3px 5px rgba(0,0,0,.35); transform:rotate(-3deg); }
+    .investigator-summary-name { padding-top:5px; color:#7d2929; font-family:'La Belle Aurore','Special Elite',cursive; font-size:clamp(1.8rem,3vw,2.7rem); line-height:1; text-shadow:0 1px 0 #fdf5dc; }
+    .investigator-summary-skills { margin-top:-16px; margin-left:2px; padding-right:2px; gap:8px; }
+    .investigator-summary-skill { min-height:68px; padding:4px; border:0; border-radius:3px; background:#f5f1e5 url('images/textures/notebookpaper.png') 0 0 / cover; box-shadow:2px 3px 4px rgba(0,0,0,.32); transform:rotate(-2deg); }
+    .investigator-summary-skill:nth-child(even) { transform:rotate(2deg); }
+    .investigator-summary-skill img { width:35px; height:35px; }
+    .investigator-summary-skill strong { color:#17120d; font-size:2rem; }
+    .investigator-class-badge { width:72px; height:72px; top:-32px; right:-26px; z-index:25; }
+    .skill-buttons { padding-left:9%; gap:9px; }
+    .skill-button { min-height:60px; padding:7px 14px; border:0; border-left:5px solid currentColor; background:#f5f2e8 url('images/textures/notebookpaper.png') 0 0 / cover; box-shadow:2px 3px 5px rgba(0,0,0,.32); color:#251f19; text-shadow:0 1px #fff; }
+    .skill-button img { width:33px; height:33px; }
+    .skill-button.skill-will { color:#164d78; background-color:#dce9ef; }
+    .skill-button.skill-intellect { color:#572763; background-color:#eee1ef; }
+    .skill-button.skill-combat { color:#74381f; background-color:#efe0d6; }
+    .skill-button.skill-agility { color:#1e674d; background-color:#dbe9de; }
+    .skill-button.selected { color:#fffaf0; background:linear-gradient(110deg,var(--active-class-color),color-mix(in srgb,var(--active-class-color) 45%,#111)); box-shadow:0 0 0 3px rgba(255,247,222,.8),3px 5px 8px rgba(0,0,0,.45); }
+    .difficulty-line { margin:0 9% 0 0 !important; min-height:74px; border:0; background:#ded2b0 url('images/textures/paper01.png') 0 0 / cover; box-shadow:inset 0 0 0 1px rgba(70,50,30,.32),2px 3px 5px rgba(0,0,0,.23); }
+    .difficulty-line label { order:2; justify-content:flex-end; color:#201912; font-size:1.65rem; }
+    .difficulty-line .counter { order:1; }
+    .counter button { border:0; border-radius:2px; color:#111; background:#f6f4ed url('images/textures/notebookpaper.png') 0 0 / cover; box-shadow:inset 0 0 0 2px #777,2px 3px 4px rgba(0,0,0,.27); }
+    .counter output { color:#19130d; font:normal 2rem Teutonic,serif; }
+    .bonus-grid { padding:8px 9% 0 9%; grid-template-columns:1fr !important; gap:0; background:rgba(250,246,226,.32); }
+    .bonus-grid .counter-line { min-height:68px; grid-template-columns:minmax(150px,1fr) 140px; padding:6px 12px; border:0; border-bottom:1px solid rgba(75,54,34,.4); background:transparent; }
+    .bonus-grid .counter-line label { color:#613463; font-family:'La Belle Aurore','Special Elite',cursive; font-size:2rem; overflow:visible; }
+    .bonus-grid .counter { width:140px; grid-template-columns:44px 1fr 44px; }
+    .bonus-grid .counter button { width:44px; height:44px; min-width:44px; }
+    .test-math { margin:12px 9% 0; min-height:78px; border:0; background:rgba(255,250,235,.78) url('images/textures/notebookpaper.png') 0 0 / cover; box-shadow:inset 0 0 0 1px rgba(58,40,24,.25); }
+    .draw-button { margin:10px 9% 14px auto; width:72%; min-height:68px; border:0; color:#17120d; background:#e1b050 url('images/textures/papellow.jpg') 0 0 / cover; box-shadow:3px 5px 8px rgba(0,0,0,.35); font:normal 2.1rem Teutonic,serif; text-shadow:0 1px #fff7d8; }
+    #result-panel { position:relative; padding:42px 36px 38px; background:transparent; }
+    #result-panel::before { content:''; position:absolute; inset:8% 6% 8% 4%; z-index:0; border:12px solid transparent; border-image:linear-gradient(135deg,#64492e,#302119,#b28a56,#442d1d) 1; background:#eadfc7 url('images/textures/notebookpaper.png') 0 0 / cover; box-shadow:10px 12px 18px rgba(0,0,0,.42); transform:rotate(1.6deg); }
+    #result-panel::after { content:''; position:absolute; inset:15% 11% 14% 9%; z-index:0; background:rgba(205,223,169,.46); box-shadow:inset 0 0 35px rgba(65,94,40,.2); transform:rotate(1.6deg); }
+    #result-panel > * { position:relative; z-index:1; }
+    .result { height:100%; min-height:540px; padding:75px 10% 48px; background:transparent; box-shadow:none; display:flex; flex-direction:column; justify-content:center; text-align:center; }
+    .notebook-class-pin { top:16px; right:4px; width:62px; height:62px; }
+    .result-token { align-self:center; width:min(170px,16vw); height:min(170px,16vw); margin:-74px 0 8px; filter:drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
+    .result-title { font-size:3.3rem; order:3; }
+    .result-comparison { order:2; margin:0 auto 8px; padding:12px 20px; border:2px solid #613463; background:rgba(255,255,255,.48); }
+    .result-effect { order:4; margin:12px auto 0; padding:20px; border-top:1px solid rgba(68,48,27,.45); background:transparent; color:#221b14; font-size:1.35rem; }
+    .result-grid { display:none !important; }
+    @media (min-width:821px) { .app { grid-template-columns:122px minmax(0,1fr); gap:0; padding:0; } .top-actions { padding:18px 7px; } .top-actions button { min-height:116px; font-size:1.15rem; gap:8px; } .top-actions img { width:48px; height:48px; } .layout { grid-template-columns:minmax(650px,1.07fr) minmax(530px,.93fr); gap:0; } .layout > section.panel { grid-template-columns:minmax(220px,.38fr) minmax(390px,.62fr); padding:0; column-gap:10px; row-gap:8px; } .investigators { grid-column:1 / -1; } .skill-buttons { grid-column:1; grid-row:2 / span 3; } .difficulty-line { grid-column:2; grid-row:2; } .bonus-grid { grid-column:2; grid-row:3; } .test-math { grid-column:1 / -1; grid-row:4; } .draw-button { grid-column:2; grid-row:5; } }
+    @media (max-width:820px) { .top-actions { display:flex; } .investigators { padding:24px 7px 12px; } .layout > section.panel::before { left:1%; width:98%; } .bonus-grid { padding:6px 5%; } .bonus-grid .counter-line { min-height:54px; } .bonus-grid .counter-line label { font-size:1.45rem; } }
+    /* Reference composition: leather spine / clipped player file / working notes. */
+    @media (min-width:821px) and (orientation:landscape) {
+      .app { max-width:none; grid-template-columns:clamp(130px,10.2vw,210px) minmax(0,1fr); }
+      .top-actions { padding:34px 14px 0; background-color:#20140e; background-size:460px 650px; box-shadow:5px 0 15px rgba(0,0,0,.62); }
+      .top-actions button { min-height:154px; padding:14px 4px; gap:10px; border-bottom:2px solid rgba(236,208,155,.2); font-size:1.35rem; }
+      .top-actions img { width:58px; height:58px; }
+      .layout { grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); background:linear-gradient(90deg,rgba(255,255,255,.15),transparent 40%),url('images/textures/notebookpaper.png') 0 0 / 920px auto; }
+      .layout > section.panel { display:grid; grid-template-columns:clamp(165px,25%,250px) minmax(0,1fr); grid-template-rows:clamp(300px,31vw,420px) 84px minmax(270px,1fr) 74px; align-content:start; min-height:100dvh; padding:0 0 0 clamp(20px,3vw,54px); overflow:visible; }
+      .layout > section.panel::before { left:8%; top:40%; bottom:9%; width:72%; border:0; background:transparent url('images/textures/card2.png') center / 100% 100% no-repeat; box-shadow:8px 10px 14px rgba(0,0,0,.28); transform:rotate(-.25deg); }
+      .investigators { grid-column:1 / -1; grid-row:1; width:82%; max-width:800px; margin:42px 0 0 42px; padding:40px 25px 22px; gap:20px; align-self:start; background:transparent url('images/textures/card01.png') center / 100% 100% no-repeat; box-shadow:none; transform:rotate(-1.7deg); }
+      .investigators::before { content:''; position:absolute; z-index:-1; top:-27px; left:25px; width:65%; height:52px; border-radius:19px 19px 0 0; background:#f0e6ce url('images/textures/notebookpaper.png') 0 0 / cover; box-shadow:0 -6px 8px rgba(0,0,0,.25); }
+      .investigators::after { content:'PLAYER FILE'; position:absolute; top:-17px; left:52px; color:#18233d; font:normal 1.25rem 'Special Elite','Courier New',monospace; letter-spacing:.08em; }
+      .investigator { padding:8px; box-shadow:3px 5px 7px rgba(0,0,0,.32); }
+      .investigator-summary { min-height:242px; padding:9px 12px; }
+      .investigator-summary-top { grid-template-columns:105px minmax(0,1fr); }
+      .investigator-photo { width:96px; height:126px; }
+      .investigator-summary-name { font-size:2.55rem; }
+      .investigator-summary-skills { margin-top:-25px; gap:10px; }
+      .investigator-summary-skill { min-height:82px; }
+      .investigator-summary-skill img { width:41px; height:41px; }
+      .investigator-summary-skill strong { font-size:2.35rem; }
+      .investigator-class-badge { width:82px; height:82px; top:-43px; right:-34px; }
+      .skill-buttons { grid-column:1; grid-row:2 / span 2; padding:18px 14px 10px 7%; gap:11px; align-content:start; }
+      .skill-button { min-height:66px; font-size:1.4rem; }
+      .difficulty-line { grid-column:2; grid-row:2; width:87%; margin:18px 0 0 0 !important; min-height:68px; }
+      .difficulty-line label { font-size:1.75rem; }
+      .bonus-grid { grid-column:2; grid-row:3; width:87%; margin:8px 0 0; padding:7px 10px 8px; }
+      .bonus-grid .counter-line { min-height:65px; grid-template-columns:minmax(150px,1fr) 150px; }
+      .bonus-grid .counter-line label { font-size:2rem; }
+      .bonus-grid .counter { width:150px; grid-template-columns:48px 1fr 48px; }
+      .bonus-grid .counter button { width:48px; height:48px; min-width:48px; }
+      .test-math { display:none; }
+      .draw-button { grid-column:2; grid-row:4; width:87%; margin:8px 0 0; min-height:70px; font-size:2.05rem; }
+      #result-panel { min-height:100dvh; padding:142px 84px 82px 36px; overflow:visible; }
+      #result-panel::before { inset:18% 8% 14% 5%; border:0; background:transparent url('images/textures/card3.png') center / 100% 100% no-repeat; box-shadow:10px 12px 18px rgba(0,0,0,.42); transform:rotate(1.2deg); }
+      #result-panel::after { inset:24% 14% 21% 10%; transform:rotate(1.2deg); }
+      .result { min-height:0; height:100%; padding:42px 12% 40px; justify-content:center; }
+      .result-token { width:min(206px,15vw); height:min(206px,15vw); margin:-126px auto 12px; }
+      .result-title { font-size:3.8rem; line-height:.9; }
+      .result-comparison { min-height:112px; padding:17px 32px; }
+      .result-score-counter { width:102px; height:102px; }
+      .result-score-counter span { font-size:3rem; }
+      .result-score-vs { font-size:2rem; }
+      .result-effect { margin-top:17px; padding:25px 15px; font-size:1.55rem; line-height:1.18; }
+      .notebook-class-pin { top:7%; right:7%; width:72px; height:72px; }
+    }
+    @media (min-width:821px) and (max-width:1199px) and (orientation:landscape) {
+      .top-actions { padding:12px 5px 0; }
+      .top-actions button { min-height:104px; padding:7px 2px; font-size:1rem; }
+      .top-actions img { width:42px; height:42px; }
+      .layout > section.panel { grid-template-columns:155px minmax(0,1fr); grid-template-rows:278px 62px minmax(210px,1fr) 58px; padding-left:12px; }
+      .investigators { width:92%; margin:24px 0 0 15px; padding:26px 13px 11px; gap:11px; }
+      .investigator-summary { min-height:190px; padding:5px; }
+      .investigator-summary-top { grid-template-columns:67px minmax(0,1fr); }
+      .investigator-photo { width:62px; height:80px; padding:3px; }
+      .investigator-summary-name { font-size:1.55rem; }
+      .investigator-summary-skills { margin-top:-12px; gap:4px; }
+      .investigator-summary-skill { min-height:56px; }
+      .investigator-summary-skill img { width:27px; height:27px; }
+      .investigator-summary-skill strong { font-size:1.55rem; }
+      .investigator-class-badge { width:52px; height:52px; top:-25px; right:-20px; }
+      .skill-buttons { padding:9px 7px 0 4%; gap:5px; }
+      .skill-button { min-height:48px; padding:5px 7px; font-size:1.03rem; }
+      .skill-button img { width:26px; height:26px; }
+      .difficulty-line { min-height:54px; margin-top:7px !important; width:94%; }
+      .difficulty-line label { font-size:1.2rem; gap:4px; }
+      .difficulty-line label img { width:28px; height:28px; }
+      .bonus-grid { width:94%; margin-top:3px; padding:3px 5px; }
+      .bonus-grid .counter-line { min-height:49px; grid-template-columns:minmax(74px,1fr) 104px; padding:2px 4px; }
+      .bonus-grid .counter-line label { font-size:1.25rem; }
+      .bonus-grid .counter { width:104px; grid-template-columns:32px 1fr 32px; }
+      .bonus-grid .counter button { width:32px; height:32px; min-width:32px; }
+      .bonus-grid .counter output { font-size:1.45rem; }
+      .draw-button { width:94%; min-height:54px; margin-top:3px; font-size:1.38rem; }
+      #result-panel { padding:75px 26px 40px 18px; }
+      #result-panel::before { inset:12% 4% 10% 2%; border-width:9px; }
+      #result-panel::after { inset:18% 9% 16% 7%; }
+      .result { padding:26px 9% 18px; }
+      .result-token { width:115px; height:115px; margin:-65px auto 4px; }
+      .result-title { font-size:2.35rem; }
+      .result-comparison { padding:8px 11px; min-height:72px; }
+      .result-score-counter { width:67px; height:67px; }
+      .result-score-counter span { font-size:1.9rem; }
+      .result-effect { margin-top:7px; padding:11px 6px; font-size:1rem; }
+      .notebook-class-pin { width:45px; height:45px; }
+    }
+    /* Single active player card: the board now begins with the exact file-card unit. */
+    #skill-buttons { display:none !important; }
+    .active-investigator-card { position:relative; width:100%; height:100%; min-width:0; color:#17120d; }
+    .active-investigator-header { display:flex; align-items:center; gap:10px; min-width:0; height:56px; padding-right:33%; }
+    .active-investigator-class { width:58px; height:58px; flex:0 0 auto; object-fit:contain; filter:drop-shadow(1px 2px 2px rgba(0,0,0,.45)); }
+    .active-investigator-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#9a282d; font:normal clamp(1.7rem,3.4vw,3.25rem) 'Special Elite','Courier New',monospace; letter-spacing:-.05em; }
+    .active-investigator-classname { position:absolute; top:-30px; right:23%; color:#962b2b; font:normal clamp(.95rem,1.7vw,1.6rem) 'Special Elite','Courier New',monospace; letter-spacing:.04em; text-transform:uppercase; }
+    .active-investigator-edit { position:absolute; top:4px; right:2px; width:54px; height:54px; padding:0; border:0; background:transparent; }
+    .active-investigator-edit img { width:100%; height:100%; object-fit:contain; filter:drop-shadow(1px 2px 2px rgba(0,0,0,.48)); }
+    .active-portrait { position:absolute; z-index:4; top:35px; right:5%; width:27%; max-width:200px; height:56%; object-fit:cover; padding:8px; background:#faf5e7; border:4px solid #e9dfc8; box-shadow:5px 7px 10px rgba(0,0,0,.42); transform:rotate(6deg); }
+    .vital-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; width:62%; margin:18px 0 0 3%; }
+    .vital-card { position:relative; display:grid; grid-template-columns:1fr 42px; align-items:center; min-height:106px; padding:12px 5px 10px 21px; border:0; background:transparent url('images/textures/card3.png') center / 100% 100% no-repeat; box-shadow:3px 5px 6px rgba(0,0,0,.28); }
+    .vital-main { display:flex; align-items:center; justify-content:center; gap:10px; font:normal clamp(2.3rem,5vw,4.6rem) Teutonic,serif; }
+    .vital-main img { width:42px; height:42px; object-fit:contain; }
+    .vital-buttons { display:grid; gap:5px; }
+    .vital-buttons button { width:37px; height:37px; padding:0; border:0; color:#12100e; background:#f7f7f2 url('images/textures/notebookpaper.png') 0 0 / cover; box-shadow:inset 0 0 0 2px #817c73,1px 2px 2px rgba(0,0,0,.3); font:bold 1.45rem Arial,sans-serif; }
+    .active-skill-row { position:absolute; z-index:5; left:2%; right:2%; bottom:8px; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+    .active-skill { position:relative; display:grid; grid-template-columns:1fr auto; align-items:center; min-width:0; min-height:94px; padding:8px 9px; border:0; border-radius:8px; color:#18120e; background:transparent url('images/textures/card3.png') center / 100% 100% no-repeat; box-shadow:3px 5px 7px rgba(0,0,0,.34); transform:rotate(-2deg); }
+    .active-skill:nth-child(even) { transform:rotate(2deg); }
+    .active-skill img { width:44px; height:44px; object-fit:contain; }
+    .active-skill strong { font:normal clamp(2rem,4.6vw,4rem) Teutonic,serif; }
+    .active-skill.selected { outline:3px solid rgba(255,252,252,.92); outline-offset:1px; box-shadow:0 0 0 4px #7c4c8b,0 0 20px 9px rgba(135,70,158,.78),3px 5px 7px rgba(0,0,0,.4); }
+    .active-skill.selected::before { content:''; position:absolute; top:-7px; left:50%; width:12px; height:12px; margin-left:-6px; border-radius:50%; background:#744280; box-shadow:0 0 0 3px #fff,0 0 11px 5px rgba(135,70,158,.8); }
+    @media (min-width:821px) and (orientation:landscape) {
+      .layout > section.panel { grid-template-columns:1fr; grid-template-rows:clamp(330px,33vw,470px) 78px minmax(288px,1fr) 74px; padding:0 clamp(20px,4vw,68px); }
+      .layout > section.panel::before { left:7%; right:7%; top:47%; bottom:7%; width:auto; }
+      .investigators { display:block; grid-column:1; grid-row:1; width:100%; max-width:none; height:100%; margin:0; padding:39px 4% 15px 3%; background:transparent url('images/textures/card2.png') center / 100% 100% no-repeat; box-shadow:none; transform:rotate(-.45deg); }
+      .investigators::before,.investigators::after { display:none; }
+      .investigator { display:block; width:100%; height:100%; padding:0; border:0; background:transparent; box-shadow:none; transform:none !important; }
+      .investigator-summary,.investigator-class-badge { display:none !important; }
+      .difficulty-line { grid-column:1; grid-row:2; width:86%; margin:8px auto 0 !important; }
+      .bonus-grid { grid-column:1; grid-row:3; width:86%; margin:0 auto; padding:8px 4%; background:transparent; }
+      .draw-button { grid-column:1; grid-row:4; width:86%; margin:0 auto; }
+    }
+    @media (min-width:821px) and (max-width:1199px) and (orientation:landscape) {
+      .layout > section.panel { grid-template-rows:278px 60px minmax(222px,1fr) 56px; padding:0 12px; }
+      .vital-row { margin-top:8px; gap:7px; }
+      .vital-card { min-height:72px; padding:7px 4px 7px 12px; grid-template-columns:1fr 29px; }
+      .vital-main { gap:5px; font-size:2rem; }.vital-main img{width:28px;height:28px}.vital-buttons{gap:3px}.vital-buttons button{width:27px;height:27px;font-size:1rem}
+      .active-skill-row { gap:5px; bottom:3px; }.active-skill{min-height:58px;padding:4px}.active-skill img{width:28px;height:28px}.active-skill strong{font-size:1.65rem}
+      .active-investigator-header { height:38px; gap:5px; }.active-investigator-class{width:40px;height:40px}.active-investigator-name{font-size:1.6rem}.active-investigator-classname{top:-20px;font-size:.8rem}.active-investigator-edit{width:35px;height:35px}.active-portrait{top:27px;padding:4px;border-width:2px}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="masthead"><div><h1>Skill Test Calculator</h1><p>Arkham Horror: The Card Game — two-handed solo helper</p></div><button class="reset-session" type="button" id="reset-session">Clear session</button></header>
+    <nav class="top-actions" aria-label="Application controls">
+      <button type="button" id="open-player"><img src="images/icons/tab_investigator.png" alt="">Player</button>
+      <button type="button" id="open-music" class="music-status"><img src="images/icons/tab_music.png" alt="">Music</button>
+      <button type="button" id="open-settings"><img src="images/icons/tab_round_order.png" alt="">Settings</button>
+      <button type="button" id="open-bag-top"><img src="images/icons/tab_trials.png" alt="">Chaos Bag</button>
+      <button type="button" id="reset-app"><img src="images/icons/tab_round_order.png" alt="">Reload</button>
+    </nav>
+    <button id="reset-session-top" type="button" hidden aria-hidden="true"></button><button id="reload-app" type="button" hidden aria-hidden="true"></button>
+    <nav class="mobile-nav" aria-label="Calculator views"><button type="button" id="show-test">Skill Test</button><button type="button" id="show-result">Result &amp; Bag</button></nav>
+    <button id="open-bag" type="button" hidden aria-hidden="true"></button>
+    <div class="layout">
+      <section class="panel" aria-label="Skill test controls">
+        <div class="investigators" id="investigators"></div>
+        <div class="skill-buttons" id="skill-buttons"></div>
+        <div class="counter-line difficulty-line"><label for="difficulty"><img src="images/icons/shroud.png" alt="">Difficulty</label><div class="counter"><button type="button" data-counter="difficulty" data-delta="-1">−</button><output id="difficulty">2</output><button type="button" data-counter="difficulty" data-delta="1">+</button></div></div>
+        <div class="bonus-grid"><div class="counter-line"><label>Committed cards</label><div class="counter"><button type="button" data-counter="committed" data-delta="-1">−</button><output id="committed">0</output><button type="button" data-counter="committed" data-delta="1">+</button></div></div>
+        <div class="counter-line"><label>Assets</label><div class="counter"><button type="button" data-counter="assets" data-delta="-1">−</button><output id="assets">0</output><button type="button" data-counter="assets" data-delta="1">+</button></div></div>
+        <div class="counter-line"><label>Events</label><div class="counter"><button type="button" data-counter="events" data-delta="-1">−</button><output id="events">0</output><button type="button" data-counter="events" data-delta="1">+</button></div></div>
+        <div class="counter-line"><label>Other effects</label><div class="counter"><button type="button" data-counter="other" data-delta="-1">−</button><output id="other">0</output><button type="button" data-counter="other" data-delta="1">+</button></div></div></div>
+        <div class="test-math"><div><span>Printed skill</span><strong id="printed-value">0</strong></div><b class="operator">+</b><div><span>Bonuses</span><strong id="bonus-value">0</strong></div><b class="operator">=</b><div><span>Current skill</span><strong id="current-value">0</strong></div></div>
+        <button class="draw-button" id="draw-token" type="button">Draw Chaos Token</button>
+      </section>
+      <aside class="panel" id="result-panel" aria-label="Chaos bag and test result"><button type="button" class="back-to-test" id="back-to-test">Back to Skill Test</button>
+        <section class="result" id="test-result" aria-live="polite"><img class="notebook-class-pin" id="notebook-class-pin" src="images/icons/class_guardian.png" alt="Investigator class"><div class="result-token empty" id="result-token"></div><div class="result-copy"><h3 class="result-title" id="result-title">Choose a skill</h3><div class="result-comparison" id="result-comparison" aria-label="Test comparison"></div><p class="result-effect" id="result-effect">Select an investigator skill, set your bonuses and difficulty, then draw from the chaos bag.</p><div class="result-grid" hidden><div><span>Token</span><strong id="result-modifier">—</strong></div><div><span>Final skill</span><strong id="result-final">—</strong></div><div><span>Margin</span><strong id="result-margin">—</strong></div></div></div></section>
+      </aside>
+    </div>
+  </main>
+  <div class="bag-modal" id="bag-modal" role="dialog" aria-modal="true" aria-labelledby="bag-modal-title"><section class="bag-dialog"><div class="bag-dialog-heading"><h2 id="bag-modal-title">Chaos Bag</h2><button class="bag-close" id="close-bag" type="button" aria-label="Close chaos bag editor">×</button></div><div class="bag-modal-controls"><select id="campaign" aria-label="Campaign"></select><select id="bag-difficulty" aria-label="Chaos bag difficulty"><option value="easy">Easy</option><option value="standard">Standard</option><option value="hard">Hard</option><option value="expert">Expert</option></select><button class="small-button" id="reset-bag" type="button">Stock bag</button></div><p class="bag-help">This is the active campaign bag. Set any token quantity to customize it, or restore its stock contents.</p><div class="bag-editor" id="bag-editor"></div></section></div>
+  <div class="settings-modal" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title"><section class="settings-dialog"><div class="dialog-heading"><h2 id="settings-title">Settings &amp; Sessions</h2><button class="dialog-close" id="close-settings" type="button" aria-label="Close settings">×</button></div><section class="save-bar" aria-label="Named session saves"><input id="session-name" type="text" maxlength="40" placeholder="Name this session"><button type="button" id="save-named">Save</button><select id="saved-sessions" aria-label="Saved sessions"><option value="">Saved sessions</option></select><button type="button" id="load-named">Load</button><button type="button" id="delete-named">Delete</button></section><button class="small-button" id="reset-session" type="button" style="margin-top:12px;width:100%">Clear current session</button></section></div>
+  <div class="music-modal" id="music-modal" role="dialog" aria-modal="true" aria-labelledby="music-title"><section class="music-dialog"><div class="dialog-heading"><h2 id="music-title">Ambient Music</h2><button class="dialog-close" id="close-music" type="button" aria-label="Close music player">×</button></div><div class="music-controls"><button type="button" id="music-play">Play</button><button type="button" id="music-next">Next</button><input id="music-volume" type="range" min="0" max="1" step="0.05" value="0.5" aria-label="Music volume"></div><div class="music-timeline"><span id="music-elapsed">0:00</span><input id="music-scrubber" type="range" min="0" max="0" value="0" step="0.1" aria-label="Song progress"><span id="music-total">0:00</span></div><h3 class="track-heading">Select a track</h3><div class="track-list" id="track-list"><button type="button">Beyond Arkham</button><button type="button">Dark Mystery</button><button type="button">Eldritch Nightmare</button><button type="button">The Dream-Quest of Unknown</button><button type="button">The King in Yellow</button><button type="button">The Miskatonic Museum</button></div><audio id="music-player" loop playsinline></audio></section></div>
+  <div class="investigator-modal" id="investigator-modal" role="dialog" aria-modal="true" aria-labelledby="investigator-editor-title"><section class="investigator-dialog" id="investigator-dialog"><div class="dialog-heading"><h2 id="investigator-editor-title">Investigator</h2><button class="dialog-close" id="close-investigator" type="button" aria-label="Close investigator editor">×</button></div><div class="editor-card"><img class="editor-portrait-preview" id="editor-portrait-preview" alt="Selected investigator portrait"><div class="editor-details"><input class="editor-name" id="editor-name" type="text" maxlength="28" aria-label="Investigator name"><h3 class="editor-section-title">Class</h3><div class="class-picker" id="editor-class-picker"></div><h3 class="editor-section-title">Portrait</h3><div class="portrait-picker" id="portrait-picker"></div><h3 class="editor-section-title">Skills</h3><div class="editor-stat-grid" id="editor-stat-grid"></div></div></div></section></div>
+  <script>
+  (() => {
+    'use strict';
+    const key = 'arkham-skill-calculator-v1';
+    const savesKey = 'arkham-skill-calculator-named-saves-v1';
+    const skills = [
+      { id:'will', name:'Willpower', icon:'images/icons/invest_willpower.png' },
+      { id:'intellect', name:'Intellect', icon:'images/icons/invest_intellect.png' },
+      { id:'combat', name:'Combat', icon:'images/icons/invest_combat.png' },
+      { id:'agility', name:'Agility', icon:'images/icons/invest_agility.png' }
+    ];
+    const tokenInfo = {
+      '+1': ['+1','images/icons/chaos_plus1.png'], '0': ['0','images/icons/chaos_0.png'], '-1': ['-1','images/icons/chaos_minus1.png'], '-2': ['-2','images/icons/chaos_minus2.png'], '-3': ['-3','images/icons/chaos_minus3.png'], '-4': ['-4','images/icons/chaos_minus4.png'], '-5': ['-5','images/icons/chaos_minus5.png'], '-6': ['-6','images/icons/chaos_minus6.png'], '-7': ['-7','images/icons/chaos_minus7.png'], '-8': ['-8','images/icons/chaos_minus8.png'],
+      skull:['Skull','images/icons/chaos_skull.png'], cultist:['Cultist','images/icons/chaos_cultist.png'], tablet:['Tablet','images/icons/chaos_tablet.png'], elderthing:['Elder Thing','images/icons/chaos_elderthing.png'], eldersign:['Elder Sign','images/icons/chaos_eldersign.png'], autofail:['Auto Fail','images/icons/chaos_autofail.png'], bless:['Bless',null], curse:['Curse',null], frost:['Frost',null]
+    };
+    const investigatorClasses = {
+      guardian:{ label:'Guardian', color:'#1a334d', icon:'images/icons/class_guardian.png' },
+      seeker:{ label:'Seeker', color:'#8a6416', icon:'images/icons/class_seeker.png' },
+      rogue:{ label:'Rogue', color:'#075734', icon:'images/icons/class_rogue.png' },
+      mystic:{ label:'Mystic', color:'#5c3d75', icon:'images/icons/class_mystic.png' },
+      survivor:{ label:'Survivor', color:'#8b263e', icon:'images/icons/class_survivor.png' }
+    };
+    const portraits = ['agnes','akachi','daisy','daniela','dexter','isabelle','jenny','jim','joe','lola','mark','min','minh','pete','rex','roland','sefina','skids','trish','wendy','william','yorick','zoey'].map(id=>({id,label:id.replace(/(^|[-_])\w/g,match=>match.toUpperCase()).replace(/[-_]/g,' '),path:`images/investigators/${id}.png`}));
+    const numberBags = {
+      easy:['+1','+1','0','0','0','-1','-1','-1','-2','-2'], standard:['+1','0','0','-1','-1','-1','-2','-2','-3','-4'], hard:['0','0','0','-1','-1','-2','-2','-3','-3','-4','-5'], expert:['0','-1','-1','-2','-2','-3','-3','-4','-4','-5','-6','-8']
+    };
+    const campaignSymbols = {
+      'Night of the Zealot':['skull','skull','cultist','tablet'],
+      'The Dunwich Legacy':['skull','skull','cultist','elderthing'],
+      'The Path to Carcosa':['skull','skull','skull','elderthing'],
+      'Brethren of Ash (Core Set 2026)':['skull','cultist','tablet','elderthing']
+    };
+    const initial = { selectedInvestigator:0, selectedSkill:null, difficulty:2, committed:0, assets:0, events:0, other:0, investigators:[{name:'Investigator 1',color:'#1a334d',will:3,intellect:3,combat:3,agility:3},{name:'Investigator 2',color:'#693b73',will:3,intellect:3,combat:3,agility:3}], campaign:'Night of the Zealot', bagDifficulty:'easy', bags:{} };
+    let state = load();
+    if (!campaignSymbols[state.campaign]) state.campaign='Night of the Zealot';
+    const $ = id => document.getElementById(id);
+    function freshState() { return JSON.parse(JSON.stringify(initial)); }
+    function load() { try { return { ...freshState(), ...JSON.parse(sessionStorage.getItem(key) || '{}') }; } catch { return freshState(); } }
+    function save() { sessionStorage.setItem(key, JSON.stringify(state)); }
+    function namedSaves() { try { return JSON.parse(localStorage.getItem(savesKey) || '{}'); } catch { return {}; } }
+    function saveNamedSession() { const name=$('session-name').value.trim(); if(!name) { $('session-name').focus(); return; } const saves=namedSaves(); saves[name]={ state, savedAt:Date.now() }; localStorage.setItem(savesKey,JSON.stringify(saves)); renderSavedSessions(name); }
+    function loadNamedSession() { const name=$('saved-sessions').value; const saved=namedSaves()[name]; if(!saved) return; state={ ...freshState(), ...saved.state }; save(); $('session-name').value=name; showResult(null,'Session loaded',`Loaded ${name}.`, 'resolve'); render(); renderSavedSessions(name); }
+    function deleteNamedSession() { const name=$('saved-sessions').value; if(!name) return; const saves=namedSaves(); delete saves[name]; localStorage.setItem(savesKey,JSON.stringify(saves)); renderSavedSessions(); }
+    function renderSavedSessions(selected='') { const select=$('saved-sessions'); if(!select) return; const current=selected||select.value; select.innerHTML='<option value="">Saved sessions</option>'; Object.entries(namedSaves()).sort((a,b)=>b[1].savedAt-a[1].savedAt).forEach(([name])=>{ const option=document.createElement('option'); option.value=name; option.textContent=name; option.selected=name===current; select.append(option); }); }
+    function bagDefault(campaign, difficulty=state.bagDifficulty) { const counts = Object.fromEntries(Object.keys(tokenInfo).map(token => [token,0])); [...numberBags[difficulty], ...campaignSymbols[campaign], 'eldersign','autofail'].forEach(token => counts[token]++); return counts; }
+    function bagStorageKey() { return `${state.campaign}|${state.bagDifficulty}`; }
+    function currentBag() { const bagKey=bagStorageKey(); if (!state.bags[bagKey]) state.bags[bagKey] = bagDefault(state.campaign,state.bagDifficulty); return state.bags[bagKey]; }
+    function totalBonus() { return state.committed + state.assets + state.events + state.other; }
+    function printed() { return Number(state.investigators[state.selectedInvestigator][state.selectedSkill]) || 0; }
+    function currentSkill() { return printed() + totalBonus(); }
+    function renderInvestigators() { const host = $('investigators'); host.innerHTML = ''; state.investigators.forEach((investigator,index) => { investigator.name ||= `Investigator ${index+1}`; investigator.color ||= index===0 ? '#1a334d' : '#693b73'; const card = document.createElement('section'); card.className = `investigator ${index === state.selectedInvestigator ? 'selected' : ''}`; card.style.setProperty('--investigator-color',investigator.color); const select = document.createElement('button'); select.type='button'; select.className='investigator-select'; select.textContent=investigator.name; select.onclick=()=>{ state.selectedInvestigator=index; save(); render(); }; card.append(select); const details=document.createElement('div'); details.className='investigator-details'; const nameInput=document.createElement('input'); nameInput.className='investigator-name'; nameInput.type='text'; nameInput.maxLength=28; nameInput.value=investigator.name; nameInput.setAttribute('aria-label',`Investigator ${index+1} name`); nameInput.oninput=()=>{ investigator.name=nameInput.value.trim()||`Investigator ${index+1}`; select.textContent=investigator.name; save(); }; const colorInput=document.createElement('input'); colorInput.className='investigator-color'; colorInput.type='color'; colorInput.value=investigator.color; colorInput.setAttribute('aria-label',`${investigator.name} color`); colorInput.oninput=()=>{ investigator.color=colorInput.value; card.style.setProperty('--investigator-color',investigator.color); save(); }; details.append(nameInput,colorInput); card.append(details); const grid=document.createElement('div'); grid.className='stat-grid'; skills.forEach(skill=>{ const wrap=document.createElement('label'); wrap.className=`stat-input skill-${skill.id}`; wrap.title=skill.name; const image=document.createElement('img'); image.src=skill.icon; image.alt=skill.name; const input=document.createElement('input'); input.type='number'; input.inputMode='numeric'; input.min='0'; input.max='20'; input.value=investigator[skill.id]; input.setAttribute('aria-label',`${investigator.name} ${skill.name}`); input.oninput=()=>{ investigator[skill.id]=Math.max(0,Number(input.value)||0); save(); updateNumbers(); }; wrap.append(image,input); grid.append(wrap); }); card.append(grid); host.append(card); }); }
+    function renderInvestigators() {
+      const host=$('investigators'); host.innerHTML='';
+      state.investigators.forEach((investigator,index)=>{
+        investigator.name ||= `Investigator ${index+1}`;
+        investigator.classId ||= index === 0 ? 'guardian' : 'seeker';
+        const classInfo=investigatorClasses[investigator.classId]; investigator.color=classInfo.color;
+        const card=document.createElement('section'); card.className=`investigator ${index===state.selectedInvestigator?'selected':''}`; card.style.setProperty('--investigator-color',classInfo.color);
+        const select=document.createElement('button'); select.type='button'; select.className='investigator-select'; select.textContent=investigator.name; select.onclick=()=>{state.selectedInvestigator=index;save();render();}; card.append(select);
+        const details=document.createElement('div'); details.className='investigator-details';
+        const name=document.createElement('input'); name.className='investigator-name'; name.type='text'; name.maxLength=28; name.value=investigator.name; name.setAttribute('aria-label',`Investigator ${index+1} name`); name.oninput=()=>{investigator.name=name.value.trim()||`Investigator ${index+1}`;select.textContent=investigator.name;save();}; details.append(name);
+        const picker=document.createElement('div'); picker.className='class-picker'; Object.entries(investigatorClasses).forEach(([id,info])=>{const button=document.createElement('button');button.type='button';button.className=`class-choice ${id===investigator.classId?'selected':''}`;button.title=info.label;button.setAttribute('aria-label',`Set ${investigator.name} to ${info.label}`);button.innerHTML=`<img src="${info.icon}" alt="${info.label}">`;button.onclick=()=>{investigator.classId=id;investigator.color=info.color;save();renderInvestigators();};picker.append(button);}); details.append(picker);card.append(details);
+        const grid=document.createElement('div');grid.className='stat-grid'; skills.forEach(skill=>{const wrap=document.createElement('div');wrap.className=`stat-input skill-${skill.id}`;const image=document.createElement('img');image.src=skill.icon;image.alt=skill.name;const minus=document.createElement('button');minus.type='button';minus.textContent='−';minus.setAttribute('aria-label',`Decrease ${skill.name}`);const input=document.createElement('input');input.type='number';input.inputMode='numeric';input.min='0';input.max='20';input.value=investigator[skill.id];input.setAttribute('aria-label',`${investigator.name} ${skill.name}`);const plus=document.createElement('button');plus.type='button';plus.textContent='+';const setValue=value=>{investigator[skill.id]=Math.max(0,Math.min(20,value));input.value=investigator[skill.id];save();updateNumbers();};minus.onclick=()=>setValue((Number(investigator[skill.id])||0)-1);plus.onclick=()=>setValue((Number(investigator[skill.id])||0)+1);input.oninput=()=>setValue(Number(input.value)||0);wrap.append(image,minus,input,plus);grid.append(wrap);});card.append(grid);host.append(card);
+      });
+    }
+    let editedInvestigator=0;
+    function openInvestigatorEditor(index) { editedInvestigator=index; state.selectedInvestigator=index; save(); render(); renderInvestigatorEditor(); $('investigator-modal').classList.add('open'); }
+    function renderInvestigators() { const host=$('investigators'); host.innerHTML=''; state.investigators.forEach((investigator,index)=>{ investigator.name ||= `Investigator ${index+1}`; investigator.classId ||= index===0?'guardian':'seeker'; const classInfo=investigatorClasses[investigator.classId]; investigator.color=classInfo.color; const card=document.createElement('section'); card.className=`investigator ${index===state.selectedInvestigator?'selected':''}`; card.style.setProperty('--investigator-color',classInfo.color); const button=document.createElement('button'); button.type='button'; button.className='investigator-summary'; button.setAttribute('aria-label',`Edit ${investigator.name}`); button.innerHTML=`<span class="investigator-summary-top"><span class="investigator-summary-name">${investigator.name}</span><img class="investigator-summary-badge" src="${classInfo.icon}" alt="${classInfo.label}"></span><span class="investigator-summary-skills">${skills.map(skill=>`<span class="investigator-summary-skill skill-${skill.id}"><img src="${skill.icon}" alt="${skill.name}"><strong>${investigator[skill.id]}</strong></span>`).join('')}</span>`; button.onclick=()=>openInvestigatorEditor(index); card.append(button); host.append(card); }); }
+    function renderInvestigatorEditor() { const investigator=state.investigators[editedInvestigator]; investigator.classId ||= editedInvestigator===0?'guardian':'seeker'; const classInfo=investigatorClasses[investigator.classId]; const dialog=$('investigator-dialog'); dialog.style.setProperty('--editor-color',classInfo.color); $('investigator-editor-title').textContent=`Edit Investigator ${editedInvestigator+1}`; const name=$('editor-name'); name.value=investigator.name; name.oninput=()=>{investigator.name=name.value.trim()||`Investigator ${editedInvestigator+1}`; save(); renderInvestigators();}; const picker=$('editor-class-picker'); picker.innerHTML=''; Object.entries(investigatorClasses).forEach(([id,info])=>{const button=document.createElement('button');button.type='button';button.className=`class-choice ${id===investigator.classId?'selected':''}`;button.title=info.label;button.setAttribute('aria-label',`Set class to ${info.label}`);button.innerHTML=`<img src="${info.icon}" alt="${info.label}">`;button.onclick=()=>{investigator.classId=id;investigator.color=info.color;save();renderInvestigators();renderInvestigatorEditor();};picker.append(button);}); const grid=$('editor-stat-grid'); grid.innerHTML=''; skills.forEach(skill=>{const wrap=document.createElement('div');wrap.className=`stat-input skill-${skill.id}`;const image=document.createElement('img');image.src=skill.icon;image.alt=skill.name;const minus=document.createElement('button');minus.type='button';minus.textContent='-';minus.setAttribute('aria-label',`Decrease ${skill.name}`);const input=document.createElement('input');input.type='number';input.inputMode='numeric';input.min='0';input.max='20';input.value=investigator[skill.id];input.setAttribute('aria-label',`${skill.name} value`);const plus=document.createElement('button');plus.type='button';plus.textContent='+';plus.setAttribute('aria-label',`Increase ${skill.name}`);const setValue=value=>{investigator[skill.id]=Math.max(0,Math.min(20,value));input.value=investigator[skill.id];save();renderInvestigators();updateNumbers();};minus.onclick=()=>setValue((Number(investigator[skill.id])||0)-1);plus.onclick=()=>setValue((Number(investigator[skill.id])||0)+1);input.oninput=()=>setValue(Number(input.value)||0);wrap.append(image,minus,input,plus);grid.append(wrap);}); }
+    function renderInvestigators() { const host=$('investigators'); host.innerHTML=''; state.investigators.forEach((investigator,index)=>{ investigator.name ||= `Investigator ${index+1}`; investigator.classId ||= index===0?'guardian':'seeker'; investigator.portrait ||= portraits[index%portraits.length].id; const classInfo=investigatorClasses[investigator.classId]; const portrait=portraits.find(item=>item.id===investigator.portrait)||portraits[0]; investigator.color=classInfo.color; const card=document.createElement('section'); card.className=`investigator ${index===state.selectedInvestigator?'selected':''}`; card.style.setProperty('--investigator-color',classInfo.color); const button=document.createElement('button'); button.type='button'; button.className='investigator-summary'; button.setAttribute('aria-label',`Edit ${investigator.name}`); button.innerHTML=`<span class="investigator-summary-top"><img class="investigator-photo" src="${portrait.path}" alt="${portrait.label}"><span class="investigator-summary-name">${investigator.name}</span><img class="investigator-summary-badge" src="${classInfo.icon}" alt="${classInfo.label}"></span><span class="investigator-summary-skills">${skills.map(skill=>`<span class="investigator-summary-skill skill-${skill.id}"><img src="${skill.icon}" alt="${skill.name}"><strong>${investigator[skill.id]}</strong></span>`).join('')}</span>`; button.onclick=()=>openInvestigatorEditor(index); card.append(button); host.append(card); }); }
+    function renderInvestigatorEditor() { const investigator=state.investigators[editedInvestigator]; investigator.classId ||= editedInvestigator===0?'guardian':'seeker'; investigator.portrait ||= portraits[editedInvestigator%portraits.length].id; const classInfo=investigatorClasses[investigator.classId]; const dialog=$('investigator-dialog'); dialog.style.setProperty('--editor-color',classInfo.color); $('investigator-editor-title').textContent=`Edit Investigator ${editedInvestigator+1}`; const name=$('editor-name'); name.value=investigator.name; name.oninput=()=>{investigator.name=name.value.trim()||`Investigator ${editedInvestigator+1}`;save();renderInvestigators();}; const picker=$('editor-class-picker'); picker.innerHTML=''; Object.entries(investigatorClasses).forEach(([id,info])=>{const button=document.createElement('button');button.type='button';button.className=`class-choice ${id===investigator.classId?'selected':''}`;button.title=info.label;button.setAttribute('aria-label',`Set class to ${info.label}`);button.innerHTML=`<img src="${info.icon}" alt="${info.label}">`;button.onclick=()=>{investigator.classId=id;investigator.color=info.color;save();renderInvestigators();renderInvestigatorEditor();};picker.append(button);}); const portraitPicker=$('portrait-picker');portraitPicker.innerHTML='';portraits.forEach(info=>{const button=document.createElement('button');button.type='button';button.className=`portrait-choice ${info.id===investigator.portrait?'selected':''}`;button.title=info.label;button.setAttribute('aria-label',`Use ${info.label} portrait`);button.innerHTML=`<img src="${info.path}" alt="${info.label}">`;button.onclick=()=>{investigator.portrait=info.id;save();renderInvestigators();renderInvestigatorEditor();};portraitPicker.append(button);}); const grid=$('editor-stat-grid'); grid.innerHTML=''; skills.forEach(skill=>{const wrap=document.createElement('div');wrap.className=`stat-input skill-${skill.id}`;const image=document.createElement('img');image.src=skill.icon;image.alt=skill.name;const minus=document.createElement('button');minus.type='button';minus.textContent='-';minus.setAttribute('aria-label',`Decrease ${skill.name}`);const input=document.createElement('input');input.type='number';input.inputMode='numeric';input.min='0';input.max='20';input.value=investigator[skill.id];input.setAttribute('aria-label',`${skill.name} value`);const plus=document.createElement('button');plus.type='button';plus.textContent='+';plus.setAttribute('aria-label',`Increase ${skill.name}`);const setValue=value=>{investigator[skill.id]=Math.max(0,Math.min(20,value));input.value=investigator[skill.id];save();renderInvestigators();updateNumbers();};minus.onclick=()=>setValue((Number(investigator[skill.id])||0)-1);plus.onclick=()=>setValue((Number(investigator[skill.id])||0)+1);input.oninput=()=>setValue(Number(input.value)||0);wrap.append(image,minus,input,plus);grid.append(wrap);}); }
+    function renderInvestigators() { const host=$('investigators'); host.innerHTML=''; state.investigators.forEach((investigator,index)=>{investigator.name ||= `Investigator ${index+1}`;investigator.classId ||= index===0?'guardian':'seeker';investigator.portrait ||= portraits[index%portraits.length].id;const classInfo=investigatorClasses[investigator.classId];const portrait=portraits.find(item=>item.id===investigator.portrait)||portraits[0];investigator.color=classInfo.color;const card=document.createElement('section');card.className=`investigator ${index===state.selectedInvestigator?'selected':''}`;card.style.setProperty('--investigator-color',classInfo.color);const select=document.createElement('button');select.type='button';select.className='investigator-summary';select.setAttribute('aria-label',`Select ${investigator.name} for this skill test`);select.innerHTML=`<span class="investigator-summary-top"><img class="investigator-photo" src="${portrait.path}" alt="${portrait.label}"><span class="investigator-summary-name">${investigator.name}</span><img class="investigator-summary-badge" src="${classInfo.icon}" alt="${classInfo.label}"></span><span class="investigator-summary-skills">${skills.map(skill=>`<span class="investigator-summary-skill skill-${skill.id}"><img src="${skill.icon}" alt="${skill.name}"><strong>${investigator[skill.id]}</strong></span>`).join('')}</span>`;select.onclick=()=>{state.selectedInvestigator=index;save();render();};const edit=document.createElement('button');edit.type='button';edit.className='investigator-edit';edit.textContent='Edit';edit.setAttribute('aria-label',`Edit ${investigator.name}`);edit.onclick=()=>openInvestigatorEditor(index);card.append(select,edit);host.append(card);}); }
+    function renderInvestigators() { const host=$('investigators');host.innerHTML='';state.investigators.forEach((investigator,index)=>{investigator.name ||= `Investigator ${index+1}`;investigator.classId ||= index===0?'guardian':'seeker';investigator.portrait ||= portraits[index%portraits.length].id;const classInfo=investigatorClasses[investigator.classId];const portrait=portraits.find(item=>item.id===investigator.portrait)||portraits[0];investigator.color=classInfo.color;const card=document.createElement('section');card.className=`investigator ${index===state.selectedInvestigator?'selected':''}`;card.style.setProperty('--investigator-color',classInfo.color);const select=document.createElement('button');select.type='button';select.className='investigator-summary';select.setAttribute('aria-label',`Select ${investigator.name} for this skill test`);select.innerHTML=`<span class="investigator-summary-top"><img class="investigator-photo" src="${portrait.path}" alt="${portrait.label}"><span class="investigator-summary-name">${investigator.name}</span></span><span class="investigator-summary-skills">${skills.map(skill=>`<span class="investigator-summary-skill skill-${skill.id}"><img src="${skill.icon}" alt="${skill.name}"><strong>${investigator[skill.id]}</strong></span>`).join('')}</span>`;select.onclick=()=>{state.selectedInvestigator=index;save();render();};const badge=document.createElement('button');badge.type='button';badge.className='investigator-class-badge';badge.innerHTML=`<img src="${classInfo.icon}" alt="${classInfo.label}">`;badge.setAttribute('aria-label',`Edit ${investigator.name}`);badge.onclick=event=>{event.stopPropagation();openInvestigatorEditor(index);};card.append(select,badge);host.append(card);}); }
+    const baseRenderInvestigatorEditor=renderInvestigatorEditor;
+    renderInvestigatorEditor=()=>{baseRenderInvestigatorEditor();const investigator=state.investigators[editedInvestigator];const portrait=portraits.find(item=>item.id===investigator.portrait)||portraits[0];$('editor-portrait-preview').src=portrait.path;$('editor-portrait-preview').alt=portrait.label;};
+    function renderSkills() { const host=$('skill-buttons'); host.innerHTML=''; skills.forEach(skill=>{ const button=document.createElement('button'); button.type='button'; button.className=`skill-button skill-${skill.id} ${state.selectedSkill===skill.id?'selected':''}`; button.innerHTML=`<img src="${skill.icon}" alt=""><span>${skill.name}</span>`; button.onclick=()=>{state.selectedSkill=skill.id; save(); renderSkills(); updateNumbers();}; host.append(button); }); }
+    function renderBag() { const bag=currentBag(); const host=$('bag-editor'); host.innerHTML=''; Object.entries(tokenInfo).forEach(([token,[name,path]])=>{ const row=document.createElement('label'); row.className='token-row'; if(path){ const image=document.createElement('img'); image.src=path; image.alt=''; row.append(image); } else { const fallback=document.createElement('span'); fallback.className='token-fallback'; fallback.textContent=name.slice(0,2); row.append(fallback); } const text=document.createElement('span'); text.textContent=name; const input=document.createElement('input'); input.type='number'; input.min='0'; input.max='20'; input.inputMode='numeric'; input.value=bag[token]||0; input.setAttribute('aria-label',`${name} quantity`); input.oninput=()=>{ bag[token]=Math.max(0,Number(input.value)||0); save(); updateBagCount(); }; row.append(text,input); host.append(row); }); updateBagCount(); }
+    function renderBag() { const bag=currentBag(); const host=$('bag-editor'); host.innerHTML=''; Object.entries(tokenInfo).forEach(([token,[name,path]])=>{const row=document.createElement('label');row.className=`token-row ${bag[token]>0?'populated-token':''} ${state.selectedBagToken===token?'selected-token':''}`;let tokenButton;if(path){tokenButton=document.createElement('img');tokenButton.src=path;tokenButton.alt=`Draw ${name}`;}else{tokenButton=document.createElement('span');tokenButton.className='token-fallback';tokenButton.textContent=name.slice(0,2);tokenButton.setAttribute('role','button');tokenButton.setAttribute('aria-label',`Draw ${name}`);}tokenButton.onclick=event=>{event.preventDefault();event.stopPropagation();if(!(bag[token]>0)) return;state.selectedBagToken=token;save();playSfx('card.mp3');$('bag-modal').classList.remove('open');resolve(token);};row.append(tokenButton);const text=document.createElement('span');text.textContent=name;const input=document.createElement('input');input.type='number';input.min='0';input.max='20';input.inputMode='numeric';input.value=bag[token]||0;input.setAttribute('aria-label',`${name} quantity`);input.oninput=()=>{bag[token]=Math.max(0,Number(input.value)||0);row.classList.toggle('populated-token',bag[token]>0);save();updateBagCount();};row.append(text,input);host.append(row);});updateBagCount();}
+    function updateBagCount(){ const total=Object.values(currentBag()).reduce((sum,value)=>sum+(Number(value)||0),0); const count=$('bag-count'); if(count) count.textContent=`(${total})`; }
+    function updateNumbers(){ $('difficulty').textContent=state.difficulty; ['committed','assets','events','other'].forEach(name=>$(`${name}`).textContent=state[name]); $('printed-value').textContent=printed(); $('bonus-value').textContent=totalBonus()>=0?`+${totalBonus()}`:totalBonus(); $('current-value').textContent=currentSkill(); }
+    function playSfx(filename) { const sound=new Audio(`sfx/${filename}`); sound.volume=.58; sound.play().catch(()=>{}); }
+    function draw(){ if(!state.selectedSkill){showResult(null,'Choose a skill','Select Willpower, Intellect, Combat, or Agility before drawing a chaos token.','resolve');return;} playSfx('card.mp3'); const drawPool=[]; Object.entries(currentBag()).forEach(([token,quantity])=>{ for(let i=0;i<quantity;i++) drawPool.push(token); }); if(!drawPool.length){ showResult(null,'Bag is empty','Add at least one token before drawing.','resolve'); return; } const token=drawPool[Math.floor(Math.random()*drawPool.length)]; resolve(token); }
+    function resolve(token){ const [name,path]=tokenInfo[token]; const before=currentSkill(); const difficulty=state.difficulty; if(token==='autofail'){ playSfx('dmg.mp3'); showResult(path,'AUTO FAIL','The test automatically fails.','autofail',name,'—','—'); return; } if(token==='eldersign'){ playSfx('stager.mp3'); showResult(path,'ELDER SIGN!','Automatic success. Resolve this investigator’s Elder Sign ability.','eldersign',name,before,'—'); return; } if(['skull','cultist','tablet','elderthing'].includes(token)){ showResult(path,`${name} drawn`,'Resolve this token’s campaign effect before completing the test.','resolve',name,before,'—'); return; } if(['bless','curse','frost'].includes(token)){ showResult(path,`${name} drawn`,'Resolve this token’s campaign or card effect, then apply any modifier.','resolve',name,before,'—'); return; } const modifier=Number(token); const final=before+modifier; const margin=final-difficulty; showResult(path,margin>=0?'Success!':'Failure',`${before} ${modifier>=0?'+':''}${modifier} = ${final} against difficulty ${difficulty}.`,margin>=0?'success':'failure',token,final,margin>=0?`+${margin}`:margin); }
+    function showResult(path,title,effect,kind,modifier='—',final='—',margin='—'){ const token=$('result-token'); token.className=`result-token ${path?'':'empty'}`; token.style.backgroundImage=path?`url('${path}')`:'none'; const heading=$('result-title'); heading.className=`result-title ${kind}`; heading.textContent=title; $('result-effect').textContent=effect; $('result-modifier').textContent=modifier; $('result-final').textContent=final; $('result-margin').textContent=margin; const result=$('test-result'); result.className=`result ${kind}`; void result.offsetWidth; result.classList.add('revealed'); }
+    function renderResultComparison(final,kind){const host=$('result-comparison');host.replaceChildren();if(!['success','failure'].includes(kind)||!Number.isFinite(Number(final))){host.hidden=true;return;}host.hidden=false;const skill=skills.find(item=>item.id===state.selectedSkill)||skills[0];const filters={shroud:'invert(18%) sepia(72%) saturate(2025%) hue-rotate(342deg) brightness(83%) contrast(96%)',will:'invert(28%) sepia(31%) saturate(1430%) hue-rotate(164deg) brightness(87%) contrast(91%)',intellect:'invert(26%) sepia(22%) saturate(1776%) hue-rotate(243deg) brightness(88%) contrast(91%)',combat:'invert(31%) sepia(29%) saturate(1458%) hue-rotate(336deg) brightness(87%) contrast(88%)',agility:'invert(33%) sepia(18%) saturate(1699%) hue-rotate(113deg) brightness(86%) contrast(88%)'};const addCounter=(value,color,filter,rotated)=>{const counter=document.createElement('div');counter.className='result-score-counter';const frame=document.createElement('img');frame.src='images/icons/counter-frame.svg';frame.alt='';frame.style.filter=filter;frame.style.transform=rotated?'rotate(45deg)':'none';const number=document.createElement('span');number.textContent=value;number.style.color=color;counter.append(frame,number);return counter;};host.append(addCounter(state.difficulty,'#9d2828',filters.shroud,true),Object.assign(document.createElement('span'),{className:'result-score-vs',textContent:'vs'}),addCounter(final,skill.id==='will'?'#1a4f78':skill.id==='intellect'?'#693b73':skill.id==='combat'?'#7a4027':'#1f6b52',filters[skill.id],false));}
+    const baseComparisonRenderer=renderResultComparison;renderResultComparison=(final,kind)=>{if(!state.selectedSkill){$('result-comparison').replaceChildren();$('result-comparison').hidden=true;return;}baseComparisonRenderer(final,kind);};
+    const baseResultRenderer=showResult;showResult=(...args)=>{baseResultRenderer(...args);renderResultComparison(args[5],args[3]);};
+    function renderCampaigns(){ const select=$('campaign'); select.innerHTML=''; Object.keys(campaignSymbols).forEach(name=>{ const option=document.createElement('option'); option.value=name; option.textContent=name; option.selected=name===state.campaign; select.append(option); }); const difficulty=$('bag-difficulty'); difficulty.value=state.bagDifficulty||'standard'; select.onchange=()=>{state.campaign=select.value; save(); renderBag();}; difficulty.onchange=()=>{state.bagDifficulty=difficulty.value; save(); renderBag();}; }
+    function syncActiveTheme(){const investigator=state.investigators[state.selectedInvestigator];investigator.classId ||= state.selectedInvestigator===0?'guardian':'seeker';const info=investigatorClasses[investigator.classId];document.querySelector('.app').style.setProperty('--active-class-color',info.color);const pin=$('notebook-class-pin');if(pin){pin.src=info.icon;pin.alt=`${info.label} investigator class`;}}
+    function render(){ renderInvestigators(); renderSkills(); renderCampaigns(); renderBag(); updateNumbers(); syncActiveTheme(); }
+    document.addEventListener('click',event=>{ const button=event.target.closest('[data-counter]'); if(!button) return; const field=button.dataset.counter; state[field]=Math.max(0,(Number(state[field])||0)+Number(button.dataset.delta)); save(); updateNumbers(); });
+    $('draw-token').addEventListener('click',draw); $('reset-bag').addEventListener('click',()=>{state.bags[bagStorageKey()]=bagDefault(state.campaign,state.bagDifficulty); save(); renderBag();}); $('open-bag').addEventListener('click',()=>$('bag-modal').classList.add('open')); $('close-bag').addEventListener('click',()=>$('bag-modal').classList.remove('open')); $('bag-modal').addEventListener('click',event=>{if(event.target===event.currentTarget) event.currentTarget.classList.remove('open');}); $('reset-session').addEventListener('click',()=>{sessionStorage.removeItem(key); state=freshState(); showResult(null,'Ready to test','Choose an investigator, skill, and difficulty, then draw from the chaos bag.','resolve'); render();});
+    $('save-named').addEventListener('click',saveNamedSession); $('load-named').addEventListener('click',loadNamedSession); $('delete-named').addEventListener('click',deleteNamedSession);
+    function setResultView(open) { document.querySelector('.layout').classList.toggle('show-result',open); }
+    const baseShowResult=showResult;
+    showResult=(...args)=>{ baseShowResult(...args); if (window.matchMedia('(max-width: 820px)').matches) setResultView(true); };
+    $('show-test').addEventListener('click',()=>setResultView(false)); $('show-result').addEventListener('click',()=>setResultView(true)); $('back-to-test').addEventListener('click',()=>setResultView(false));
+    $('open-settings').addEventListener('click',()=>$('settings-modal').classList.add('open')); $('close-settings').addEventListener('click',()=>$('settings-modal').classList.remove('open')); $('settings-modal').addEventListener('click',event=>{if(event.target===event.currentTarget) event.currentTarget.classList.remove('open');});
+    $('open-bag-top').addEventListener('click',()=>$('bag-modal').classList.add('open')); $('reset-session-top').addEventListener('click',()=>{playSfx('flip.mp3');$('reset-session').click();}); $('reload-app').addEventListener('click',()=>window.location.reload());
+    document.querySelectorAll('#reset-session').forEach(button=>{if(button!==$('reset-session')) button.addEventListener('click',()=>{playSfx('flip.mp3');$('reset-session').click();});});
+    $('close-investigator').addEventListener('click',()=>$('investigator-modal').classList.remove('open')); $('investigator-modal').addEventListener('click',event=>{if(event.target===event.currentTarget) event.currentTarget.classList.remove('open');});
+    const tracks=[['Beyond Arkham','music/Beyond Arkham.mp3'],['Dark Mystery','music/Dark Mystery.mp3'],['Eldritch Nightmare','music/Eldritch Nightmare.mp3'],['The Dream-Quest of Unknown','music/The Dream-Quest of Unknown.mp3'],['The King in Yellow','music/The King in Yellow  .mp3'],['The Miskatonic Museum','music/The Miskatonic Museum.mp3']];
+    const player=$('music-player'); let activeTrack=0;
+    const formatTime=seconds=>{if(!Number.isFinite(seconds)) return '0:00'; const minutes=Math.floor(seconds/60); return `${minutes}:${String(Math.floor(seconds%60)).padStart(2,'0')}`;};
+    function updateTimeline(){ const duration=player.duration; const current=player.currentTime||0; $('music-scrubber').max=Number.isFinite(duration)?duration:0; $('music-scrubber').value=Math.min(current,Number.isFinite(duration)?duration:0); $('music-elapsed').textContent=formatTime(current); $('music-total').textContent=formatTime(duration); }
+    function playTrack(index, autoplay=true){ activeTrack=(index+tracks.length)%tracks.length; player.src=tracks[activeTrack][1]; player.load(); if(autoplay) player.play().catch(()=>{}); updateTimeline(); updateMusicUi(); }
+    function updateMusicUi(){ const playing=!player.paused; const indicator=$('open-music'); indicator.classList.toggle('on',playing); indicator.lastChild.nodeValue=playing?'Music On':'Music Off'; $('music-play').textContent=playing?'Pause':'Play'; document.querySelectorAll('#track-list button').forEach((button,index)=>button.classList.toggle('active',index===activeTrack)); }
+    function renderTracks(){ const list=$('track-list'); list.innerHTML=''; tracks.forEach(([label],index)=>{const button=document.createElement('button');button.type='button';button.textContent=label;button.onclick=()=>playTrack(index);list.append(button);}); }
+    $('open-music').addEventListener('click',()=>$('music-modal').classList.add('open')); $('close-music').addEventListener('click',()=>$('music-modal').classList.remove('open')); $('music-modal').addEventListener('click',event=>{if(event.target===event.currentTarget) event.currentTarget.classList.remove('open');}); $('music-play').addEventListener('click',()=>{if(player.paused) { if(!player.src) playTrack(activeTrack); else player.play().catch(()=>{}); } else player.pause();}); $('music-next').addEventListener('click',()=>playTrack(activeTrack+1)); $('music-volume').addEventListener('input',event=>{player.volume=Number(event.target.value);}); $('music-scrubber').addEventListener('input',event=>{if(Number.isFinite(player.duration)) player.currentTime=Number(event.target.value);}); player.addEventListener('play',updateMusicUi); player.addEventListener('pause',updateMusicUi); player.addEventListener('timeupdate',updateTimeline); player.addEventListener('loadedmetadata',updateTimeline); player.addEventListener('ended',()=>playTrack(activeTrack+1));
+    /* One clean, direct editor path. The class badge is deliberately a separate
+       button so tapping it can never also select the investigator card. */
+    renderInvestigators=()=>{
+      const host=$('investigators'); host.replaceChildren();
+      state.investigators.forEach((investigator,index)=>{
+        investigator.name ||= `Investigator ${index+1}`;
+        investigator.classId ||= index===0?'guardian':'seeker';
+        investigator.portrait ||= portraits[index%portraits.length].id;
+        const classInfo=investigatorClasses[investigator.classId];
+        const portrait=portraits.find(item=>item.id===investigator.portrait)||portraits[0];
+        investigator.color=classInfo.color;
+        const card=document.createElement('section');
+        card.className=`investigator ${index===state.selectedInvestigator?'selected':''}`;
+        card.style.setProperty('--investigator-color',classInfo.color);
+        const select=document.createElement('button');
+        select.type='button'; select.className='investigator-summary';
+        select.setAttribute('aria-label',`Select ${investigator.name} for this skill test`);
+        const top=document.createElement('span'); top.className='investigator-summary-top';
+        const photo=document.createElement('img'); photo.className='investigator-photo'; photo.src=portrait.path; photo.alt=portrait.label;
+        const name=document.createElement('span'); name.className='investigator-summary-name'; name.textContent=investigator.name;
+        top.append(photo,name);
+        const skillList=document.createElement('span'); skillList.className='investigator-summary-skills';
+        skills.forEach(skill=>{ const item=document.createElement('span'); item.className=`investigator-summary-skill skill-${skill.id}`; const icon=document.createElement('img'); icon.src=skill.icon; icon.alt=skill.name; const value=document.createElement('strong'); value.textContent=investigator[skill.id]; item.append(icon,value); skillList.append(item); });
+        select.append(top,skillList);
+        select.onclick=()=>{state.selectedInvestigator=index;save();render();};
+        const badge=document.createElement('button');
+        badge.type='button'; badge.className='investigator-class-badge';
+        badge.setAttribute('aria-label',`Edit ${investigator.name}`);
+        const badgeIcon=document.createElement('img'); badgeIcon.src=classInfo.icon; badgeIcon.alt=''; badge.append(badgeIcon);
+        badge.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();openInvestigatorEditor(index);});
+        card.append(select,badge); host.append(card);
+      });
+    };
+    openInvestigatorEditor=index=>{
+      editedInvestigator=index;
+      state.selectedInvestigator=index;
+      save(); syncActiveTheme(); renderInvestigators(); renderInvestigatorEditor();
+      const modal=$('investigator-modal'); modal.classList.add('open');
+      requestAnimationFrame(()=>$('editor-name').focus());
+    };
+    renderInvestigatorEditor=()=>{
+      const investigator=state.investigators[editedInvestigator];
+      investigator.classId ||= editedInvestigator===0?'guardian':'seeker';
+      investigator.portrait ||= portraits[editedInvestigator%portraits.length].id;
+      const classInfo=investigatorClasses[investigator.classId];
+      const dialog=$('investigator-dialog'); dialog.style.setProperty('--editor-color',classInfo.color);
+      $('investigator-editor-title').textContent=`Edit ${investigator.name}`;
+      const nameInput=$('editor-name'); nameInput.value=investigator.name;
+      nameInput.oninput=()=>{investigator.name=nameInput.value.trim()||`Investigator ${editedInvestigator+1}`;save();renderInvestigators();};
+      const preview=portraits.find(item=>item.id===investigator.portrait)||portraits[0];
+      $('editor-portrait-preview').src=preview.path; $('editor-portrait-preview').alt=preview.label;
+      const classPicker=$('editor-class-picker'); classPicker.replaceChildren();
+      Object.entries(investigatorClasses).forEach(([id,info])=>{const choice=document.createElement('button');choice.type='button';choice.className=`class-choice ${id===investigator.classId?'selected':''}`;choice.setAttribute('aria-label',`Use ${info.label}`);const icon=document.createElement('img');icon.src=info.icon;icon.alt=info.label;choice.append(icon);choice.onclick=()=>{investigator.classId=id;investigator.color=info.color;save();syncActiveTheme();renderInvestigators();renderInvestigatorEditor();};classPicker.append(choice);});
+      const portraitPicker=$('portrait-picker'); portraitPicker.replaceChildren();
+      portraits.forEach(info=>{const choice=document.createElement('button');choice.type='button';choice.className=`portrait-choice ${info.id===investigator.portrait?'selected':''}`;choice.setAttribute('aria-label',`Use ${info.label} portrait`);const photo=document.createElement('img');photo.src=info.path;photo.alt=info.label;choice.append(photo);choice.onclick=()=>{investigator.portrait=info.id;save();renderInvestigators();renderInvestigatorEditor();};portraitPicker.append(choice);});
+      const grid=$('editor-stat-grid');grid.replaceChildren();
+      skills.forEach(skill=>{const stat=document.createElement('div');stat.className=`stat-input skill-${skill.id}`;const icon=document.createElement('img');icon.src=skill.icon;icon.alt=skill.name;const minus=document.createElement('button');minus.type='button';minus.textContent='−';minus.setAttribute('aria-label',`Decrease ${skill.name}`);const value=document.createElement('input');value.type='number';value.inputMode='numeric';value.min='0';value.max='20';value.value=investigator[skill.id];value.setAttribute('aria-label',`${skill.name} value`);const plus=document.createElement('button');plus.type='button';plus.textContent='+';plus.setAttribute('aria-label',`Increase ${skill.name}`);const setValue=next=>{investigator[skill.id]=Math.max(0,Math.min(20,Number(next)||0));value.value=investigator[skill.id];save();renderInvestigators();updateNumbers();};minus.onclick=()=>setValue((Number(investigator[skill.id])||0)-1);plus.onclick=()=>setValue((Number(investigator[skill.id])||0)+1);value.onchange=()=>setValue(value.value);stat.append(icon,minus,value,plus);grid.append(stat);});
+    };
+    /* The board shows one active investigator. Every visible value below is
+       read from the selected player and stays in sync with the Player editor. */
+    renderInvestigators=()=>{
+      const host=$('investigators'); host.replaceChildren();
+      const index=state.selectedInvestigator;
+      const investigator=state.investigators[index];
+      investigator.name ||= `Investigator ${index+1}`;
+      investigator.classId ||= index===0?'guardian':'seeker';
+      investigator.portrait ||= portraits[index%portraits.length].id;
+      if(!Number.isFinite(Number(investigator.health))) investigator.health=9;
+      if(!Number.isFinite(Number(investigator.sanity))) investigator.sanity=4;
+      const classInfo=investigatorClasses[investigator.classId];
+      const portrait=portraits.find(item=>item.id===investigator.portrait)||portraits[0];
+      investigator.color=classInfo.color;
+      const card=document.createElement('section'); card.className='investigator selected'; card.style.setProperty('--investigator-color',classInfo.color);
+      const file=document.createElement('article'); file.className='active-investigator-card';
+      const header=document.createElement('div'); header.className='active-investigator-header';
+      const badge=document.createElement('img'); badge.className='active-investigator-class'; badge.src=classInfo.icon; badge.alt=classInfo.label;
+      const name=document.createElement('span'); name.className='active-investigator-name'; name.textContent=investigator.name;
+      const className=document.createElement('span'); className.className='active-investigator-classname'; className.textContent=classInfo.label;
+      const edit=document.createElement('button'); edit.type='button'; edit.className='active-investigator-edit'; edit.setAttribute('aria-label',`Edit ${investigator.name}`);
+      const editIcon=document.createElement('img'); editIcon.src=classInfo.icon; editIcon.alt=''; edit.append(editIcon); edit.onclick=()=>openInvestigatorEditor(index);
+      header.append(badge,name); file.append(header,className,edit);
+      const photo=document.createElement('img'); photo.className='active-portrait'; photo.src=portrait.path; photo.alt=portrait.label; file.append(photo);
+      const vitals=document.createElement('div'); vitals.className='vital-row';
+      const vitalData=[['health','images/icons/investigator_hp.png','Health'],['sanity','images/icons/investigator_mind.png','Sanity']];
+      vitalData.forEach(([field,iconPath,label])=>{
+        const vital=document.createElement('div'); vital.className='vital-card';
+        const main=document.createElement('div'); main.className='vital-main';
+        const value=document.createElement('strong'); value.textContent=investigator[field];
+        const icon=document.createElement('img'); icon.src=iconPath; icon.alt=label; main.append(value,icon);
+        const controls=document.createElement('div'); controls.className='vital-buttons';
+        [-1,1].forEach(delta=>{const button=document.createElement('button');button.type='button';button.textContent=delta>0?'+':'−';button.setAttribute('aria-label',`${delta>0?'Increase':'Decrease'} ${label}`);button.onclick=()=>{investigator[field]=Math.max(0,(Number(investigator[field])||0)+delta);save();renderInvestigators();};controls.append(button);});
+        vital.append(main,controls); vitals.append(vital);
+      });
+      file.append(vitals);
+      const skillsRow=document.createElement('div'); skillsRow.className='active-skill-row';
+      skills.forEach(skill=>{const button=document.createElement('button');button.type='button';button.className=`active-skill skill-${skill.id}${state.selectedSkill===skill.id?' selected':''}`;button.setAttribute('aria-label',`Test ${skill.name}`);const value=document.createElement('strong');value.textContent=investigator[skill.id];const icon=document.createElement('img');icon.src=skill.icon;icon.alt=skill.name;button.append(value,icon);button.onclick=()=>{state.selectedSkill=skill.id;save();renderInvestigators();renderSkills();updateNumbers();};skillsRow.append(button);});
+      file.append(skillsRow); card.append(file); host.append(card);
+    };
+    $('open-player').addEventListener('click',()=>openInvestigatorEditor(state.selectedInvestigator));
+    $('reset-app').addEventListener('click',()=>{playSfx('flip.mp3');window.location.reload();});
+    document.addEventListener('click',event=>{const badge=event.target.closest('.investigator-class-badge');if(!badge)return;event.preventDefault();event.stopPropagation();const index=[...document.querySelectorAll('.investigator')].indexOf(badge.closest('.investigator'));if(index>=0)openInvestigatorEditor(index);});
+    render(); renderSavedSessions(); renderTracks(); updateMusicUi();
+  })();
+  </script>
+</body>
+</html>
