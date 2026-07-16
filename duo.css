@@ -3047,6 +3047,65 @@ text-align:center;
   }
 }
 
+/* iPad Safari rendering fixes. */
+@media (min-width: 768px) and (max-width: 1366px) {
+  /* Keep the class color on the real banner layer. Put the texture in a
+     translucent pseudo-layer so Safari cannot replace the color with white. */
+  html body #dynamic-class-skin,
+  html body #dynamic-class-skin.ios-banner-color-fix {
+    background-color: var(--class-color) !important;
+    background-image: none !important;
+    background-blend-mode: normal !important;
+  }
+
+  html body #dynamic-class-skin::before,
+  html body #dynamic-class-skin.ios-banner-color-fix::before {
+    display: block !important;
+    background-color: transparent !important;
+    background-image: url('images/textures/paper01.png') !important;
+    background-position: center !important;
+    background-size: cover !important;
+    opacity: 0.2 !important;
+    mix-blend-mode: multiply !important;
+  }
+
+  /* The plate artwork stays put; only lift the names within it. */
+  #header-primary-tab .duo-investigator-tab-name,
+  #header-secondary-tab .duo-investigator-tab-name {
+    transform: translateY(-4px);
+  }
+
+  /* Safari can rasterize a filtered transparent SVG into a pastel rectangle.
+     Use the same SVG as a mask so only the frame itself receives color. */
+  .test-score-counter {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .test-score-counter .counter-frame-shape {
+    display: none;
+  }
+
+  .test-score-counter::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--counter-color);
+    -webkit-mask-image: url('images/icons/counter-frame.svg');
+    -webkit-mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-image: url('images/icons/counter-frame.svg');
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-size: contain;
+  }
+
+  .shroud-score-counter::before {
+    transform: rotate(45deg);
+  }
+}
+
 /* Angled closed cover visible beneath an opened trial notebook. */
 #view-arena .arena-right {
   position: relative;
