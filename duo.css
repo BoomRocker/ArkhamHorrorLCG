@@ -2423,6 +2423,138 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
   transform-origin: center center;
 }
 
+#session-modal .session-modal-card {
+  width: 460px;
+  max-width: calc(100vw - 32px);
+  padding: 20px;
+  transform: none;
+  background: #eee7d5 url('images/textures/notebookpapergrey.jpg') center / cover no-repeat;
+  border: 3px solid #3a2e23;
+  border-radius: 12px;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.72);
+  color: #271f18;
+  font-family: 'Special Elite', 'Courier New', monospace;
+}
+
+.session-modal-heading,
+.session-modal-title-wrap,
+.session-modal-actions {
+  display: flex;
+  align-items: center;
+}
+
+.session-modal-heading {
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 9px;
+  border-bottom: 2px solid rgba(58, 46, 35, 0.65);
+}
+
+.session-modal-title-wrap {
+  gap: 10px;
+}
+
+.session-modal-title-wrap img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.session-modal-title-wrap h2 {
+  margin: 0;
+  color: var(--class-color);
+  font-family: 'Teutonic', Georgia, serif;
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.session-modal-copy {
+  margin: 16px 0 10px;
+  line-height: 1.35;
+}
+
+.session-save-status {
+  min-height: 42px;
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  background: rgba(255, 252, 239, 0.72);
+  border: 1px solid rgba(58, 46, 35, 0.4);
+  border-radius: 6px;
+  line-height: 1.3;
+}
+
+.session-modal-actions {
+  flex-wrap: nowrap;
+  gap: 9px;
+}
+
+.session-modal-actions button {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 48px;
+  padding: 8px 14px;
+  border: 2px solid #3a2e23;
+  border-radius: 6px;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.session-save-button {
+  background: var(--class-color);
+  background-image: linear-gradient(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.2)), url('images/textures/paper01.png');
+  background-position: center;
+  background-size: cover;
+  background-blend-mode: multiply;
+  color: #ffffff;
+}
+
+.session-load-button {
+  background: #e8dcc1;
+  background-image: linear-gradient(rgba(255, 250, 230, 0.26), rgba(111, 91, 66, 0.12)), url('images/textures/paper01.png');
+  background-position: center;
+  background-size: cover;
+  background-blend-mode: multiply;
+  color: #271f18;
+}
+
+.session-clear-button {
+  margin-left: 0;
+  background: #702126;
+  background-image: linear-gradient(rgba(70, 0, 4, 0.08), rgba(55, 0, 3, 0.28)), url('images/textures/paper01.png');
+  background-position: center;
+  background-size: cover;
+  background-blend-mode: multiply;
+  color: #ffffff;
+}
+
+.session-modal-actions button:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+
+@media (max-width: 520px) {
+  #session-modal .session-modal-card {
+    padding: 14px;
+  }
+
+  .session-modal-title-wrap h2 {
+    font-size: 22px;
+  }
+
+  .session-modal-actions button {
+    flex: 1 1 0;
+    padding-right: 7px;
+    padding-left: 7px;
+    font-size: 13px;
+  }
+
+  .session-clear-button {
+    margin-left: 0;
+  }
+}
+
 #bag-headline{
 	font-family: 'Special Elite', 'Courier New', monospace;
 	font-size: 15px;

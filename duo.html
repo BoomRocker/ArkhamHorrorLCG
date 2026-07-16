@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="images/icons/favicon.png">
   <link rel="apple-touch-icon" href="images/icons/favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="duo.css?v=full-notepad-bottom-49">
+  <link rel="stylesheet" href="duo.css?v=session-paper-buttons-52">
 </head>
 <body>
 
@@ -355,12 +355,16 @@
       <span>Trials</span>
     </div>
     <div id="tab-btn-rounds" class="nav-tab-item" onclick="switchActiveTab('rounds')">
-      <img src="images/icons/tab_round_order.png" alt="Rounds">
+      <img src="images/icons/phase_upkeep.png" alt="Rounds">
       <span>Phases</span>
     </div>
     <div id="tab-btn-music" class="nav-tab-item" onclick="switchActiveTab('music')">
       <img id="ambient-tab-music-icon" src="images/icons/tab_music.png" alt="Music">
       <span>Ambient</span>
+    </div>
+    <div id="tab-btn-session" class="nav-tab-item" role="button" tabindex="0" onclick="toggleSessionModal(true)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleSessionModal(true); }">
+      <img src="images/icons/tab_round_order.png" alt="Save session">
+      <span>Session</span>
     </div>
   </div>
 
@@ -412,9 +416,28 @@
       </div>
     </div>
   </div>
+
+  <div id="session-modal" class="popover-overlay" onclick="toggleSessionModal(false)">
+    <div class="popover-container session-modal-card" role="dialog" aria-modal="true" aria-labelledby="session-modal-title" onclick="event.stopPropagation()">
+      <div class="session-modal-heading">
+        <div class="session-modal-title-wrap">
+          <img src="images/icons/tab_round_order.png" alt="">
+          <h2 id="session-modal-title">Campaign Session</h2>
+        </div>
+        <button class="modal-close" type="button" onclick="toggleSessionModal(false)" aria-label="Close session window">×</button>
+      </div>
+      <p class="session-modal-copy">Save this investigation on this device and return to it later.</p>
+      <p id="session-save-status" class="session-save-status" aria-live="polite">No saved session on this device.</p>
+      <div class="session-modal-actions">
+        <button class="session-save-button" type="button" onclick="saveCurrentSession()">Save Session</button>
+        <button id="session-load-button" class="session-load-button" type="button" onclick="loadSavedSession()">Resume Session</button>
+        <button id="session-clear-button" class="session-clear-button" type="button" onclick="clearSavedSession()">Delete Save</button>
+      </div>
+    </div>
+  </div>
   
   <script src="tokendata.js?v=ipad-banner-3"></script>
-  <script src="duo.js?v=muted-ambient-tab-45"></script>
+  <script src="duo.js?v=session-sounds-51"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));

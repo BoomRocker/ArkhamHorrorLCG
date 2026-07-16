@@ -873,6 +873,165 @@ function toggleInvestigatorModal(show) {
   document.getElementById('investigator-modal').style.display = show ? 'flex' : 'none';
 }
 
+const savedSessionStorageKey = 'arkham-duo-saved-session-v1';
+
+function toggleSessionModal(show) {
+  const modal = document.getElementById('session-modal');
+  modal.style.display = show ? 'flex' : 'none';
+  if (show) {
+    playSfx('sfx/pageflip1.mp3');
+    updateSessionSaveStatus();
+  }
+}
+
+function readSavedSession() {
+  try {
+    const saved = localStorage.getItem(savedSessionStorageKey);
+    return saved ? JSON.parse(saved) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function updateSessionSaveStatus(message = '') {
+  const saved = readSavedSession();
+  const status = document.getElementById('session-save-status');
+  const loadButton = document.getElementById('session-load-button');
+  const clearButton = document.getElementById('session-clear-button');
+  if (!status || !loadButton || !clearButton) return;
+
+  if (message) {
+    status.textContent = message;
+  } else if (saved?.savedAt) {
+    status.textContent = `Last saved ${new Date(saved.savedAt).toLocaleString()}.`;
+  } else {
+    status.textContent = 'No saved session on this device.';
+  }
+  loadButton.disabled = !saved;
+  clearButton.disabled = !saved;
+}
+
+function saveCurrentSession() {
+  const counterIds = ['val-target', 'val-commit', 'val-events', 'val-assets', 'val-other'];
+  const player = document.getElementById('audio-player');
+  const activeTrack = document.querySelector('.track-item.active');
+  const activeView = document.querySelector('.view-panel.active-view');
+  const session = {
+    version: 1,
+    savedAt: new Date().toISOString(),
+    primaryInvestigator: document.getElementById('investigator-select').value,
+    secondaryInvestigator: document.getElementById('co-investigator-select').value,
+    activeInvestigatorSlot,
+    investigatorVitals: JSON.parse(JSON.stringify(investigatorVitalState)),
+    campaign: document.getElementById('campaign-select').value,
+    scenario: document.getElementById('scenario-select').value,
+    difficulty: document.getElementById('difficulty-select').value,
+    activeSkillType,
+    counters: Object.fromEntries(counterIds.map(id => [id, document.getElementById(id)?.textContent || '0'])),
+    phaseChecks: Array.from(document.querySelectorAll('.phase-flow-step input[type="checkbox"]'), input => input.checked),
+    activeTab: activeView?.id.replace('view-', '') || 'setup',
+    audio: {
+      trackSrc: activeTrack?.dataset.src || player.getAttribute('src'),
+      trackTitle: activeTrack?.dataset.title || document.getElementById('current-track-name').textContent,
+      currentTime: Number.isFinite(player.currentTime) ? player.currentTime : 0,
+      volume: document.getElementById('volume-slider').value,
+      wasPlaying: !player.paused,
+      masterMuted
+    }
+  };
+
+  try {
+    localStorage.setItem(savedSessionStorageKey, JSON.stringify(session));
+    updateSessionSaveStatus(`Session saved ${new Date(session.savedAt).toLocaleString()}.`);
+    playSfx('sfx/type.wav');
+  } catch (error) {
+    updateSessionSaveStatus('This browser could not save the session.');
+  }
+}
+
+function loadSavedSession() {
+  const session = readSavedSession();
+  if (!session) {
+    updateSessionSaveStatus('No saved session is available.');
+    return;
+  }
+  playSfx('sfx/load.wav');
+
+  const primarySelect = document.getElementById('investigator-select');
+  const secondarySelect = document.getElementById('co-investigator-select');
+  primarySelect.value = session.primaryInvestigator || 'roland';
+  secondarySelect.value = session.secondaryInvestigator || 'daisy';
+  activeInvestigatorSlot = session.activeInvestigatorSlot === 'secondary' ? 'secondary' : 'primary';
+  Object.keys(investigatorVitalState).forEach(key => delete investigatorVitalState[key]);
+  Object.assign(investigatorVitalState, session.investigatorVitals || {});
+  loadInvestigatorProfileManual();
+
+  const campaignSelect = document.getElementById('campaign-select');
+  const scenarioSelect = document.getElementById('scenario-select');
+  const difficultySelect = document.getElementById('difficulty-select');
+  campaignSelect.value = session.campaign || 'notz';
+  updateCampaignScenario();
+  scenarioSelect.value = session.scenario || scenarioSelect.options[0]?.value || '';
+  difficultySelect.value = session.difficulty || 'easy';
+  syncDifficultyBagLayout();
+
+  Object.entries(session.counters || {}).forEach(([id, value]) => {
+    const counter = document.getElementById(id);
+    if (counter) counter.textContent = value;
+  });
+  selectSkillManual(session.activeSkillType || 'will', 0, false);
+
+  const phaseInputs = document.querySelectorAll('.phase-flow-step input[type="checkbox"]');
+  phaseInputs.forEach((input, index) => {
+    input.checked = Boolean(session.phaseChecks?.[index]);
+  });
+  [0, 1, 2].forEach(index => {
+    const tasks = Array.from(document.querySelectorAll(`.phase-flow-step.phase-${index} input[type="checkbox"]`));
+    const complete = tasks.length > 0 && tasks.every(task => task.checked);
+    document.querySelectorAll(`.phase-flow-step.phase-${index}`)
+      .forEach(step => step.classList.toggle('phase-complete', complete));
+  });
+  updatePhaseFlowGuidance();
+
+  const audioState = session.audio || {};
+  const player = document.getElementById('audio-player');
+  const volumeSlider = document.getElementById('volume-slider');
+  const matchingTrack = Array.from(document.querySelectorAll('.track-item'))
+    .find(track => track.dataset.src === audioState.trackSrc);
+  document.querySelectorAll('.track-item').forEach(track => track.classList.toggle('active', track === matchingTrack));
+  if (matchingTrack) {
+    player.src = matchingTrack.dataset.src;
+    document.getElementById('current-track-name').textContent = matchingTrack.dataset.title;
+  } else if (audioState.trackSrc) {
+    player.src = audioState.trackSrc;
+    document.getElementById('current-track-name').textContent = audioState.trackTitle || 'Saved track';
+  }
+  volumeSlider.value = audioState.volume ?? 80;
+  setVolume();
+  player.load();
+  player.addEventListener('loadedmetadata', () => {
+    if (Number.isFinite(audioState.currentTime)) {
+      player.currentTime = Math.min(audioState.currentTime, player.duration || audioState.currentTime);
+    }
+    syncAudioScrubber();
+    if (audioState.wasPlaying) player.play().catch(() => updatePlayButton());
+  }, { once: true });
+
+  if (masterMuted !== Boolean(audioState.masterMuted)) toggleMasterMute();
+  switchActiveTab(session.activeTab || 'setup');
+  toggleSessionModal(false);
+}
+
+function clearSavedSession() {
+  try {
+    localStorage.removeItem(savedSessionStorageKey);
+    updateSessionSaveStatus('Saved session deleted.');
+    playSfx('sfx/trash.mp3');
+  } catch (error) {
+    updateSessionSaveStatus('This browser could not delete the saved session.');
+  }
+}
+
 function togglePhaseCard(event, index) {
   const card = document.getElementById(`phase-card-${index}`);
   card.classList.toggle('completed');
