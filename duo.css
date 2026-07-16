@@ -132,10 +132,49 @@
 }
 
 #view-music .music-player-card .now-playing {
+  position: relative;
   margin: 0 0 20px;
 }
 
+#view-music .music-player-card .now-playing-elder-sign {
+  position: absolute;
+  left: 50%;
+  top: -113px;
+  width: 79px;
+  height: auto;
+  object-fit: contain;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 2px 3px rgba(35, 25, 18, 0.48));
+  pointer-events: none;
+}
+
+#view-music .music-player-card .now-playing-elder-sign.is-playing {
+  animation: playingElderSignSpin 3s linear infinite;
+}
+
+@keyframes playingElderSignSpin {
+  from { transform: translateX(-50%) rotate(0deg); }
+  to { transform: translateX(-50%) rotate(360deg); }
+}
+
+#ambient-tab-music-icon.is-playing {
+  animation: ambientTabMusicSpin 9s linear infinite;
+  transform-origin: center center;
+}
+
+#ambient-tab-music-icon.is-muted {
+  animation: none;
+  filter: brightness(0) saturate(100%) invert(15%) sepia(55%) saturate(2450%) hue-rotate(340deg) brightness(78%);
+}
+
+@keyframes ambientTabMusicSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 #view-music .music-player-card .now-playing strong {
+  display: inline-block;
+  transform-origin: center center;
   color: #30271f;
   font-family: 'Special Elite', 'Courier New', monospace;
   font-size: 30px;
@@ -1295,6 +1334,19 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
   background-image: url('images/textures/notePad.png');
 }
 
+/* notePad.png is portrait. Filling only the width crops its lower edge in the
+   landscape Trials panel, so fit the complete notebook artwork to the card. */
+#view-arena .token-theater.trial-started:not(.elder-sign-result):not(.autofail-result) {
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+/* Keep the complete closed notebook cover visible, including its bottom edge. */
+#view-arena .token-theater:not(.trial-started) {
+  background-position: center;
+  background-size: contain;
+}
+
 /* Keep the started-trial notepad above the dossier banner and its leather lip
    when the rotated result card reaches into the header area. */
 #view-arena.view-panel.active-view {
@@ -1564,6 +1616,7 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
   background-position: center;
   background-blend-mode: normal;
   border-color: #85cfff;
+  border-radius: 20px;
   box-shadow: 0 0 0 3px rgba(91, 190, 255, 0.68), 0 0 28px rgba(58, 150, 255, 0.82), inset 0 0 30px rgba(118, 184, 236, 0.2);
   filter: drop-shadow(0 0 16px rgba(91, 190, 255, 0.82));
   animation: elderSignTheaterBurst 0.9s ease-out;
@@ -1639,6 +1692,7 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
   background-position: center;
   background-blend-mode: multiply;
   border-color: #ff5c5c;
+  border-radius: 20px;
   box-shadow: 0 0 0 3px rgba(196, 25, 25, 0.72), 0 0 30px rgba(190, 8, 8, 0.9), inset 0 0 34px rgba(255, 54, 54, 0.26);
   animation: autofailTheaterBurst 0.9s ease-out;
 }
@@ -1740,6 +1794,10 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
 }
 
 /* Large, serpentine round track for quick play in landscape. */
+#view-rounds {
+  padding-top: 20px;
+}
+
 .phase-flow-board {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1754,11 +1812,16 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
 }
 
 .phase-flow-board .phase-hand-step {
+  grid-row: 3;
+  grid-column: 1;
+}
+
+.phase-flow-board .phase-gain-resource-step {
   grid-row: 2;
   grid-column: 1;
 }
 
-.phase-flow-board .phase-resource-step {
+.phase-flow-board .phase-draw-card-step {
   grid-row: 2;
   grid-column: 2;
 }
@@ -1780,7 +1843,7 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
 
 .phase-flow-board .phase-reset-flow {
   grid-row: 3;
-  grid-column: 1;
+  grid-column: 2;
 }
 
 .phase-flow-step {
@@ -1793,8 +1856,7 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
   justify-content: flex-end;
   padding: 0;
   border: 1px solid rgba(49, 42, 35, 0.36);
-  background: rgba(246, 241, 225, 0.82);
-  background-image: linear-gradient(rgba(246, 241, 225, 0.2), rgba(246, 241, 225, 0.2)), url('images/textures/paper01.png');
+  background: #e9e8e4 url('images/textures/notebookpapergrey.jpg') center / cover no-repeat;
   background-size: cover;
   cursor: pointer;
   text-align: center;
@@ -2259,8 +2321,8 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
 
   .phase-flow-board {
     grid-template-rows: repeat(3, minmax(150px, 1fr));
-    column-gap: 64px;
-    row-gap: 34px;
+    column-gap: 18px;
+    row-gap: 10px;
     padding: 12px 18px;
   }
 
@@ -2878,12 +2940,12 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
 
 .profile-flavor-main {
     font-family: 'La Belle Aurore', 'Segoe Print', cursive;
-    font-size: 22px;
+    font-size: 26px;
     font-weight: normal;
-    line-height: 1.15;
+    line-height: 1;
     color: var(--class-color);
 
-    margin: 10px 10px 0 -75px;
+    margin: 0px 10px 0 -75px;
     padding: 14px 80px 12px 0;
 text-align:center;
     border: none;
@@ -3104,6 +3166,16 @@ text-align:center;
   .shroud-score-counter::before {
     transform: rotate(45deg);
   }
+
+  /* Keep the selected song visibly class-colored when Safari ignores
+     background blending on the opaque paper texture. */
+  html body #view-music .track-item.active {
+    background-color: var(--class-color) !important;
+    background-image: none !important;
+    background-blend-mode: normal !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff;
+  }
 }
 
 /* Angled closed cover visible beneath an opened trial notebook. */
@@ -3113,18 +3185,18 @@ text-align:center;
 
 #view-arena .notepad-cover-return {
   position: absolute;
-  top: 4%;
-  right: 3%;
-  bottom: 4%;
-  left: 3%;
+  top: 1%;
+  right: 2%;
+  bottom: 0%;
+  left: 4%;
   z-index: 20;
   display: none;
   border: 0;
   border-radius: 0;
   background-color: transparent;
   background-image: url("images/textures/coverer.png");
-  background-position: top center;
-  background-size: 100% auto;
+  background-position: center;
+  background-size: contain;
   background-repeat: no-repeat;
   box-shadow: none;
   filter: none;
@@ -3135,6 +3207,18 @@ text-align:center;
 
 #view-arena .arena-right.notebook-open .notepad-cover-return {
   display: block;
+}
+
+/* Reserve a small visible shelf beneath the opened paper so the full bottom
+   of the cover PNG remains inside the Trials arena. */
+#view-arena .arena-right.notebook-open {
+  box-sizing: border-box;
+  padding-bottom: 20px;
+  overflow: visible;
+}
+
+#view-arena .arena-right.notebook-open .notepad-cover-return {
+  transform: translate(8%, 0);
 }
 
 #view-arena .notepad-cover-return::after {
@@ -3151,7 +3235,7 @@ text-align:center;
   margin: 2px auto 5px;
   color: #8a8175;
   font-family: 'La Belle Aurore', 'Segoe Print', cursive;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 1.15;
   text-align: center;
@@ -3165,7 +3249,7 @@ text-align:center;
 @media (max-width: 520px) {
   .token-theater .test-math-details {
     max-width: 88%;
-    font-size: 15px;
+    font-size: 17px;
   }
 }
 
@@ -3465,7 +3549,7 @@ text-align:center;
     right: 7%;
     width: 700px;
     min-height: 350px;
-    padding: 12px 14px;
+    padding: 20px 22px 12px 14px;
     color: #251d16;
     background: rgba(248, 243, 224, 0.88) url('images/textures/notebookpapergrey.jpg') center / cover;
     border: 0 solid rgba(49, 42, 35, 0.72);
@@ -3538,24 +3622,27 @@ text-align:center;
     height: 182px;
   }
 
-  .ipad-investigator-portrait {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    object-position: center top;
-    border: 5px solid #fff;
-    box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.42);
-    margin: 15px 0 0 -35px;
-    transform: rotate(6deg);
-    background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url(images/textures/paper01.png);
-  }
+.ipad-investigator-portrait {
+  width: 165px;
+  height: 200px;
+  object-fit: cover;
+  object-position: center top;
+  border: 5px solid #fff;
+  box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.42);
+  margin: 0px 0 0 -60px;
+  transform: rotate(6deg);
+  
+  /* Stretches to cover the box from the top-center down */
+  background: url('images/textures/card1.png') center top / cover no-repeat;
+  background-color: #342A21;
+}
 
   .ipad-card-class-icon {
     position: absolute;
     z-index: 2;
-    top: 150px;
-    left: -30px;
-    width: 75px;
+    top: 190px;
+    left: -50px;
+    width: 100px;
     height: auto;
     object-fit: contain;
     filter: drop-shadow(2px 3px 3px rgba(0, 0, 0, 0.42));
@@ -3588,10 +3675,10 @@ text-align:center;
   .ipad-investigator-rule p {
     margin: 2px 0 0;
     font-family: 'Special Elite', 'Courier New', monospace;
-    font-size: 1.1rem;
+    font-size: 1.35rem;
     font-weight: normal;
     line-height: 1.18;
-	width:335px;
+	width:460px;
   }
 
   .ipad-investigator-rule p .rule-term-highlight {
@@ -3908,7 +3995,7 @@ text-align:center;
   background-image: url('images/textures/platename.png'), url('images/textures/leather.png');
   background-position: center, left top;
   background-repeat: no-repeat, repeat;
-  background-size: 75% 325%, 420px auto;
+  background-size: var(--nameplate-width, 75%) 325%, 420px auto;
   background-attachment: scroll, fixed;
   border: 2px solid rgba(84, 39, 22, 1);
   border-bottom: 0;
@@ -3950,8 +4037,8 @@ text-align:center;
   color: var(--tab-class-color, #2d251e);
   font-weight: 700;
   text-shadow: 0 1px 0 rgba(255, 252, 235, 0.75);
-    margin-top:5px;
-	font-size:16.75px;
+    margin-top:15px;
+	font-size:20px;
 }
 
 /* Textured, single-card music player. */
@@ -4083,8 +4170,8 @@ text-align:center;
 
 #view-music .track-item {
   min-height: 40px;
-  height: 40px;
-  font-size: 1rem;
+  height: 60px;
+  font-size: 1.25rem;
 }
 
 @media (max-width: 600px) {
@@ -4441,7 +4528,7 @@ text-align:center;
     background-position: top center;
     background-blend-mode: normal;
 	min-width:300px;
-    transform: rotate(3deg);
+
 	padding: 40px 20px 60px 20px;
   }
 }
@@ -4451,6 +4538,15 @@ text-align:center;
   flex-direction: column;
   align-items: stretch;
   gap: 6px;
+  /* Scales the entire vitals block up by 15% (1.15 = 115%) */
+/* Scales up by 15% AND rotates 3 degrees clockwise */
+  transform: scale(1.1) rotate(3deg);
+  
+  /* Anchors both the scale and rotation to the center */
+  transform-origin: center center;
+  
+  /* Optional: Add a little margin if the bigger size overlaps neighboring elements */
+  margin: 6px 0;
 }
 
 #view-setup .dossier-vital {
@@ -4670,6 +4766,21 @@ margin-top: -10px;
   margin-top:-20px;
 }
 
+#view-music .music-player-card .now-playing strong.is-playing {
+  animation: playingTitlePulse 1.6s ease-in-out infinite;
+}
+
+@keyframes playingTitlePulse {
+  0%, 100% {
+    transform: scale(1);
+    text-shadow: 0 0 2px rgba(48, 39, 31, 0.2);
+  }
+  50% {
+    transform: scale(1.06);
+    text-shadow: 0 0 5px rgba(255, 244, 205, 0.95), 0 0 12px rgba(48, 39, 31, 0.7);
+  }
+}
+
 #view-music .music-player-card .player-slider-row {
   grid-template-columns: 100px 1fr 100px;
   gap: 15px;
@@ -4717,7 +4828,7 @@ margin-top: -10px;
 }
 
 #view-music .music-player-card .player-slider-row:last-of-type {
-  grid-template-columns: 36px 1fr 36px;
+  grid-template-columns: 36px 1fr 58px;
   gap: 12px;
   width: 100%;
   
@@ -4737,9 +4848,30 @@ margin-top: -10px;
   min-width: 0;
 }
 
-#view-music .music-player-card .player-slider-row:last-of-type .volume-icon:last-child {
+#view-music .music-player-card .player-slider-row:last-of-type .volume-mute-toggle {
   grid-column: 3;
   grid-row: 1;
+}
+
+#view-music .volume-mute-toggle {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+#view-music .volume-mute-toggle .volume-icon {
+  display: block;
+  width: auto;
+  height: 36px;
+  max-width: none;
 }
 
 #view-music .music-player-card .scrubber,
@@ -4839,6 +4971,31 @@ margin-top: -10px;
   line-height: .85em;
   text-align:center;
     transform: rotate(-2deg);
+}
+
+#view-music .volume-mute-toggle.is-muted {
+  background: transparent;
+  box-shadow: none;
+}
+
+#view-music .volume-mute-toggle.is-muted .volume-icon {
+  filter: brightness(0) saturate(100%) invert(15%) sepia(55%) saturate(2450%) hue-rotate(340deg) brightness(78%);
+}
+
+@media (max-width: 600px) {
+  #view-music .music-player-card .player-slider-row:last-of-type {
+    grid-template-columns: 30px 1fr 48px;
+  }
+
+  #view-music .volume-mute-toggle {
+    width: 48px;
+    height: 30px;
+  }
+
+  #view-music .volume-mute-toggle .volume-icon {
+    width: auto;
+    height: 30px;
+  }
 }
 
 #investigator-modal #profile-ability,

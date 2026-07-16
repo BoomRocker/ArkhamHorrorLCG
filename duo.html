@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="images/icons/favicon.png">
   <link rel="apple-touch-icon" href="images/icons/favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="duo.css?v=ipad-render-fixes-26">
+  <link rel="stylesheet" href="duo.css?v=full-notepad-bottom-49">
 </head>
 <body>
 
@@ -40,27 +40,27 @@
         <div class="form-group">
           <label>First investigator</label>
           <select id="investigator-select" onchange="setInvestigatorForSlot('primary')">
-            <option value="roland">Roland Banks [Guardian] — Core</option>
-            <option value="daisy">Daisy Walker [Seeker] — Core</option>
-            <option value="skids">"Skids" O'Toole [Rogue] — Core</option>
             <option value="agnes">Agnes Baker [Mystic] — Core</option>
-            <option value="wendy">Wendy Adams [Survivor] — Core</option>
-            <option value="zoey">Zoey Samaras [Guardian] — Dunwich</option>
-            <option value="rex">Rex Murphy [Seeker] — Dunwich</option>
-            <option value="jenny">Jenny Barnes [Rogue] — Dunwich</option>
-            <option value="jim">Jim Culver [Mystic] — Dunwich</option>
-            <option value="pete">"Ashcan" Pete [Survivor] — Dunwich</option>
-            <option value="mark">Mark Harrigan [Guardian] — Carcosa</option>
-            <option value="minh">Minh Thi Phan [Seeker] — Carcosa</option>
-            <option value="sefina">Sefina Rousseau [Rogue] — Carcosa</option>
             <option value="akachi">Akachi Onyele [Mystic] — Carcosa</option>
-            <option value="yorick">William Yorick [Survivor] — Carcosa</option>
-            <option value="lola">Lola Hayes [Neutral] — Carcosa</option>
+            <option value="pete">"Ashcan" Pete [Survivor] — Dunwich</option>
+            <option value="daisy">Daisy Walker [Seeker] — Core</option>
             <option value="daniela">Daniela Reyes [Guardian] — Edge of the Earth</option>
-            <option value="joe">Joe Diamond [Seeker] — Circle Undone</option>
-            <option value="trish">Trish Scarborough [Rogue] — Innsmouth</option>
             <option value="dexter">Dexter Drake [Mystic] — Innsmouth</option>
             <option value="isabelle">Isabelle Barnes [Survivor] — Custom</option>
+            <option value="jenny">Jenny Barnes [Rogue] — Dunwich</option>
+            <option value="jim">Jim Culver [Mystic] — Dunwich</option>
+            <option value="joe">Joe Diamond [Seeker] — Circle Undone</option>
+            <option value="lola">Lola Hayes [Neutral] — Carcosa</option>
+            <option value="mark">Mark Harrigan [Guardian] — Carcosa</option>
+            <option value="minh">Minh Thi Phan [Seeker] — Carcosa</option>
+            <option value="rex">Rex Murphy [Seeker] — Dunwich</option>
+            <option value="roland" selected>Roland Banks [Guardian] — Core</option>
+            <option value="sefina">Sefina Rousseau [Rogue] — Carcosa</option>
+            <option value="skids">"Skids" O'Toole [Rogue] — Core</option>
+            <option value="trish">Trish Scarborough [Rogue] — Innsmouth</option>
+            <option value="wendy">Wendy Adams [Survivor] — Core</option>
+            <option value="yorick">William Yorick [Survivor] — Carcosa</option>
+            <option value="zoey">Zoey Samaras [Guardian] — Dunwich</option>
           </select>
         </div>
 
@@ -285,7 +285,8 @@
         <label class="phase-flow-step phase-1 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(1)"><img class="phase-flow-badge" src="images/icons/phase_investigation.png" alt="Investigation"><img id="phase-action-primary-icon" class="phase-flow-icon" src="images/icons/class_guardian.png" alt="First investigator class"><span id="phase-action-primary-label">Roland Actions</span></label>
         <label class="phase-flow-step phase-1 flow-down"><input type="checkbox" onclick="checkSubtaskProgress(1)"><img class="phase-flow-badge" src="images/icons/phase_investigation.png" alt="Investigation"><img id="phase-action-secondary-icon" class="phase-flow-icon" src="images/icons/class_seeker.png" alt="Second investigator class"><span id="phase-action-secondary-label">Daisy Actions</span></label>
 
-        <label class="phase-flow-step phase-3 phase-resource-step flow-left"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_resources.png" alt=""><span>+1 Card & Resource</span></label>
+        <label class="phase-flow-step phase-3 phase-draw-card-step flow-left"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_drawcard.png" alt=""><span>Draw a Card</span></label>
+        <label class="phase-flow-step phase-3 phase-gain-resource-step flow-left"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_plusresources.png" alt=""><span>Gain a Resource</span></label>
         <label class="phase-flow-step phase-3 phase-ready-step flow-left"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_refresh.png" alt=""><span>Ready Cards</span></label>
         <label class="phase-flow-step phase-2 phase-enemy-step flow-left"><input type="checkbox" onclick="checkSubtaskProgress(2)"><img class="phase-flow-badge" src="images/icons/phase_enemy.png" alt="Enemy"><img class="phase-flow-icon" src="images/icons/phase_step_enemy.png" alt=""><span>Enemy Attack</span></label>
         <label class="phase-flow-step phase-2 phase-hunter-step flow-left"><input type="checkbox" onclick="checkSubtaskProgress(2)"><img class="phase-flow-badge" src="images/icons/phase_enemy.png" alt="Enemy"><img class="phase-flow-icon" src="images/icons/phase_step_enemy2.png" alt=""><span>Hunter Move</span></label>
@@ -303,6 +304,7 @@
         <div class="music-player-card">
         <div class="now-playing" aria-live="polite">
           <span class="now-playing-label">Now playing</span>
+          <img id="now-playing-elder-sign" class="now-playing-elder-sign" src="images/icons/tab_music.png" alt="">
           <strong id="current-track-name">Beyond Arkham</strong>
         </div>
 
@@ -319,16 +321,16 @@
             <span id="duration-time" class="audio-time">0:00</span>
           </div>
           <div class="player-slider-row">
-            <img class="volume-icon" src="images/icons/music_quiet.png" alt="Quiet">
+            <img class="volume-icon" src="images/icons/sound-speaker.svg" alt="Low volume">
             <input type="range" id="volume-slider" class="volume-slider" value="80" min="0" max="100" aria-label="Volume" oninput="setVolume(true)" onchange="setVolume(true)">
-            <img class="volume-icon" src="images/icons/music_loud.png" alt="Loud">
+            <button id="master-sound-toggle" class="volume-mute-toggle" type="button" aria-pressed="false" aria-label="Mute all sound and music" onclick="toggleMasterMute()"><img class="volume-icon" src="images/icons/sound-on.svg" alt=""></button>
           </div>
         </div>
 
         </div>
         <div class="track-list">
           <button class="track-item active" type="button" data-src="music/Beyond%20Arkham.mp3" data-title="Beyond Arkham" onclick="loadTrack(this)"><span>Beyond Arkham</span><span>2:00:14</span></button>
-          <button class="track-item" type="button" data-src="music/Dark%20Mystery.mp3" data-title="Dark Mystery" onclick="loadTrack(this)"><span>Dark Mystery</span><span>2:00:14</span></button>
+          <button class="track-item" type="button" data-src="music/Dark%20Mystery.mp3" data-title="Dark Mystery" onclick="loadTrack(this)"><span>Dark Mystery</span><span>1:59:30</span></button>
           <button class="track-item" type="button" data-src="music/Eldritch%20Nightmare.mp3" data-title="Eldritch Nightmare" onclick="loadTrack(this)"><span>Eldritch Nightmare</span><span>1:02:00</span></button>
           <button class="track-item" type="button" data-src="music/The%20Dream-Quest%20of%20Unknown.mp3" data-title="The Dream-Quest of Unknown" onclick="loadTrack(this)"><span>The Dream-Quest of Unknown</span><span>26:59</span></button>
           <button class="track-item" type="button" data-src="music/The%20King%20in%20Yellow%20%20.mp3" data-title="The King in Yellow" onclick="loadTrack(this)"><span>The King in Yellow</span><span>1:09:10</span></button>
@@ -357,7 +359,7 @@
       <span>Phases</span>
     </div>
     <div id="tab-btn-music" class="nav-tab-item" onclick="switchActiveTab('music')">
-      <img src="images/icons/tab_music.png" alt="Music">
+      <img id="ambient-tab-music-icon" src="images/icons/tab_music.png" alt="Music">
       <span>Ambient</span>
     </div>
   </div>
@@ -412,7 +414,7 @@
   </div>
   
   <script src="tokendata.js?v=ipad-banner-3"></script>
-  <script src="duo.js?v=ipad-volume-27"></script>
+  <script src="duo.js?v=muted-ambient-tab-45"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));

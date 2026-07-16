@@ -66,6 +66,7 @@ function setInvestigatorForSlot(slot) {
 
 function activateInvestigatorSlot(slot) {
   activeInvestigatorSlot = slot;
+  playSfx('sfx/pageflip2.mp3');
   loadInvestigatorProfileManual();
 }
 
@@ -90,6 +91,12 @@ function updateDuoInvestigatorTabs() {
     const name = document.createElement('span');
     name.className = 'duo-investigator-tab-name';
     name.textContent = investigator?.name || fallback;
+    const nameLength = name.textContent.replace(/["']/g, '').length;
+    let nameplateWidth = '75%';
+    if (nameLength >= 18) nameplateWidth = '94%';
+    else if (nameLength >= 15) nameplateWidth = '88%';
+    else if (nameLength >= 12) nameplateWidth = '82%';
+    tab.style.setProperty('--nameplate-width', nameplateWidth);
     tab.replaceChildren(icon, name);
   };
   setTabContents(primaryTab, primary.value, 'First investigator');
@@ -754,6 +761,7 @@ function cycleInvestigator(direction) {
   const select = getActiveInvestigatorSelect();
   const next = (select.selectedIndex + direction + select.options.length) % select.options.length;
   select.selectedIndex = next;
+  playSfx('sfx/pageflip2.mp3');
   loadInvestigatorProfileManual();
 }
 
@@ -820,6 +828,7 @@ function adjustCounter(id, delta) {
 }
 
 const sfxPlayers = new Map();
+let masterMuted = false;
 
 function getSfxPlayer(src) {
   if (!sfxPlayers.has(src)) {
@@ -834,6 +843,7 @@ function getSfxPlayer(src) {
 }
 
 function playSfx(src) {
+  if (masterMuted) return;
   const sound = getSfxPlayer(src);
   sound.pause();
   sound.currentTime = 0;
@@ -844,6 +854,7 @@ function playSfx(src) {
 getSfxPlayer('sfx/symbol.mp3');
 
 function switchActiveTab(target) {
+  playSfx('sfx/pageflip1.mp3');
   document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active-view'));
   document.querySelectorAll('.nav-tab-item').forEach(t => t.classList.remove('active-tab'));
   document.getElementById(`view-${target}`).classList.add('active-view');
@@ -885,7 +896,7 @@ function updatePhaseFlowGuidance() {
   const steps = Array.from(document.querySelectorAll('.phase-flow-step'));
   // The visual track doubles back across row two, so its DOM order differs
   // from the arrow order at that turn in the round.
-  const roundOrder = [0, 1, 2, 3, 4, 8, 7, 6, 5, 9, 10];
+  const roundOrder = [0, 1, 2, 3, 4, 9, 8, 7, 5, 6, 10, 11];
   steps.forEach(step => step.classList.remove('next-action'));
 
   const nextIndex = roundOrder.find(index => {
@@ -1005,10 +1016,16 @@ function updatePlayButton() {
   const button = document.getElementById('transport-toggle');
   if (!player || !button) return;
   const playing = !player.paused;
+  const trackName = document.getElementById('current-track-name');
+  const elderSign = document.getElementById('now-playing-elder-sign');
+  const ambientTabIcon = document.getElementById('ambient-tab-music-icon');
   button.innerHTML = playing
     ? '<img src="images/icons/music_pause.png" alt="">'
     : '<img src="images/icons/music_play.png" alt="">';
   button.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+  if (trackName) trackName.classList.toggle('is-playing', playing);
+  if (elderSign) elderSign.classList.toggle('is-playing', playing);
+  if (ambientTabIcon) ambientTabIcon.classList.toggle('is-playing', playing);
 }
 
 function togglePlay() {
@@ -1092,7 +1109,7 @@ function setVolume(fromUserGesture = false) {
   if (fromUserGesture) {
     const gainNode = ensureMusicVolumeGraph();
     if (gainNode && musicAudioContext) {
-      gainNode.gain.setValueAtTime(volume, musicAudioContext.currentTime);
+      gainNode.gain.setValueAtTime(masterMuted ? 0 : volume, musicAudioContext.currentTime);
       if (musicAudioContext.state === 'suspended') {
         musicAudioContext.resume().catch(() => {});
       }
@@ -1100,6 +1117,38 @@ function setVolume(fromUserGesture = false) {
   }
 
   updateSliderFill(slider);
+}
+
+function toggleMasterMute() {
+  masterMuted = !masterMuted;
+  const player = document.getElementById('audio-player');
+  const slider = document.getElementById('volume-slider');
+  const button = document.getElementById('master-sound-toggle');
+  const ambientTabIcon = document.getElementById('ambient-tab-music-icon');
+  const selectedVolume = Number(slider.value) / 100;
+
+  player.muted = masterMuted;
+  sfxPlayers.forEach(sound => {
+    sound.muted = masterMuted;
+    if (masterMuted) sound.pause();
+  });
+
+  if (musicGainNode && musicAudioContext) {
+    musicGainNode.gain.setValueAtTime(masterMuted ? 0 : selectedVolume, musicAudioContext.currentTime);
+  }
+
+  button.classList.toggle('is-muted', masterMuted);
+  button.setAttribute('aria-pressed', String(masterMuted));
+  button.setAttribute('aria-label', masterMuted ? 'Turn on all sound and music' : 'Mute all sound and music');
+  const buttonIcon = button.querySelector('img');
+  if (buttonIcon) {
+    buttonIcon.src = masterMuted ? 'images/icons/sound-mute.svg' : 'images/icons/sound-on.svg';
+  }
+
+  if (ambientTabIcon) {
+    ambientTabIcon.src = masterMuted ? 'images/icons/sound-mute.svg' : 'images/icons/tab_music.png';
+    ambientTabIcon.classList.toggle('is-muted', masterMuted);
+  }
 }
 
 function updateSliderFill(slider) {
