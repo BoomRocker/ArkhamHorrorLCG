@@ -1258,8 +1258,7 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
   color: var(--text-dark);
 }
 
-#val-target,
-#val-commit {
+#val-target {
   font-family: 'Teutonic', serif !important;
   font-size: 32px !important;
   line-height: 1 !important;
@@ -1299,6 +1298,38 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
   align-items: center;
   gap: 7px;
   min-width: 0;
+}
+
+.bonus-skills-row .counter-control > span {
+  font-weight: 700;
+}
+
+.bonus-skills-row .counter-control > span.is-zero {
+  font-family: 'Teutonic', serif !important;
+  font-weight: 700;
+  opacity: 0.35;
+}
+
+.bonus-skills-row .bonus-skill-control .bonus-lock-button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-width: 1px;
+  border-radius: 50%;
+  background: rgba(251, 248, 240, 0.68);
+  font-family: 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif;
+  font-size: 15px;
+  line-height: 1;
+  filter: grayscale(1);
+  opacity: 0.68;
+  margin-right:10px;
+}
+
+.bonus-skills-row .bonus-skill-control .bonus-lock-button.is-locked {
+  background: var(--bonus-skill-color);
+  filter: none;
+  opacity: 1;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--bonus-skill-color) 65%, transparent);
 }
 
 .bonus-skill-icon {
@@ -1557,8 +1588,19 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
 
 .token-theater .token-effect-text.token-effect-resolved {
   font-size: 1.0125rem !important;
-  text-decoration: line-through;
+  text-decoration: none;
   opacity: 0.68;
+}
+
+.token-theater .token-effect-text .token-effect-number,
+.token-theater .token-effect-text #special-token-modifier {
+  display: inline;
+  padding: 0 3px;
+  color: inherit;
+  font-weight: 700;
+  background: linear-gradient(180deg, transparent 18%, rgba(244, 219, 74, 0.68) 18%, rgba(244, 219, 74, 0.68) 88%, transparent 88%);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 @keyframes pendingSpecialPulse {
@@ -3267,36 +3309,6 @@ text-align:center;
   #header-primary-tab .duo-investigator-tab-name,
   #header-secondary-tab .duo-investigator-tab-name {
     transform: translateY(-4px);
-  }
-
-  /* Safari can rasterize a filtered transparent SVG into a pastel rectangle.
-     Use the same SVG as a mask so only the frame itself receives color. */
-  .test-score-counter {
-    background: transparent !important;
-    box-shadow: none !important;
-  }
-
-  .test-score-counter .counter-frame-shape {
-    display: none;
-  }
-
-  .test-score-counter::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-color: var(--counter-color);
-    -webkit-mask-image: url('images/icons/counter-frame.svg');
-    -webkit-mask-position: center;
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-size: contain;
-    mask-image: url('images/icons/counter-frame.svg');
-    mask-position: center;
-    mask-repeat: no-repeat;
-    mask-size: contain;
-  }
-
-  .shroud-score-counter::before {
-    transform: rotate(45deg);
   }
 
   /* Keep the selected song visibly class-colored when Safari ignores

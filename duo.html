@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="images/icons/favicon.png">
   <link rel="apple-touch-icon" href="images/icons/favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="duo.css?v=session-paper-buttons-52">
+  <link rel="stylesheet" href="duo.css?v=skill-specific-locks-68">
 </head>
 <body>
 
@@ -200,8 +200,9 @@
               <span>Committed:</span>
             </div>
             <div class="counter-control bonus-skill-control">
+              <button id="lock-val-commit" class="bonus-lock-button" type="button" onclick="toggleBonusSkillLock('val-commit')" aria-label="Lock Committed value" aria-pressed="false">&#128275;</button>
               <button onclick="adjustCounter('val-commit', -1)">-</button>
-              <span id="val-commit" style="font-family:'Teutonic'; font-size: 32px; min-width: 20px; text-align: center;">0</span>
+              <span id="val-commit" class="is-zero" style="font-family:'Teutonic'; font-size: 32px; min-width: 20px; text-align: center;">0</span>
               <button onclick="adjustCounter('val-commit', 1)">+</button>
             </div>
           </div>
@@ -213,8 +214,9 @@
               <span>Events:</span>
             </div>
             <div class="counter-control bonus-skill-control">
+              <button id="lock-val-events" class="bonus-lock-button" type="button" onclick="toggleBonusSkillLock('val-events')" aria-label="Lock Events value" aria-pressed="false">&#128275;</button>
               <button onclick="adjustCounter('val-events', -1)">-</button>
-              <span id="val-events" style="font-family:'Teutonic'; font-size: 32px; min-width: 20px; text-align: center;">0</span>
+              <span id="val-events" class="is-zero" style="font-family:'Teutonic'; font-size: 32px; min-width: 20px; text-align: center;">0</span>
               <button onclick="adjustCounter('val-events', 1)">+</button>
             </div>
           </div>
@@ -227,8 +229,9 @@
               <span>Assets:</span>
             </div>
             <div class="counter-control bonus-skill-control">
+              <button id="lock-val-assets" class="bonus-lock-button" type="button" onclick="toggleBonusSkillLock('val-assets')" aria-label="Lock Assets value" aria-pressed="false">&#128275;</button>
               <button onclick="adjustCounter('val-assets', -1)">-</button>
-              <span id="val-assets" style="font-family:'Teutonic'; font-size: 32px; min-width: 20px; text-align: center;">0</span>
+              <span id="val-assets" class="is-zero" style="font-family:'Teutonic'; font-size: 32px; min-width: 20px; text-align: center;">0</span>
               <button onclick="adjustCounter('val-assets', 1)">+</button>
             </div>
           </div>
@@ -238,10 +241,11 @@
             <div class="bonus-skill-label">
               <img id="bonus-skill-icon" class="bonus-skill-icon" src="images/icons/invest_willpower.png" alt="Selected skill">
               <span>Other:</span>
-            </div>
+          </div>
             <div class="counter-control bonus-skill-control">
+              <button id="lock-val-other" class="bonus-lock-button" type="button" onclick="toggleBonusSkillLock('val-other')" aria-label="Lock Other value" aria-pressed="false">&#128275;</button>
               <button onclick="adjustCounter('val-other', -1)">-</button>
-              <span id="val-other" style="font-family:'Teutonic'; font-size: 32px; min-width: 20px; text-align: center;">0</span>
+              <span id="val-other" class="is-zero" style="font-family:'Teutonic'; font-size: 32px; min-width: 20px; text-align: center;">0</span>
               <button onclick="adjustCounter('val-other', 1)">+</button>
             </div>
           </div>
@@ -255,7 +259,7 @@
         <div class="arena-right">
           <button class="notepad-cover-return" type="button" onclick="closeTrialNotebook()" aria-label="Close the trial notebook and show its cover" title="Show notebook cover"></button>
           <div class="token-theater">
-            <div id="active-scenario-context" class="active-scenario-context" aria-live="polite">Night of the Zealot — The Gathering</div>
+            <div id="active-scenario-context" class="active-scenario-context" aria-live="polite">Night of the Zealot:<br>The Gathering</div>
             <div id="token-graphic" class="animated-token"></div>
             <div id="test-outcome-msg" class="result-banner"></div>
             <div id="test-score-counters" class="test-score-counters" aria-label="Test totals"></div>
@@ -437,7 +441,7 @@
   </div>
   
   <script src="tokendata.js?v=ipad-banner-3"></script>
-  <script src="duo.js?v=session-sounds-51"></script>
+  <script src="duo.js?v=investigator-switch-reset-69"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));

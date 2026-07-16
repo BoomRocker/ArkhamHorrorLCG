@@ -49,6 +49,68 @@ const investigatorFlavor = {
 // Duo mode keeps each player's selection independent; only the active dossier
 // supplies the shared skill-test controls and profile presentation.
 let activeInvestigatorSlot = 'primary';
+const bonusSkillCounterIds = ['val-commit', 'val-events', 'val-assets', 'val-other'];
+const bonusSkillTypes = ['will', 'intellect', 'combat', 'agility'];
+const makeBonusSkillState = initialValue => Object.fromEntries(
+  bonusSkillTypes.map(skill => [skill, Object.fromEntries(bonusSkillCounterIds.map(id => [id, initialValue]))])
+);
+const bonusSkillStateBySlot = {
+  primary: makeBonusSkillState(0),
+  secondary: makeBonusSkillState(0)
+};
+const bonusSkillLockStateBySlot = {
+  primary: makeBonusSkillState(false),
+  secondary: makeBonusSkillState(false)
+};
+
+function saveBonusSkillStateForSlot(slot, skill = activeSkillType) {
+  bonusSkillCounterIds.forEach(id => {
+    bonusSkillStateBySlot[slot][skill][id] = parseInt(document.getElementById(id)?.textContent) || 0;
+  });
+}
+
+function restoreBonusSkillStateForSlot(slot, skill = activeSkillType) {
+  bonusSkillCounterIds.forEach(id => {
+    const counter = document.getElementById(id);
+    const value = bonusSkillStateBySlot[slot][skill][id] || 0;
+    if (counter) {
+      counter.textContent = value;
+      counter.classList.toggle('is-zero', value === 0);
+    }
+    updateBonusSkillLockButton(id, slot, skill);
+  });
+}
+
+function updateBonusSkillLockButton(id, slot = activeInvestigatorSlot, skill = activeSkillType) {
+  const button = document.getElementById(`lock-${id}`);
+  if (!button) return;
+  const locked = Boolean(bonusSkillLockStateBySlot[slot][skill][id]);
+  const label = document.querySelector(`#${id}`)?.closest('.bonus-skills-row')
+    ?.querySelector('.bonus-skill-label span')?.textContent.replace(':', '') || 'bonus';
+  button.textContent = locked ? '🔒' : '🔓';
+  button.classList.toggle('is-locked', locked);
+  button.setAttribute('aria-pressed', String(locked));
+  button.setAttribute('aria-label', `${locked ? 'Unlock' : 'Lock'} ${label} value`);
+}
+
+function toggleBonusSkillLock(id) {
+  const locks = bonusSkillLockStateBySlot[activeInvestigatorSlot][activeSkillType];
+  locks[id] = !locks[id];
+  updateBonusSkillLockButton(id);
+  playSfx('sfx/symbol.mp3');
+}
+
+function resetUnlockedBonusSkillCounters(slot = activeInvestigatorSlot, skill = activeSkillType) {
+  bonusSkillCounterIds.forEach(id => {
+    if (bonusSkillLockStateBySlot[slot][skill][id]) return;
+    bonusSkillStateBySlot[slot][skill][id] = 0;
+    const counter = document.getElementById(id);
+    if (counter && slot === activeInvestigatorSlot && skill === activeSkillType) {
+      counter.textContent = '0';
+      counter.classList.add('is-zero');
+    }
+  });
+}
 
 function getActiveInvestigatorSelect() {
   return document.getElementById(activeInvestigatorSlot === 'secondary'
@@ -65,9 +127,12 @@ function setInvestigatorForSlot(slot) {
 }
 
 function activateInvestigatorSlot(slot) {
+  saveBonusSkillStateForSlot(activeInvestigatorSlot);
   activeInvestigatorSlot = slot;
+  resetUnlockedBonusSkillCounters(activeInvestigatorSlot, activeSkillType);
   playSfx('sfx/pageflip2.mp3');
   loadInvestigatorProfileManual();
+  restoreBonusSkillStateForSlot(activeInvestigatorSlot);
 }
 
 function updateDuoInvestigatorTabs() {
@@ -388,7 +453,12 @@ function syncDifficultyBagLayout() {
   const campaignLabel = document.getElementById('campaign-select').selectedOptions[0]?.textContent || campaign;
   const scenarioLabel = scenario?.label || 'Scenario';
   document.getElementById('bag-headline').textContent = `${campaignLabel} — ${scenarioLabel} (${difficulty})`;
-  document.getElementById('active-scenario-context').textContent = `${campaignLabel} — ${scenarioLabel}`;
+  const scenarioContext = document.getElementById('active-scenario-context');
+  scenarioContext.replaceChildren(
+    document.createTextNode(`${campaignLabel}:`),
+    document.createElement('br'),
+    document.createTextNode(scenarioLabel)
+  );
   
   const grid = document.getElementById('bag-contents-grid');
   grid.innerHTML = '';
@@ -412,6 +482,20 @@ function syncDifficultyBagLayout() {
       }
     });
     grid.appendChild(img);
+  });
+}
+
+function appendHighlightedTokenEffectText(container, text) {
+  const parts = String(text).split(/([+-]?(?:\d+(?:\.\d+)?|X)\b)/gi);
+  parts.forEach(part => {
+    if (/^[+-]?(?:\d+(?:\.\d+)?|X)$/i.test(part)) {
+      const number = document.createElement('strong');
+      number.className = 'token-effect-number';
+      number.textContent = part;
+      container.appendChild(number);
+    } else if (part) {
+      container.appendChild(document.createTextNode(part));
+    }
   });
 }
 
@@ -456,13 +540,15 @@ function drawSimpleToken(forcedToken) {
       .replace(/^Effect:\s*/i, '') || 'Resolve your investigator\'s Elder Sign effect.';
     const tokenName = document.createElement('strong');
     tokenName.textContent = 'Elder Sign';
-    effectMsgEl.append(tokenName, `: ${elderEffect}`);
+    effectMsgEl.append(tokenName);
+    appendHighlightedTokenEffectText(effectMsgEl, `: ${elderEffect}`);
     void effectMsgEl.offsetWidth;
   } else if (tokenEffect) {
     const tokenName = document.createElement('strong');
     tokenName.textContent = specialTokenLabels[drawnToken] || drawnToken;
     const effectText = tokenEffect.replace(/^[^:]+:\s*/, '');
-    effectMsgEl.append(tokenName, `: ${effectText}`);
+    effectMsgEl.append(tokenName);
+    appendHighlightedTokenEffectText(effectMsgEl, `: ${effectText}`);
   }
 
   let modifier = 0;
@@ -789,7 +875,10 @@ function highlightInvestigatorRuleTerms(element) {
 }
 
 function selectSkillManual(skill, val, playSound = true) {
+  if (playSound) saveBonusSkillStateForSlot(activeInvestigatorSlot, activeSkillType);
   activeSkillType = skill;
+  if (playSound) resetUnlockedBonusSkillCounters(activeInvestigatorSlot, activeSkillType);
+  restoreBonusSkillStateForSlot(activeInvestigatorSlot, activeSkillType);
   document.querySelectorAll('.stat-badge').forEach(b => b.classList.remove('active-test'));
   document.getElementById(`badge-${skill}`).classList.add('active-test');
   updateBonusSkillVisual(skill);
@@ -822,6 +911,10 @@ function adjustCounter(id, delta) {
   if (nextValue === current) return;
 
   el.innerText = nextValue;
+  if (bonusSkillCounterIds.includes(id)) el.classList.toggle('is-zero', nextValue === 0);
+  if (bonusSkillCounterIds.includes(id)) {
+    bonusSkillStateBySlot[activeInvestigatorSlot][activeSkillType][id] = nextValue;
+  }
   if (id === 'val-target' || id.startsWith('val-')) {
     playSfx(delta > 0 ? 'sfx/symbol.mp3' : 'sfx/trash.mp3');
   }
@@ -913,6 +1006,7 @@ function updateSessionSaveStatus(message = '') {
 
 function saveCurrentSession() {
   const counterIds = ['val-target', 'val-commit', 'val-events', 'val-assets', 'val-other'];
+  saveBonusSkillStateForSlot(activeInvestigatorSlot);
   const player = document.getElementById('audio-player');
   const activeTrack = document.querySelector('.track-item.active');
   const activeView = document.querySelector('.view-panel.active-view');
@@ -927,6 +1021,8 @@ function saveCurrentSession() {
     scenario: document.getElementById('scenario-select').value,
     difficulty: document.getElementById('difficulty-select').value,
     activeSkillType,
+    bonusSkillPointsBySlot: JSON.parse(JSON.stringify(bonusSkillStateBySlot)),
+    bonusSkillLocksBySlot: JSON.parse(JSON.stringify(bonusSkillLockStateBySlot)),
     counters: Object.fromEntries(counterIds.map(id => [id, document.getElementById(id)?.textContent || '0'])),
     phaseChecks: Array.from(document.querySelectorAll('.phase-flow-step input[type="checkbox"]'), input => input.checked),
     activeTab: activeView?.id.replace('view-', '') || 'setup',
@@ -962,8 +1058,25 @@ function loadSavedSession() {
   primarySelect.value = session.primaryInvestigator || 'roland';
   secondarySelect.value = session.secondaryInvestigator || 'daisy';
   activeInvestigatorSlot = session.activeInvestigatorSlot === 'secondary' ? 'secondary' : 'primary';
+  activeSkillType = bonusSkillTypes.includes(session.activeSkillType) ? session.activeSkillType : 'will';
   Object.keys(investigatorVitalState).forEach(key => delete investigatorVitalState[key]);
   Object.assign(investigatorVitalState, session.investigatorVitals || {});
+  const hasPerSlotBonusPoints = Boolean(session.bonusSkillPointsBySlot);
+  ['primary', 'secondary'].forEach(slot => {
+    bonusSkillTypes.forEach(skill => {
+      bonusSkillCounterIds.forEach(id => {
+        const savedPoints = session.bonusSkillPointsBySlot?.[slot];
+        const savedLocks = session.bonusSkillLocksBySlot?.[slot];
+        const legacySkill = skill === activeSkillType;
+        bonusSkillStateBySlot[slot][skill][id] = parseInt(
+          savedPoints?.[skill]?.[id] ?? (legacySkill ? savedPoints?.[id] : 0)
+        ) || 0;
+        bonusSkillLockStateBySlot[slot][skill][id] = Boolean(
+          savedLocks?.[skill]?.[id] ?? (legacySkill ? savedLocks?.[id] : false)
+        );
+      });
+    });
+  });
   loadInvestigatorProfileManual();
 
   const campaignSelect = document.getElementById('campaign-select');
@@ -979,6 +1092,11 @@ function loadSavedSession() {
     const counter = document.getElementById(id);
     if (counter) counter.textContent = value;
   });
+  if (hasPerSlotBonusPoints) restoreBonusSkillStateForSlot(activeInvestigatorSlot);
+  else {
+    saveBonusSkillStateForSlot(activeInvestigatorSlot);
+    restoreBonusSkillStateForSlot(activeInvestigatorSlot);
+  }
   selectSkillManual(session.activeSkillType || 'will', 0, false);
 
   const phaseInputs = document.querySelectorAll('.phase-flow-step input[type="checkbox"]');
