@@ -1055,10 +1055,50 @@ function scrubAudio() {
   }
 }
 
-function setVolume() {
+let musicAudioContext = null;
+let musicMediaSource = null;
+let musicGainNode = null;
+
+function ensureMusicVolumeGraph() {
+  if (musicGainNode) return musicGainNode;
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return null;
+
+  try {
+    musicAudioContext = new AudioContextClass();
+    musicMediaSource = musicAudioContext.createMediaElementSource(document.getElementById('audio-player'));
+    musicGainNode = musicAudioContext.createGain();
+    musicMediaSource.connect(musicGainNode);
+    musicGainNode.connect(musicAudioContext.destination);
+    return musicGainNode;
+  } catch (error) {
+    musicAudioContext = null;
+    musicMediaSource = null;
+    musicGainNode = null;
+    return null;
+  }
+}
+
+function setVolume(fromUserGesture = false) {
   const player = document.getElementById('audio-player');
   const slider = document.getElementById('volume-slider');
-  player.volume = Number(slider.value) / 100;
+  const volume = Number(slider.value) / 100;
+
+  // Desktop browsers honor media-element volume directly.
+  player.volume = volume;
+
+  // iPad/iPhone Safari keeps media-element volume tied to the device. A gain
+  // node created during the slider gesture provides app-level volume control.
+  if (fromUserGesture) {
+    const gainNode = ensureMusicVolumeGraph();
+    if (gainNode && musicAudioContext) {
+      gainNode.gain.setValueAtTime(volume, musicAudioContext.currentTime);
+      if (musicAudioContext.state === 'suspended') {
+        musicAudioContext.resume().catch(() => {});
+      }
+    }
+  }
+
   updateSliderFill(slider);
 }
 

@@ -298,7 +298,7 @@
     <!-- TAB 4: ATMOSPHERE -->
     <div id="view-music" class="view-panel">
       <div class="audio-core-view">
-        <audio id="audio-player" src="music/Beyond%20Arkham.mp3" loop preload="metadata"></audio>
+        <audio id="audio-player" src="music/Beyond%20Arkham.mp3" loop preload="metadata" playsinline></audio>
 
         <div class="music-player-card">
         <div class="now-playing" aria-live="polite">
@@ -320,7 +320,7 @@
           </div>
           <div class="player-slider-row">
             <img class="volume-icon" src="images/icons/music_quiet.png" alt="Quiet">
-            <input type="range" id="volume-slider" class="volume-slider" value="80" min="0" max="100" aria-label="Volume" oninput="setVolume()">
+            <input type="range" id="volume-slider" class="volume-slider" value="80" min="0" max="100" aria-label="Volume" oninput="setVolume(true)" onchange="setVolume(true)">
             <img class="volume-icon" src="images/icons/music_loud.png" alt="Loud">
           </div>
         </div>
@@ -412,7 +412,7 @@
   </div>
   
   <script src="tokendata.js?v=ipad-banner-3"></script>
-  <script src="duo.js?v=reset-guidance-21"></script>
+  <script src="duo.js?v=ipad-volume-27"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
