@@ -802,15 +802,15 @@ select option {
 }
 
 #view-setup select {
-  height: 38px;
+  height: 30px;
   padding: 0 7px;
-  background: linear-gradient(96deg, rgba(172, 145, 97, 0.48), rgba(224, 210, 174, 0.62));
+  background: linear-gradient(96deg, rgba(224, 210, 174, 0.48), rgba(255, 255, 255, 0.62));
   color: #241b14;
   border: 0;
   border-bottom: 1px solid rgba(94, 77, 49, 0.54);
   border-radius: 0;
   font-family: 'Special Elite', 'Courier New', monospace;
-  font-size: 0.92rem;
+  font-size: 22px;
   font-weight: normal;
   box-shadow: none;
 }
@@ -1441,6 +1441,79 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
 
 }
 
+.special-token-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(54, 42, 31, 0.45);
+}
+
+.special-token-control-label {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.special-token-modifier-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.special-token-modifier-row button {
+  width: 46px;
+  height: 46px;
+  padding-top: .5rem;
+  border-radius: 4px;
+  border: 1.5px solid var(--panel-border);
+  background-color: #333;
+  background-image: url(images/textures/clipperFlip.png);
+  background-size: cover;
+  color: var(--text-dark);
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#special-token-modifier {
+  min-width: 48px;
+  color: #251d16;
+  font-family: 'Teutonic', serif;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.special-token-modifier-row .special-token-confirm {
+  width: 105px;
+  padding: 6px 13px;
+  background: var(--class-color);
+  color: #fff8e7;
+  font-size: 16px;
+}
+
+.token-theater.special-token-pending .result-banner {
+  color: var(--class-color);
+  animation: pendingSpecialPulse 1.2s ease-in-out infinite;
+}
+
+.token-theater .token-effect-text.token-effect-resolved {
+  font-size: 1.0125rem !important;
+  text-decoration: line-through;
+  opacity: 0.68;
+}
+
+@keyframes pendingSpecialPulse {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; }
+}
+
 .token-theater.test-success {
   border-color: var(--success-green);
   filter: drop-shadow(0 0 16px #013220 );
@@ -1560,7 +1633,7 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
 }
 
 .token-theater.autofail-result {
-  background-color: #3a080b;
+ 
   background-image: linear-gradient(rgba(155, 12, 20, 0.66), rgba(59, 4, 10, 0.76)), url('images/textures/cosmic.png');
   background-size: cover;
   background-position: center;
@@ -1669,7 +1742,7 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
 /* Large, serpentine round track for quick play in landscape. */
 .phase-flow-board {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   grid-template-rows: repeat(3, minmax(112px, 1fr));
   column-gap: 54px;
   row-gap: 28px;
@@ -1678,6 +1751,36 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
   min-height: 0;
   overflow: auto;
 
+}
+
+.phase-flow-board .phase-hand-step {
+  grid-row: 2;
+  grid-column: 1;
+}
+
+.phase-flow-board .phase-resource-step {
+  grid-row: 2;
+  grid-column: 2;
+}
+
+.phase-flow-board .phase-ready-step {
+  grid-row: 2;
+  grid-column: 3;
+}
+
+.phase-flow-board .phase-enemy-step {
+  grid-row: 2;
+  grid-column: 4;
+}
+
+.phase-flow-board .phase-hunter-step {
+  grid-row: 2;
+  grid-column: 5;
+}
+
+.phase-flow-board .phase-reset-flow {
+  grid-row: 3;
+  grid-column: 1;
 }
 
 .phase-flow-step {
@@ -2250,13 +2353,27 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
   width: 100%;
   max-width: 400px;
   padding: 12px;
+    background-color: #f6f1df;
+  background-image: url('images/textures/dossier4.jpg');
+  background-size: cover;
+  background-position: center; /* You can also write this as: left top */
+  transform: scale(1.5);
+  transform-origin: center center;
+}
+
+#bag-headline{
+	font-family: 'Special Elite', 'Courier New', monospace;
+	font-size: 15px;
+	color:#000;
 }
 
 #bag-popover .popover-container {
   background-color: #f6f1df;
-  background-image: url('images/textures/notebookpaper.png');
+  background-image: url('images/textures/dossier4.jpg');
   background-size: cover;
-  background-position: center;
+  background-position: center; /* You can also write this as: left top */
+  transform: scale(1.5);
+  transform-origin: center center;
 }
 
 .bag-popover-heading {
@@ -2745,10 +2862,18 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
   margin: 14px 0 0;
   padding: 5px 3px 0;
   color: #2b2118;
-  font-family: 'Special Elite', 'Courier New', monospace;
   font-size: 0.72rem;
   font-style: normal;
   line-height: 1.35;
+
+}
+
+#profile-flavor .profile-flavor {
+    font-family: 'La Belle Aurore', 'Segoe Print', cursive;
+    font-size: 22px;
+    font-weight: normal;
+    line-height: 1.15;
+    color: var(--class-color);
 }
 
 .profile-flavor-main {
@@ -2872,6 +2997,236 @@ text-align:center;
   }
 }
 
+/* Show the scenario name once on the closed theater cover, not on result paper. */
+#view-arena .token-theater {
+  position: relative;
+}
+
+#view-arena .token-theater .active-scenario-context {
+  position: absolute;
+  right: 14%;
+  bottom: 8%;
+  left: 14%;
+  z-index: 4;
+  display: block;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  color: #eee3ca;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.4px;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  text-shadow:
+    0 -1px 0 rgba(22, 13, 8, 0.95),
+    0 1px 0 rgba(255, 240, 205, 0.3),
+    1px 2px 3px rgba(0, 0, 0, 0.75);
+  transform: none;
+  pointer-events: none;
+}
+
+#view-arena .token-theater.trial-started .active-scenario-context {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  #view-arena .token-theater .active-scenario-context {
+    right: 12%;
+    bottom: 7%;
+    left: 12%;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    font-size: 16px;
+  }
+}
+
+/* Angled closed cover visible beneath an opened trial notebook. */
+#view-arena .arena-right {
+  position: relative;
+}
+
+#view-arena .notepad-cover-return {
+  position: absolute;
+  top: 4%;
+  right: 3%;
+  bottom: 4%;
+  left: 3%;
+  z-index: 20;
+  display: none;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  background-image: url("images/textures/coverer.png");
+  background-position: top center;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  box-shadow: none;
+  filter: none;
+  transform: translate(8%, 5%);
+  transform-origin: center;
+  cursor: pointer;
+}
+
+#view-arena .arena-right.notebook-open .notepad-cover-return {
+  display: block;
+}
+
+#view-arena .notepad-cover-return::after {
+  content: none;
+}
+
+#view-arena .notepad-cover-return:focus-visible {
+  outline: 3px solid #f1d58d;
+  outline-offset: 3px;
+}
+
+.token-theater .test-math-details {
+  max-width: 84%;
+  margin: 2px auto 5px;
+  color: #8a8175;
+  font-family: 'La Belle Aurore', 'Segoe Print', cursive;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  transform: rotate(-1deg);
+}
+
+.token-theater .test-math-details:empty {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  .token-theater .test-math-details {
+    max-width: 88%;
+    font-size: 15px;
+  }
+}
+
+/* Oversized class badge floating above the banner and page layers. */
+.investigator-sticky-header {
+  isolation: auto;
+  overflow: visible;
+}
+
+.investigator-sticky-header .class-mood-icon {
+  z-index: 1000;
+  transform: translateY(12px) scale(1.25) rotate(3deg);
+  transform-origin: center;
+}
+
+@media (max-width: 932px) {
+  .investigator-sticky-header .class-mood-icon {
+    transform: translateY(10px) scale(1.25) rotate(3deg);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1366px) and (orientation: landscape) {
+  .investigator-sticky-header .class-mood-icon {
+    transform: translateY(10px) scale(1.75) rotate(5deg);
+  }
+}
+
+/* Improve number comparison contrast on Elder Sign results only. */
+#view-arena .token-theater.elder-sign-result .test-score-counters:not(:empty) {
+  flex-wrap: wrap;
+  padding: 8px 14px;
+  background-color: #e8dfc9;
+  background-image: url("images/textures/card3.png");
+  background-position: center;
+  background-size: cover;
+  border: 1px solid rgba(43, 33, 24, 0.55);
+  border-radius: 7px;
+  box-shadow: 0 3px 8px rgba(7, 20, 32, 0.48);
+}
+
+#view-arena .token-theater.elder-sign-result .test-score-counters .test-math-details {
+  flex-basis: 100%;
+  width: 100%;
+  max-width: 100%;
+  margin: 2px 0 0;
+  color: #665b4e;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+#view-arena .token-theater.elder-sign-result .test-score-vs {
+  color: #211912;
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+/* Health and Sanity at the bottom of a successful trial notebook. */
+#view-arena .token-theater .profile-vitals {
+  display: none;
+}
+
+#view-arena .token-theater.trial-started.test-success .profile-vitals {
+  position: absolute;
+  right: 12%;
+  bottom: 7%;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background-image: url("images/textures/card3.png");
+  background-position: center;
+  background-size: cover;
+  border: 2px solid var(--class-color);
+  border-radius: 7px;
+  box-shadow: 0 2px 5px rgba(27, 18, 11, 0.35);
+  transform: rotate(2deg);
+  display:none;
+}
+
+#view-arena .token-theater .profile-vital {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 58px;
+  color: #251d16;
+  font-family: 'Teutonic', serif;
+  font-size: 31px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+#view-arena .token-theater .profile-vital img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+#view-arena .token-theater .profile-vital span {
+  font-weight: 700;
+}
+
+@media (max-width: 520px) {
+  #view-arena .token-theater.trial-started.test-success .profile-vitals {
+    right: 10%;
+    bottom: 6%;
+    gap: 7px;
+    padding: 6px 9px;
+  }
+
+  #view-arena .token-theater .profile-vital {
+    min-width: 46px;
+    font-size: 25px;
+  }
+
+  #view-arena .token-theater .profile-vital img {
+    width: 25px;
+    height: 25px;
+  }
+}
+
 /* iPad dossier: align the usable controls with the form sheet, then use the open notebook below. */
 @media (min-width: 768px) and (max-width: 1366px) and (orientation: landscape) {
   #view-setup {
@@ -2889,7 +3244,7 @@ text-align:center;
   }
 
   #view-setup .setup-grid {
-    column-gap: 72px;
+    column-gap: 25px;
     row-gap: 22px;
   }
 
@@ -3049,7 +3404,7 @@ text-align:center;
   .ipad-investigator-card {
     top: 20%;
     right: 7%;
-    width: 80%;
+    width: 700px;
     min-height: 350px;
     padding: 12px 14px;
     color: #251d16;
@@ -3157,6 +3512,10 @@ text-align:center;
 
   .ipad-investigator-rule {
     min-width: 0;
+  }
+  
+  #ipad-investigator-elder {
+	min-height:60px;
   }
 
   .ipad-investigator-rule > span {
@@ -3280,11 +3639,19 @@ text-align:center;
 
 /* Recover space in the Duo dossier, especially in iPad layouts. */
 #view-setup {
-  padding-top: 20px;
+  padding-top: 0px;
 }
 
 #view-setup .setup-grid {
-  row-gap: 20px;
+  row-gap: 10px;
+  background: #fbf8f0 url('images/textures/dossier3.jpg') center / cover;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+  padding:22px 20px 15px 40px;
+  border-radius:10px;
+  border: 0 solid rgba(49, 42, 35, 0.72);
+  box-shadow: 4px 7px 14px rgba(0, 0, 0, 0.35);
+  width:800px;
+  margin-left:-20px;
 }
 
 #view-setup .form-group label {
@@ -3517,13 +3884,15 @@ text-align:center;
 .duo-investigator-tab-icon {
   width: 27px;
   height: 34px;
-  margin-top:-5px;
+  margin-top:2px;
 }
 
 .duo-investigator-tab-name {
   color: var(--tab-class-color, #2d251e);
   font-weight: 700;
   text-shadow: 0 1px 0 rgba(255, 252, 235, 0.75);
+    margin-top:5px;
+	font-size:16.75px;
 }
 
 /* Textured, single-card music player. */
@@ -3914,7 +4283,8 @@ text-align:center;
   border: 1px solid rgba(54, 42, 32, 0.55);
   border-radius: 2px;
   box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.22);
-          color: var(--class-color);
+  color: var(--class-color);
+  transform: rotate(-1deg);
 }
 
 #view-setup .dossier-start-trial img {
@@ -4113,6 +4483,96 @@ margin-top: -10px;
   box-shadow: none;
 }
 
+/* iPad/iPhone Safari: color the real banner layer and remove the stale blended overlay. */
+#dynamic-class-skin.ios-banner-color-fix {
+  background-color: var(--header-class-color) !important;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+#dynamic-class-skin.ios-banner-color-fix::before {
+  display: none !important;
+}
+
+/* Read-only modal vitals in the upper-right of the investigator dossier. */
+#investigator-modal .profile-vitals {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+#investigator-modal .profile-vital {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 48px;
+  color: #251d16;
+  font-family: 'Teutonic', serif;
+  font-size: 25px;
+  line-height: 1;
+}
+
+#investigator-modal .profile-vital img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+@media (max-width: 520px) {
+  #investigator-modal .profile-vitals {
+    gap: 4px;
+  }
+
+  #investigator-modal .profile-vital {
+    min-width: 39px;
+    font-size: 20px;
+  }
+
+  #investigator-modal .profile-vital img {
+    width: 23px;
+    height: 23px;
+  }
+}
+
+/* Scenario heading written into the unused top of the trial notepad. */
+#view-arena .token-theater .active-scenario-context {
+  display: none;
+}
+
+#view-arena .token-theater.trial-started .active-scenario-context {
+  position: absolute;
+  top: 7%;
+  left: 13%;
+  z-index: 4;
+  display: block;
+  width: 74%;
+  max-width: 74%;
+  margin: 25px 0 0 0;
+  padding: 0;
+  color: var(--class-color);
+  font-family: 'La Belle Aurore', 'Segoe Print', cursive;
+  font-size: 21px;
+  font-weight: bold;
+  line-height: 1.05;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: break-word;
+  transform: rotate(-2deg);
+  transform-origin: center;
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  #view-arena .token-theater.trial-started .active-scenario-context {
+    top: 6%;
+    left: 11%;
+    width: 78%;
+    max-width: 78%;
+    font-size: 15px;
+  }
+}
+
 /* Final music-console layer: keep this after legacy music rules. */
 #view-music.view-panel.active-view {
   background: #d8d4cb url('images/textures/musicbacker.jpg') center / cover no-repeat;
@@ -4308,5 +4768,120 @@ margin-top: -10px;
   #view-music .music-player-card .volume-icon {
     width: 30px;
     height: 30px;
+  }
+}
+/* Investigator dossier typography: flavor uses the investigator's class color;
+   rules text stays regular except for the highlighted rule terms. */
+#investigator-modal #profile-flavor {
+  font-family: "La Belle Aurore", "Segoe Print", cursive;
+  color: var(--class-color);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: .85em;
+  text-align:center;
+    transform: rotate(-2deg);
+}
+
+#investigator-modal #profile-ability,
+#investigator-modal #profile-elder,
+#investigator-modal #profile-ability b,
+#investigator-modal #profile-elder b,
+#investigator-modal #profile-ability strong:not(.rule-term-highlight),
+#investigator-modal #profile-elder strong:not(.rule-term-highlight) {
+  font-weight: 400;
+}
+
+#investigator-modal .rule-term-highlight {
+  font-weight: 700;
+}
+
+/* Textured Health and Sanity panel in the investigator heading. */
+#investigator-modal .profile-vitals {
+  gap: 12px;
+  padding: 8px 2px 8px 12px;
+  background-image: url("images/textures/notebook2.png");
+  background-position: center;
+  background-size: cover;
+  border: 2px solid rgba(55, 39, 26, 0.65);
+  border-radius: 7px;
+  box-shadow: 0 2px 5px rgba(27, 18, 11, 0.35);
+      transform: rotate(2deg);
+	  border-color:var(--class-color);
+	  min-height: 60px;
+}
+
+#investigator-modal .profile-vital {
+  min-width: 58px;
+  font-size: 31px;
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+#investigator-modal .profile-vital span {
+  font-weight: 500;
+}
+
+@media (max-width: 520px) {
+  #investigator-modal .profile-vitals {
+    gap: 7px;
+    padding: 6px 9px;
+  }
+
+  #investigator-modal .profile-vital {
+    min-width: 46px;
+    font-size: 25px;
+  }
+}
+
+/* Final scenario-label placement: closed cover only. */
+#view-arena .token-theater {
+  position: relative;
+}
+
+#view-arena .token-theater .active-scenario-context {
+  position: absolute;
+  right: 14%;
+  bottom: 8%;
+  left: 14%;
+  top: auto;
+  z-index: 4;
+  display: block;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  color: #eee3ca;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.4px;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  text-shadow:
+    0 -1px 0 rgba(0, 0, 0, 0.95),
+    0 1px 0 rgba(0, 0, 0, 0.3),
+    1px 2px 3px rgba(0, 0, 0, 0.75);
+  transform: none;
+  pointer-events: none;
+  text-align:center
+}
+
+#view-arena .token-theater.trial-started .active-scenario-context {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  #view-arena .token-theater .active-scenario-context {
+    right: 12%;
+    bottom: 7%;
+    left: 12%;
+    top: auto;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    font-size: 16px;
   }
 }

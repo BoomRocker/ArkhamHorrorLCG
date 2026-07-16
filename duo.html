@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="images/icons/favicon.png">
   <link rel="apple-touch-icon" href="images/icons/favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="duo.css">
+  <link rel="stylesheet" href="duo.css?v=revert-nameplates-25">
 </head>
 <body>
 
@@ -164,7 +164,6 @@
     <div id="view-arena" class="view-panel">
       <div class="arena-split">
         <div class="arena-left">
-          <div id="active-scenario-context" class="active-scenario-context" aria-live="polite">Night of the Zealot — The Gathering</div>
           <div class="calc-row shroud-row">
             <span class="shroud-label"><img src="images/icons/shroud.png" alt="">Test Difficulty:</span>
             <div class="counter-control bonus-skill-control">
@@ -254,11 +253,24 @@
         </div>
 
         <div class="arena-right">
+          <button class="notepad-cover-return" type="button" onclick="closeTrialNotebook()" aria-label="Close the trial notebook and show its cover" title="Show notebook cover"></button>
           <div class="token-theater">
+            <div id="active-scenario-context" class="active-scenario-context" aria-live="polite">Night of the Zealot — The Gathering</div>
             <div id="token-graphic" class="animated-token"></div>
             <div id="test-outcome-msg" class="result-banner"></div>
             <div id="test-score-counters" class="test-score-counters" aria-label="Test totals"></div>
+            <div id="test-math-details" class="test-math-details" aria-live="polite"></div>
             <div id="token-effect-msg" class="token-effect-text"></div>
+            <div class="profile-vitals" aria-label="Investigator health and sanity">
+              <div class="profile-vital" title="Health">
+                <img src="images/icons/investigator_hp.png" alt="Health">
+                <span id="profile-vital-health">9</span>
+              </div>
+              <div class="profile-vital" title="Sanity">
+                <img src="images/icons/investigator_sanity.png" alt="Sanity">
+                <span id="profile-vital-sanity">5</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -267,17 +279,18 @@
     <!-- TAB 3: PHASES -->
     <div id="view-rounds" class="view-panel">
       <div class="phase-flow-board" aria-label="Round sequence">
-        <label class="phase-flow-step phase-0 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img class="phase-flow-badge" src="images/icons/phase_mythos.png" alt="Mythos"><img class="phase-flow-icon" src="images/icons/phase_step_horror.png" alt=""><span>+1 Doom</span></label>
+        <label class="phase-flow-step phase-0 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img class="phase-flow-badge" src="images/icons/phase_mythos.png" alt="Mythos"><img class="phase-flow-icon" src="images/icons/phase_step_horror.png" alt=""><span>+1 Doom Token</span></label>
         <label class="phase-flow-step phase-0 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img class="phase-flow-badge" src="images/icons/phase_mythos.png" alt="Mythos"><img class="phase-flow-icon" src="images/icons/phase_step_doomthreshold.png" alt=""><span>Doom Limit</span></label>
-        <label class="phase-flow-step phase-0 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img class="phase-flow-badge" src="images/icons/phase_mythos.png" alt="Mythos"><img class="phase-flow-icon" src="images/icons/phase_step_encounter.png" alt=""><span>Encounter</span></label>
-        <label class="phase-flow-step phase-1 flow-down"><input type="checkbox" onclick="checkSubtaskProgress(1)"><img class="phase-flow-badge" src="images/icons/phase_investigation.png" alt="Investigation"><img class="phase-flow-icon" src="images/icons/phase_step_spendactions.png" alt=""><span>Actions</span></label>
+        <label class="phase-flow-step phase-0 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(0)"><img class="phase-flow-badge" src="images/icons/phase_mythos.png" alt="Mythos"><img class="phase-flow-icon" src="images/icons/phase_step_encounter.png" alt=""><span>Draw Encounter</span></label>
+        <label class="phase-flow-step phase-1 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(1)"><img class="phase-flow-badge" src="images/icons/phase_investigation.png" alt="Investigation"><img id="phase-action-primary-icon" class="phase-flow-icon" src="images/icons/class_guardian.png" alt="First investigator class"><span id="phase-action-primary-label">Roland Actions</span></label>
+        <label class="phase-flow-step phase-1 flow-down"><input type="checkbox" onclick="checkSubtaskProgress(1)"><img class="phase-flow-badge" src="images/icons/phase_investigation.png" alt="Investigation"><img id="phase-action-secondary-icon" class="phase-flow-icon" src="images/icons/class_seeker.png" alt="Second investigator class"><span id="phase-action-secondary-label">Daisy Actions</span></label>
 
-        <label class="phase-flow-step phase-3 flow-down"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_resources.png" alt=""><span>+1 Card+Rsrc.</span></label>
-        <label class="phase-flow-step phase-3 flow-left"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_reset.png" alt=""><span>Ready Cards</span></label>
-        <label class="phase-flow-step phase-2 flow-left"><input type="checkbox" onclick="checkSubtaskProgress(2)"><img class="phase-flow-badge" src="images/icons/phase_enemy.png" alt="Enemy"><img class="phase-flow-icon" src="images/icons/phase_step_enemy.png" alt=""><span>Enemy Attack</span></label>
-        <label class="phase-flow-step phase-2 flow-left"><input type="checkbox" onclick="checkSubtaskProgress(2)"><img class="phase-flow-badge" src="images/icons/phase_enemy.png" alt="Enemy"><img class="phase-flow-icon" src="images/icons/phase_step_enemy2.png" alt=""><span>Hunter Move</span></label>
+        <label class="phase-flow-step phase-3 phase-resource-step flow-left"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_resources.png" alt=""><span>+1 Card & Resource</span></label>
+        <label class="phase-flow-step phase-3 phase-ready-step flow-left"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_refresh.png" alt=""><span>Ready Cards</span></label>
+        <label class="phase-flow-step phase-2 phase-enemy-step flow-left"><input type="checkbox" onclick="checkSubtaskProgress(2)"><img class="phase-flow-badge" src="images/icons/phase_enemy.png" alt="Enemy"><img class="phase-flow-icon" src="images/icons/phase_step_enemy.png" alt=""><span>Enemy Attack</span></label>
+        <label class="phase-flow-step phase-2 phase-hunter-step flow-left"><input type="checkbox" onclick="checkSubtaskProgress(2)"><img class="phase-flow-badge" src="images/icons/phase_enemy.png" alt="Enemy"><img class="phase-flow-icon" src="images/icons/phase_step_enemy2.png" alt=""><span>Hunter Move</span></label>
 
-        <label class="phase-flow-step phase-3 flow-right"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_hand.png" alt=""><span>8 Card Hand</span></label>
+        <label class="phase-flow-step phase-3 phase-hand-step flow-down"><input type="checkbox" onclick="checkSubtaskProgress(3)"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_hand.png" alt=""><span>8 Card Hand</span></label>
         <div class="phase-flow-step phase-reset-flow" role="button" tabindex="0" onclick="resetRoundMatrix()" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); resetRoundMatrix(); }"><img class="phase-flow-badge" src="images/icons/phase_upkeep.png" alt="Upkeep"><img class="phase-flow-icon" src="images/icons/phase_step_reset2.png" alt=""><span>Reset</span></div>
       </div>
     </div>
@@ -370,6 +383,16 @@
           <h2 id="profile-name">Roland Banks</h2>
           <button class="profile-nav-button" type="button" onclick="cycleInvestigator(1)" aria-label="Next investigator"><img src="images/icons/arrow-right.svg" alt=""></button>
         </div>
+        <div class="profile-vitals" aria-label="Investigator health and sanity">
+          <div class="profile-vital" title="Health">
+            <img src="images/icons/investigator_hp.png" alt="Health">
+            <span id="profile-modal-vital-health">9</span>
+          </div>
+          <div class="profile-vital" title="Sanity">
+            <img src="images/icons/investigator_sanity.png" alt="Sanity">
+            <span id="profile-modal-vital-sanity">5</span>
+          </div>
+        </div>
         <button class="modal-close" onclick="toggleInvestigatorModal(false)" aria-label="Close profile">×</button>
       </div>
       <div class="profile-id-card">
@@ -388,8 +411,8 @@
     </div>
   </div>
   
-  <script src="tokendata.js"></script>
-  <script src="duo.js"></script>
+  <script src="tokendata.js?v=ipad-banner-3"></script>
+  <script src="duo.js?v=reset-guidance-21"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));

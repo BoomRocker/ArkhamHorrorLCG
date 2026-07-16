@@ -2,7 +2,7 @@
   "name": "Arkham Horror Companion",
   "short_name": "Arkham Companion",
   "description": "A companion app for Arkham Horror: The Card Game.",
-  "start_url": "./index.html",
+  "start_url": "./duo.html",
   "scope": "./",
   "display": "standalone",
   "display_override": ["fullscreen", "standalone"],

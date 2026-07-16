@@ -94,6 +94,28 @@ function updateDuoInvestigatorTabs() {
   };
   setTabContents(primaryTab, primary.value, 'First investigator');
   setTabContents(secondaryTab, secondary.value, 'Second investigator');
+
+  const primaryActionIcon = document.getElementById('phase-action-primary-icon');
+  const secondaryActionIcon = document.getElementById('phase-action-secondary-icon');
+  const primaryActionLabel = document.getElementById('phase-action-primary-label');
+  const secondaryActionLabel = document.getElementById('phase-action-secondary-label');
+  const primaryInvestigator = investigators[primary.value];
+  const secondaryInvestigator = investigators[secondary.value];
+  const firstName = investigator => (investigator?.name || 'Investigator')
+    .replace(/["']/g, '')
+    .trim()
+    .split(/\s+/)[0];
+  if (primaryActionIcon) {
+    primaryActionIcon.src = primaryInvestigator?.classIcon || `images/icons/class_${primaryInvestigator?.classId || 'neutral'}.png`;
+    primaryActionIcon.alt = `${primaryInvestigator?.name || 'First investigator'} class`;
+  }
+  if (secondaryActionIcon) {
+    secondaryActionIcon.src = secondaryInvestigator?.classIcon || `images/icons/class_${secondaryInvestigator?.classId || 'neutral'}.png`;
+    secondaryActionIcon.alt = `${secondaryInvestigator?.name || 'Second investigator'} class`;
+  }
+  if (primaryActionLabel) primaryActionLabel.textContent = `${firstName(primaryInvestigator)} Actions`;
+  if (secondaryActionLabel) secondaryActionLabel.textContent = `${firstName(secondaryInvestigator)} Actions`;
+
   primaryTab.classList.toggle('active', activeInvestigatorSlot === 'primary');
   secondaryTab.classList.toggle('active', activeInvestigatorSlot === 'secondary');
   primaryTab.setAttribute('aria-selected', String(activeInvestigatorSlot === 'primary'));
@@ -116,6 +138,10 @@ function syncDossierVitals(investigatorId) {
   const vitals = investigatorVitalState[investigatorId] ||= { ...limits };
   document.getElementById('vital-health').textContent = vitals.health;
   document.getElementById('vital-sanity').textContent = vitals.sanity;
+  document.getElementById('profile-vital-health').textContent = vitals.health;
+  document.getElementById('profile-vital-sanity').textContent = vitals.sanity;
+  document.getElementById('profile-modal-vital-health').textContent = vitals.health;
+  document.getElementById('profile-modal-vital-sanity').textContent = vitals.sanity;
 }
 
 function adjustVital(type, delta) {
@@ -413,6 +439,8 @@ function drawSimpleToken(forcedToken) {
     || campaignDescriptors[drawnToken]
     || specialTokenDescriptors.default[drawnToken];
   effectMsgEl.replaceChildren();
+  effectMsgEl.classList.remove('token-effect-resolved');
+  document.getElementById('test-math-details')?.replaceChildren();
   effectMsgEl.classList.toggle('elder-sign-effect-flash', isElderSign);
   if (isElderSign) {
     const investigator = investigators[getActiveInvestigatorKey()];
@@ -440,14 +468,30 @@ function drawSimpleToken(forcedToken) {
   const baseSkill = parseInt(document.getElementById(`stat-${activeSkillType}`).innerText) || 0;
   const committed = getBonusSkillTotal();
   const target = parseInt(document.getElementById('val-target').innerText) || 0;
-  
+
   const finalTotal = Math.max(0, baseSkill + committed + (drawnToken === 'autofail' ? -99 : modifier));
   const outcomeMsg = document.getElementById('test-outcome-msg');
   const tokenTheater = document.querySelector('.token-theater');
+  tokenTheater.closest('.arena-right')?.classList.add('notebook-open');
   tokenTheater.classList.add('trial-started');
-  tokenTheater.classList.remove('test-success', 'test-failure', 'elder-sign-result', 'autofail-result');
+  tokenTheater.classList.remove('test-success', 'test-failure', 'elder-sign-result', 'autofail-result', 'special-token-pending');
   void tokenTheater.offsetWidth;
-  
+
+  const needsManualModifier = ['skull', 'cultist', 'tablet', 'elderthing', 'eye', 'eldersign'].includes(drawnToken);
+  if (needsManualModifier) {
+    pendingSpecialTest = { drawnToken, isElderSign, baseSkill, committed, target, modifier: 0 };
+    addSpecialTokenControls(effectMsgEl);
+    outcomeMsg.textContent = 'Pending...';
+    outcomeMsg.style.color = 'var(--class-color)';
+    outcomeMsg.classList.remove('has-skill-outcome');
+    tokenTheater.classList.add('special-token-pending');
+    if (isElderSign) tokenTheater.classList.add('elder-sign-result');
+    document.getElementById('test-score-counters').replaceChildren();
+    playSfx('sfx/rty.mp3');
+    return;
+  }
+
+  pendingSpecialTest = null;
   outcomeMsg.classList.remove('has-skill-outcome');
   if (drawnToken === 'autofail' || (!isElderSign && finalTotal < target)) {
     if (drawnToken === 'autofail') {
@@ -485,7 +529,109 @@ function drawSimpleToken(forcedToken) {
     document.getElementById('test-score-counters').replaceChildren();
   } else {
     renderTestScoreCounters(target, finalTotal, activeSkillType);
+    renderTestMathDetails(baseSkill, committed, modifier, finalTotal, target);
   }
+}
+
+let pendingSpecialTest = null;
+
+function addSpecialTokenControls(effectCard) {
+  const controls = document.createElement('div');
+  controls.className = 'special-token-controls';
+
+  const label = document.createElement('span');
+  label.className = 'special-token-control-label';
+  label.textContent = 'Final token modifier';
+
+  const modifierRow = document.createElement('div');
+  modifierRow.className = 'special-token-modifier-row';
+  modifierRow.innerHTML = `
+    <button type="button" onclick="adjustSpecialTokenModifier(-1)" aria-label="Decrease token modifier">−</button>
+    <span id="special-token-modifier" aria-live="polite">0</span>
+    <button type="button" onclick="adjustSpecialTokenModifier(1)" aria-label="Increase token modifier">+</button>
+    <button class="special-token-confirm" type="button" onclick="confirmSpecialTokenModifier()">Calculate</button>
+  `;
+
+  controls.append(label, modifierRow);
+  effectCard.appendChild(controls);
+}
+
+function adjustSpecialTokenModifier(delta) {
+  if (!pendingSpecialTest) return;
+  pendingSpecialTest.modifier += delta;
+  document.getElementById('special-token-modifier').textContent = pendingSpecialTest.modifier > 0
+    ? `+${pendingSpecialTest.modifier}`
+    : pendingSpecialTest.modifier;
+  playSfx(delta > 0 ? 'sfx/symbol.mp3' : 'sfx/trash.mp3');
+}
+
+function confirmSpecialTokenModifier() {
+  if (!pendingSpecialTest) return;
+
+  const test = pendingSpecialTest;
+  const finalTotal = Math.max(0, test.baseSkill + test.committed + test.modifier);
+  const outcomeMsg = document.getElementById('test-outcome-msg');
+  const tokenTheater = document.querySelector('.token-theater');
+  tokenTheater.classList.remove('special-token-pending', 'test-success', 'test-failure');
+  outcomeMsg.classList.remove('has-skill-outcome');
+
+  if (finalTotal < test.target) {
+    setOutcomeLabel(outcomeMsg, 'Failed', activeSkillType);
+    outcomeMsg.style.color = 'var(--fail-red)';
+    tokenTheater.classList.add('test-failure');
+    playSfx('sfx/tenaclesfail.mp3');
+  } else {
+    setOutcomeLabel(outcomeMsg, 'Success!', activeSkillType);
+    outcomeMsg.style.color = 'var(--success-green)';
+    tokenTheater.classList.add('test-success');
+    playSfx('sfx/success.mp3');
+  }
+
+  renderTestScoreCounters(test.target, finalTotal, activeSkillType);
+  renderTestMathDetails(test.baseSkill, test.committed, test.modifier, finalTotal, test.target);
+  document.querySelector('.special-token-controls')?.remove();
+  document.getElementById('token-effect-msg').classList.add('token-effect-resolved');
+  pendingSpecialTest = null;
+}
+
+function closeTrialNotebook() {
+  const tokenTheater = document.querySelector('.token-theater');
+  tokenTheater.classList.remove('trial-started', 'test-success', 'test-failure', 'elder-sign-result', 'autofail-result', 'special-token-pending');
+  tokenTheater.closest('.arena-right')?.classList.remove('notebook-open');
+
+  const graphic = document.getElementById('token-graphic');
+  graphic.classList.remove('spin-roll');
+  graphic.style.backgroundImage = '';
+  document.getElementById('test-outcome-msg').replaceChildren();
+  document.getElementById('test-score-counters').replaceChildren();
+  document.getElementById('test-math-details')?.remove();
+  const effect = document.getElementById('token-effect-msg');
+  effect.replaceChildren();
+  effect.classList.remove('elder-sign-effect-flash', 'token-effect-resolved');
+  document.getElementById('card-portrait')?.classList.remove('elder-sign-triggered');
+  pendingSpecialTest = null;
+  playSfx('sfx/flip2.mp3');
+}
+
+function renderTestMathDetails(baseSkill, committed, modifier, finalTotal, target) {
+  const counters = document.getElementById('test-score-counters');
+  let details = document.getElementById('test-math-details');
+  if (!details) {
+    details = document.createElement('div');
+    details.id = 'test-math-details';
+    details.className = 'test-math-details';
+    details.setAttribute('aria-live', 'polite');
+  }
+
+  if (document.querySelector('.token-theater').classList.contains('elder-sign-result')) {
+    counters.appendChild(details);
+  } else {
+    counters.insertAdjacentElement('afterend', details);
+  }
+
+  const committedMath = committed > 0 ? ` + ${committed}` : '';
+  const tokenMath = modifier > 0 ? ` + ${modifier}` : modifier < 0 ? ` − ${Math.abs(modifier)}` : ' + 0';
+  details.textContent = `Difficulty ${target} vs skill ${baseSkill}${committedMath}${tokenMath} = ${finalTotal}`;
 }
 
 function renderTestScoreCounters(shroud, skillTotal, skill) {
@@ -581,8 +727,13 @@ function loadInvestigatorProfileManual() {
     neutral: "#4f4f4f"
   };
   const activeSkinColor = classColors[data.classId] || "#362a20";
-  document.getElementById('dynamic-class-skin').style.backgroundColor = activeSkinColor;
+  const dynamicSkin = document.getElementById('dynamic-class-skin');
+  dynamicSkin.style.setProperty('--header-class-color', activeSkinColor);
+  dynamicSkin.style.backgroundColor = activeSkinColor;
+  dynamicSkin.classList.add('ios-banner-color-fix');
+  dynamicSkin.dataset.classId = data.classId;
   document.documentElement.style.setProperty('--class-color', activeSkinColor);
+  void dynamicSkin.offsetHeight;
   const classArrowFilters = {
     guardian: 'invert(22%) sepia(26%) saturate(1373%) hue-rotate(164deg) brightness(88%) contrast(89%)',
     seeker: 'invert(42%) sepia(29%) saturate(1026%) hue-rotate(4deg) brightness(92%) contrast(88%)',
@@ -734,14 +885,17 @@ function updatePhaseFlowGuidance() {
   const steps = Array.from(document.querySelectorAll('.phase-flow-step'));
   // The visual track doubles back across row two, so its DOM order differs
   // from the arrow order at that turn in the round.
-  const roundOrder = [0, 1, 2, 3, 7, 6, 5, 4, 8, 9];
+  const roundOrder = [0, 1, 2, 3, 4, 8, 7, 6, 5, 9, 10];
   steps.forEach(step => step.classList.remove('next-action'));
 
   const nextIndex = roundOrder.find(index => {
     const checkbox = steps[index]?.querySelector('input[type="checkbox"]');
     return checkbox ? !checkbox.checked : false;
   });
-  (nextIndex === undefined ? steps[9] : steps[nextIndex])?.classList.add('next-action');
+  const nextStep = nextIndex === undefined
+    ? document.querySelector('.phase-flow-board .phase-reset-flow')
+    : steps[nextIndex];
+  nextStep?.classList.add('next-action');
 }
 
 function selectPhaseForPhone(index) {

@@ -1,9 +1,13 @@
-const CACHE_NAME = 'arkham-companion-v2';
+const CACHE_NAME = 'arkham-companion-v5';
 const APP_SHELL = [
   './',
   './index.html',
   './styles.css',
   './app.js',
+  './omni.html',
+  './omni.css',
+  './omni.js',
+  './omni-manifest.webmanifest',
   './manifest.webmanifest'
 ];
 
