@@ -5145,6 +5145,34 @@ margin-top: -10px;
   align-items: stretch;
 }
 
+#session-page-save .session-modal-actions button {
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-blend-mode: multiply;
+}
+
+#session-page-save .session-save-button {
+  background-color: var(--class-color) !important;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.2)), url('images/textures/paper01.png') !important;
+  color: #ffffff !important;
+}
+
+#session-page-save .session-load-button {
+  background-color: #e8dcc1 !important;
+  background-image: linear-gradient(rgba(255, 250, 230, 0.26), rgba(111, 91, 66, 0.12)), url('images/textures/paper01.png') !important;
+  color: #271f18 !important;
+}
+
+#session-page-save .session-clear-button {
+  background-color: #702126 !important;
+  background-image: linear-gradient(rgba(70, 0, 4, 0.08), rgba(55, 0, 3, 0.28)), url('images/textures/paper01.png') !important;
+  color: #ffffff !important;
+}
+
 /* iPad/iPhone Safari: color the real banner layer and remove the stale blended overlay. */
 #dynamic-class-skin.ios-banner-color-fix {
   background-color: var(--header-class-color) !important;
