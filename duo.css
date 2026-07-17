@@ -3179,6 +3179,7 @@ text-align:center;
 
 #view-setup .ipad-investigator-rule:nth-of-type(1) {
   transform: rotate(-0.5deg);
+      min-height:150px;
 }
 
 #view-setup .ipad-investigator-rule:nth-of-type(2) {
@@ -3188,7 +3189,7 @@ text-align:center;
   background-color: #f5efdf;
   background-image: none;
   overflow: hidden;
-  
+  min-height:150px;
 }
 
 #view-setup .ipad-investigator-rule::before {
@@ -3916,13 +3917,13 @@ text-align:center;
   }
 
 .ipad-investigator-portrait {
-  width: 212px;
-  height: 246px;
+  width: 175px;
+  height: 280px;
   object-fit: cover;
   object-position: center top;
   border: 5px solid #fff;
   box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.42);
-  margin: 0px 0 0 -50px;
+  margin: 20px 0 0 -15px;
   transform: none;
     transform: rotate(-3deg);
   /* Stretches to cover the box from the top-center down */
@@ -6038,6 +6039,7 @@ background-image: url('images/textures/dossierBG.jpg');
 #view-setup .ipad-investigator-rule > span {
   font-size: 1.55rem;
   font-weight: 500;
+
 }
 
 /* Place the Elder Sign token immediately left of the Effect wording on Dossier. */
