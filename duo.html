@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="images/icons/favicon.png">
   <link rel="apple-touch-icon" href="images/icons/favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="duo.css?v=session-heading-card-height-158">
+  <link rel="stylesheet" href="duo.css?v=iphone-fit-59-183">
 </head>
 <body>
 
@@ -100,10 +100,10 @@
             <option value="scen3">The Devourer Below</option>
           </select>
           <div id="difficulty-elder-signs" class="difficulty-elder-signs" role="img" aria-label="Easy difficulty: 1 of 4 Elder Signs filled">
-            <span class="difficulty-elder-sign filled" aria-hidden="true"><img src="images/icons/diffculty-elder.svg" alt=""></span>
-            <span class="difficulty-elder-sign" aria-hidden="true"><img src="images/icons/diffculty-elder.svg" alt=""></span>
-            <span class="difficulty-elder-sign" aria-hidden="true"><img src="images/icons/diffculty-elder.svg" alt=""></span>
-            <span class="difficulty-elder-sign" aria-hidden="true"><img src="images/icons/diffculty-elder.svg" alt=""></span>
+            <button class="difficulty-elder-sign filled" type="button" onclick="selectDifficultyFromElderSign('easy')" aria-label="Select Easy difficulty"><img src="images/icons/diffculty-elder.svg" alt=""></button>
+            <button class="difficulty-elder-sign" type="button" onclick="selectDifficultyFromElderSign('standard')" aria-label="Select Standard difficulty"><img src="images/icons/diffculty-elder.svg" alt=""></button>
+            <button class="difficulty-elder-sign" type="button" onclick="selectDifficultyFromElderSign('hard')" aria-label="Select Hard difficulty"><img src="images/icons/diffculty-elder.svg" alt=""></button>
+            <button class="difficulty-elder-sign" type="button" onclick="selectDifficultyFromElderSign('expert')" aria-label="Select Expert difficulty"><img src="images/icons/diffculty-elder.svg" alt=""></button>
           </div>
         </div>
 
@@ -118,7 +118,7 @@
           <button class="ipad-investigator-nav" type="button" aria-label="Previous investigator" onclick="cycleInvestigator(-1)"><img src="images/icons/arrow-left.svg" alt=""></button>
           <div class="ipad-investigator-title">
             <img id="ipad-card-class-icon" class="ipad-card-class-icon" src="images/icons/class_guardian.png" alt="Guardian class">
-            <h4 id="ipad-investigator-name">Roland Banks</h4>
+            <h4 id="ipad-investigator-name" role="button" tabindex="0" title="Reset investigator counts" onclick="resetDossierVitals()" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); resetDossierVitals(); }">Roland Banks</h4>
           </div>
           <button class="ipad-investigator-nav" type="button" aria-label="Next investigator" onclick="cycleInvestigator(1)"><img src="images/icons/arrow-right.svg" alt=""></button>
         </div>
@@ -287,7 +287,7 @@
           <button class="notepad-cover-return" type="button" onclick="closeTrialNotebook()" aria-label="Close the trial notebook and show its cover" title="Show notebook cover"></button>
           <div class="token-theater">
             <img id="active-campaign-seal" class="active-campaign-seal" src="images/icons/seal_zealot1.png" alt="Night of the Zealot wax seal">
-            <div id="active-scenario-context" class="active-scenario-context" aria-live="polite">Night of the Zealot:<br>The Gathering</div>
+            <div id="active-scenario-context" class="active-scenario-context" aria-live="polite">Night of the Zealot:<br>The Gathering<br><em>Easy</em></div>
             <div id="token-graphic" class="animated-token"></div>
             <div id="test-outcome-msg" class="result-banner"></div>
             <div id="test-score-counters" class="test-score-counters" aria-label="Test totals"></div>
@@ -374,7 +374,10 @@
     <div id="view-session" class="view-panel active-view">
       <div class="session-page-card">
         <div class="session-page-heading">
-          <h2>Campaign Session</h2>
+          <div class="session-heading-title-wrap">
+            <img id="session-heading-seal" src="images/icons/seal_zealot1.png" alt="Night of the Zealot wax seal">
+            <h2 id="session-heading-title">Night of the Zealot Session</h2>
+          </div>
         </div>
         <div id="session-page-setup"></div>
         <div id="session-page-save"></div>
@@ -494,7 +497,7 @@
   </div>
   
   <script src="tokendata.js?v=ipad-banner-3"></script>
-  <script src="duo.js?v=session-empty-status-106"></script>
+  <script src="duo.js?v=dossier-name-reset-111"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));

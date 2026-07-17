@@ -143,7 +143,7 @@
   width: 79px;
   height: auto;
   object-fit: contain;
-  transform: translateX(-50%);
+  transform: translate(-50%, -40px);
   filter: drop-shadow(0 2px 3px rgba(35, 25, 18, 0.48));
   pointer-events: none;
 }
@@ -298,7 +298,7 @@ html {
 
 body {
   background-color: var(--bg-dark);
-  background-image: url('images/textures/bigPaper.jpg');
+  background-image: url('images/textures/paper01.png');
   background-size: cover;
   background-attachment: fixed;
   color: var(--text-dark);
@@ -2521,7 +2521,7 @@ font-family: 'La Belle Aurore', 'Segoe Print', cursive;
 .session-save-status {
   min-height: 42px;
   margin: 0 0 16px;
-  padding: 10px 12px;
+  padding: 15px 12px 10px 12px;
   background: rgba(255, 252, 239, 0.72);
   border: 1px solid rgba(58, 46, 35, 0.4);
   border-radius: 6px;
@@ -3188,6 +3188,7 @@ text-align:center;
   background-color: #f5efdf;
   background-image: none;
   overflow: hidden;
+  
 }
 
 #view-setup .ipad-investigator-rule::before {
@@ -3838,15 +3839,15 @@ text-align:center;
     min-height: 350px;
     padding: 20px 22px 12px 14px;
     color: #251d16;
-    background-color: rgba(248, 243, 224, 0.88);
+    /*   background-color: rgba(248, 243, 224, 0.88);
     background-image: url('images/textures/notebookpaperflip.jpg');
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     border: 0 solid rgba(49, 42, 35, 0.72);
     box-shadow: 4px 7px 14px rgba(0, 0, 0, 0.35);
-    transform: none;
-    /* margin-top: 40px; */
+    transform: none; */  
+    margin-top: 40px; */
   }
   
   .ipad-investigator-card::before {
@@ -3919,13 +3920,13 @@ text-align:center;
   }
 
 .ipad-investigator-portrait {
-  width: 190px;
-  height: 225px;
+  width: 212px;
+  height: 246px;
   object-fit: cover;
   object-position: center top;
   border: 5px solid #fff;
   box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.42);
-  margin: -15px 0 0 -35px;
+  margin: 0px 0 0 -50px;
   transform: none;
     transform: rotate(-3deg);
   /* Stretches to cover the box from the top-center down */
@@ -3972,6 +3973,7 @@ text-align:center;
     font-weight: normal;
     line-height: 1.18;
 	width: auto;
+	  padding: 10px 20px 0 30px;
   }
 
   .ipad-investigator-rule p .rule-term-highlight {
@@ -4942,9 +4944,29 @@ margin-top: -10px;
   z-index: 3;
 }
 
-#dossier-card-controls .skills-row {
+#view-setup .dossier-skills-row {
   width: 100%;
   margin: 0;
+}
+
+#view-setup #dossier-badge-will {
+  border-color: #1a4f78;
+  box-shadow: 0 0 0 1px rgba(26, 79, 120, 0.35);
+}
+
+#view-setup #dossier-badge-intellect {
+  border-color: #693b73;
+  box-shadow: 0 0 0 1px rgba(105, 59, 115, 0.35);
+}
+
+#view-setup #dossier-badge-combat {
+  border-color: #7a4027;
+  box-shadow: 0 0 0 1px rgba(122, 64, 39, 0.35);
+}
+
+#view-setup #dossier-badge-agility {
+  border-color: #1f6b52;
+  box-shadow: 0 0 0 1px rgba(31, 107, 82, 0.35);
 }
 
 #profile-modal-skills {
@@ -5003,6 +5025,20 @@ margin-top: -10px;
   background-repeat: no-repeat;
   background-size: 100% 3px, 100% 3px;
   border: 0;
+}
+
+#view-setup #dossier-vitals-host .dossier-skills-row {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin: 0 0 3px;
+}
+
+#ipad-investigator-name {
+  cursor: pointer;
+}
+
+#dossier-vital-reset {
+  display: none;
 }
 
 #view-setup #dossier-vitals-host .dossier-vital-block {
@@ -5109,14 +5145,14 @@ margin-top: -10px;
   height: 100%;
   min-height: 100%;
   flex: 1 1 auto;
-  padding: 75px 60px 0 60px;
-  background-color: #f4eddc;
-  background-image: url('images/textures/dossierBG.jpg');
+  padding: 40px 70px 0 70px;
+   /*  background-color: #f4eddc;
+background-image: url('images/textures/dossierBG.jpg'); 
   background-position: center top;
   background-size: cover;
   background-repeat: no-repeat;
   border-radius: 10px;
-  box-shadow: 4px 7px 14px rgba(0, 0, 0, 0.35);
+  box-shadow: 4px 7px 14px rgba(0, 0, 0, 0.35);*/
 }
 
 .session-page-heading {
@@ -5124,11 +5160,21 @@ margin-top: -10px;
   align-items: center;
   justify-content: center;
   margin-bottom: 18px;
-  padding: 12px 20px;
-  background: rgba(248, 243, 224, 0.72) url('images/textures/notebookpapergrey.jpg') center / cover;
+  padding: 0px 20px 0px 20px;
+  border-bottom: 2px solid rgba(49, 42, 35, 0.68);
+   /*  background: rgba(248, 243, 224, 0.72) url('images/textures/notebookpapergrey.jpg') center / cover;
   border-radius: 8px;
   box-shadow: 3px 5px 10px rgba(47, 32, 20, 0.3);
-  border-bottom: 0;
+  border-bottom: 0; */  
+}
+
+.session-heading-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: auto;
+  white-space: nowrap;
 }
 
 @media (min-width: 768px) and (max-width: 1366px) {
@@ -5148,15 +5194,20 @@ margin-top: -10px;
   width: 54px;
   height: 54px;
   object-fit: contain;
+  flex: 0 0 54px;
+  transform: rotate(-5deg);
+  filter: drop-shadow(1px 2px 2px rgba(43, 25, 15, 0.4));
 }
 
 .session-page-heading h2 {
   margin: 0;
-  width: 100%;
+  width: auto;
+  flex: 0 0 auto;
   color: var(--class-color);
   font-family: 'Special Elite', 'Courier New', monospace;
-  font-size: 2rem;
+  font-size: 1.65rem;
   text-align: center;
+  border-bottom: 0;
 }
 
 #session-page-setup .setup-grid {
@@ -5275,6 +5326,14 @@ margin-top: -10px;
   height: 58px;
   opacity: 0.2;
   overflow: hidden;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #session-page-setup .difficulty-elder-sign img {
@@ -5300,6 +5359,12 @@ margin-top: -10px;
   filter: drop-shadow(60px 0 0 var(--class-color));
 }
 
+#view-arena .active-scenario-context em {
+  font-size: 0.82em;
+  font-style: italic;
+  font-weight: normal;
+}
+
 #session-page-save {
   display: grid;
   grid-template-columns: 50px 50px 1fr 50px;
@@ -5309,6 +5374,8 @@ margin-top: -10px;
   background: rgba(248, 243, 224, 0.72) url('images/textures/notebookpapergrey.jpg') center / cover;
   border-radius: 8px;
   box-shadow: 3px 5px 10px rgba(47, 32, 20, 0.3);
+  background: url(images/textures/notebook3.png) center / cover no-repeat;
+    transform: scaleX(1);
 }
 
 #session-page-save .session-modal-copy {
@@ -5329,6 +5396,10 @@ margin-top: -10px;
   width: 100%;
   min-height: 48px;
   margin: 0;
+  background-color: #eee6d2;
+  background-image: url('images/textures/bigPaper.jpg');
+  background-position: center;
+  background-size: cover;
   color: var(--class-color);
   font-family: 'Special Elite', 'Courier New', monospace;
   font-weight: 700 !important;
@@ -5886,4 +5957,100 @@ margin-top: -10px;
     margin: 0;
     font-size: 16px;
   }
+}
+
+/* Fit the complete tablet-sized interface onto a horizontally held iPhone.
+   Enlarging the layout before scaling it keeps the app filling the screen. */
+@media screen and (orientation: landscape) and (max-width: 950px) and (max-height: 500px) {
+  body {
+    width: 170vw;
+    height: 170dvh;
+    min-height: 170dvh;
+    transform: scale(0.59);
+    transform-origin: top left;
+  }
+}
+
+/* Dossier vitals: four individual paper cards across the skills-bar width. */
+#view-setup #dossier-vitals-host .dossier-vitals {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+#view-setup #dossier-vitals-host .dossier-skills-row,
+#view-setup #dossier-vitals-host .dossier-vitals-divider {
+  grid-column: 1 / -1;
+}
+
+#view-setup #dossier-vitals-host .dossier-vital-block {
+  display: contents;
+}
+
+#view-setup #dossier-vitals-host .dossier-vital-block .dossier-vital {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  width: 100%;
+  min-width: 0;
+  min-height: 108px;
+  margin: 0;
+  padding: 10px;
+  background-position: center;
+  background-size: cover;
+  border: 2px solid rgba(79, 59, 43, 0.62);
+  border-radius: 8px;
+  box-shadow: inset 0 0 7px rgba(255, 255, 255, 0.42), 1px 3px 6px rgba(0, 0, 0, 0.24);
+}
+
+#view-setup #dossier-vitals-host .dossier-vital-label {
+  flex: 0 0 auto;
+  justify-content: center;
+  width: 100%;
+  margin: 0 0 10px;
+  font-size: 30px;
+  text-align: center;
+}
+
+#view-setup #dossier-vitals-host .dossier-vital-label img {
+  width: 30px;
+  height: 30px;
+}
+
+#view-setup #dossier-vitals-host .dossier-vital-control {
+  justify-content: center;
+  width: 100%;
+  margin-top: auto;
+}
+
+#view-setup #dossier-vitals-host .dossier-vital-control button {
+  width: 38px;
+  height: 38px;
+}
+
+#view-setup #dossier-vitals-host .dossier-vital-control > span {
+  min-width: 34px;
+  font-size: 29px !important;
+}
+
+/* Smaller, stronger Dossier rule headings. */
+#view-setup .ipad-investigator-rule > span {
+  font-size: 1.55rem;
+  font-weight: 500;
+}
+
+/* Place the Elder Sign token immediately left of the Effect wording on Dossier. */
+#view-setup #ipad-investigator-elder {
+  position: relative;
+  padding: 10px 20px 0 30px;
+}
+
+#view-setup #ipad-investigator-elder .token-icon {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  width: 28px;
+  height: auto;
+  margin:  4px 20px 0 0px;
 }

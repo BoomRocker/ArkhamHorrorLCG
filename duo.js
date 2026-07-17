@@ -238,6 +238,9 @@ function adjustVital(type, delta) {
 
 function resetDossierVitals() {
   const investigatorId = getActiveInvestigatorKey();
+  const investigatorName = investigators[investigatorId]?.name || 'this investigator';
+  const shouldReset = window.confirm(`Reset ${investigatorName}'s Health, Sanity, Resources, and Clues to their original values?`);
+  if (!shouldReset) return;
   const limits = investigatorVitalLimits[investigatorId] || { health: 7, sanity: 7 };
   investigatorVitalState[investigatorId] = { ...limits, resources: 5, clues: 0 };
   syncDossierVitals(investigatorId);
@@ -459,6 +462,13 @@ function updateCampaignScenario() {
   syncDifficultyBagLayout();
 }
 
+function selectDifficultyFromElderSign(difficulty) {
+  const difficultySelect = document.getElementById('difficulty-select');
+  if (!difficultySelect) return;
+  difficultySelect.value = difficulty;
+  syncDifficultyBagLayout();
+}
+
 function syncDifficultyBagLayout() {
   const campaign = document.getElementById('campaign-select').value;
   const difficulty = document.getElementById('difficulty-select').value;
@@ -486,17 +496,29 @@ function syncDifficultyBagLayout() {
   const campaignSealPath = campaignSealImages[campaign] || campaignSealImages.notz;
   const campaignSeal = document.getElementById('active-campaign-seal');
   const sessionCampaignSeal = document.getElementById('session-campaign-seal');
+  const sessionHeadingSeal = document.getElementById('session-heading-seal');
+  const sessionHeadingTitle = document.getElementById('session-heading-title');
   if (campaignSeal) {
     campaignSeal.src = campaignSealPath;
     campaignSeal.alt = `${campaignLabel} wax seal`;
   }
   if (sessionCampaignSeal) sessionCampaignSeal.src = campaignSealPath;
+  if (sessionHeadingSeal) {
+    sessionHeadingSeal.src = campaignSealPath;
+    sessionHeadingSeal.alt = `${campaignLabel} wax seal`;
+  }
+  if (sessionHeadingTitle) sessionHeadingTitle.textContent = `${campaignLabel} Session`;
   document.getElementById('bag-headline').textContent = `${campaignLabel} — ${scenarioLabel} (${difficulty})`;
   const scenarioContext = document.getElementById('active-scenario-context');
+  const difficultyLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+  const difficultyLine = document.createElement('em');
+  difficultyLine.textContent = difficultyLabel;
   scenarioContext.replaceChildren(
     document.createTextNode(`${campaignLabel}:`),
     document.createElement('br'),
-    document.createTextNode(scenarioLabel)
+    document.createTextNode(scenarioLabel),
+    document.createElement('br'),
+    difficultyLine
   );
   
   const grid = document.getElementById('bag-contents-grid');
@@ -1597,7 +1619,14 @@ window.addEventListener('DOMContentLoaded', () => {
     modalSkillsHost.appendChild(modalSkills);
   }
   const dossierVitalsHost = document.getElementById('dossier-vitals-host');
-  if (dossierVitalsHost && dossierVitals) dossierVitalsHost.appendChild(dossierVitals);
+  if (dossierVitalsHost && dossierVitals) {
+    dossierVitalsHost.appendChild(dossierVitals);
+    const dossierSkills = document.querySelector('#dossier-card-controls .dossier-skills-row');
+    const vitalsDivider = dossierVitals.querySelector('.dossier-vitals-divider');
+    if (dossierSkills && vitalsDivider) {
+      dossierVitals.insertBefore(dossierSkills, vitalsDivider);
+    }
+  }
 
   const primarySelect = document.getElementById('investigator-select');
   const secondarySelect = document.getElementById('co-investigator-select');
