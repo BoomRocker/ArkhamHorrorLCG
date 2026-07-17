@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="images/icons/favicon.png">
   <link rel="apple-touch-icon" href="images/icons/favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="duo.css?v=ipad-session-button-colors-121">
+  <link rel="stylesheet" href="duo.css?v=session-heading-card-height-158">
 </head>
 <body>
 
@@ -34,7 +34,7 @@
   <div class="main-viewport">
     
     <!-- TAB 1: SETUP -->
-    <div id="view-setup" class="view-panel active-view">
+    <div id="view-setup" class="view-panel">
       <div class="setup-grid">
         
         <div class="form-group">
@@ -71,6 +71,8 @@
           </select>
         </div>
 
+        <div class="session-investigator-divider" aria-hidden="true"></div>
+
 		<div class="form-group">
           <label>Campaign log chronology</label>
           <select id="campaign-select" onchange="updateCampaignScenario()">
@@ -79,6 +81,15 @@
             <option value="carcosa">Path to Carcosa</option>
             <option value="ash">Brethren of Ash (2026)</option>
           </select>
+          <div class="campaign-difficulty-group">
+            <label>Chaos bag difficulty tier</label>
+            <select id="difficulty-select" onchange="syncDifficultyBagLayout()">
+              <option value="easy" selected>Easy</option>
+              <option value="standard">Standard</option>
+              <option value="hard">Hard</option>
+              <option value="expert">Expert</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-group">
@@ -88,16 +99,16 @@
             <option value="scen2">Midnight Masks / Chapter II</option>
             <option value="scen3">The Devourer Below</option>
           </select>
+          <div id="difficulty-elder-signs" class="difficulty-elder-signs" role="img" aria-label="Easy difficulty: 1 of 4 Elder Signs filled">
+            <span class="difficulty-elder-sign filled" aria-hidden="true"><img src="images/icons/diffculty-elder.svg" alt=""></span>
+            <span class="difficulty-elder-sign" aria-hidden="true"><img src="images/icons/diffculty-elder.svg" alt=""></span>
+            <span class="difficulty-elder-sign" aria-hidden="true"><img src="images/icons/diffculty-elder.svg" alt=""></span>
+            <span class="difficulty-elder-sign" aria-hidden="true"><img src="images/icons/diffculty-elder.svg" alt=""></span>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>Chaos bag difficulty tier</label>
-          <select id="difficulty-select" onchange="syncDifficultyBagLayout()">
-            <option value="easy" selected>Easy</option>
-            <option value="standard">Standard</option>
-            <option value="hard">Hard</option>
-            <option value="expert">Expert</option>
-          </select>
+        <div class="session-campaign-seal-space" aria-hidden="true">
+          <img id="session-campaign-seal" class="session-campaign-seal" src="images/icons/seal_zealot1.png" alt="">
         </div>
 
       </div>
@@ -275,6 +286,7 @@
         <div class="arena-right">
           <button class="notepad-cover-return" type="button" onclick="closeTrialNotebook()" aria-label="Close the trial notebook and show its cover" title="Show notebook cover"></button>
           <div class="token-theater">
+            <img id="active-campaign-seal" class="active-campaign-seal" src="images/icons/seal_zealot1.png" alt="Night of the Zealot wax seal">
             <div id="active-scenario-context" class="active-scenario-context" aria-live="polite">Night of the Zealot:<br>The Gathering</div>
             <div id="token-graphic" class="animated-token"></div>
             <div id="test-outcome-msg" class="result-banner"></div>
@@ -359,7 +371,7 @@
       </div>
     </div>
 
-    <div id="view-session" class="view-panel">
+    <div id="view-session" class="view-panel active-view">
       <div class="session-page-card">
         <div class="session-page-heading">
           <h2>Campaign Session</h2>
@@ -376,11 +388,11 @@
     <div class="nav-investigator-photo investigator-profile-trigger" role="button" tabindex="0" aria-label="Open investigator profile" onclick="toggleInvestigatorModal(true)">
       <img id="card-portrait" class="header-portrait" src="images/investigators/roland.png" alt="Portrait">
     </div>
-    <div id="tab-btn-session" class="nav-tab-item" onclick="switchActiveTab('session')">
+    <div id="tab-btn-session" class="nav-tab-item active-tab" onclick="switchActiveTab('session')">
       <img src="images/icons/tab_round_order.png" alt="Session">
       <span>Session</span>
     </div>
-    <div id="tab-btn-setup" class="nav-tab-item active-tab" onclick="switchActiveTab('setup')">
+    <div id="tab-btn-setup" class="nav-tab-item" onclick="switchActiveTab('setup')">
       <img src="images/icons/tab_investigator.png" alt="Setup">
       <span>Dossier</span>
     </div>
@@ -459,11 +471,11 @@
         <button class="modal-close" type="button" onclick="toggleSessionModal(false)" aria-label="Close session window">×</button>
       </div>
       <p class="session-modal-copy">Save this investigation on this device and return to it later.</p>
-      <p id="session-save-status" class="session-save-status" aria-live="polite">No saved session on this device.</p>
+      <p id="session-save-status" class="session-save-status no-saved-session" aria-live="polite">No saved session</p>
       <div class="session-modal-actions">
-        <button class="session-save-button" type="button" onclick="saveCurrentSession()">Save Session</button>
-        <button id="session-load-button" class="session-load-button" type="button" onclick="loadSavedSession()">Load Session</button>
-        <button id="session-clear-button" class="session-clear-button" type="button" onclick="clearSavedSession()">Delete Save</button>
+        <button class="btn session-save-button session-icon-button" type="button" onclick="saveCurrentSession()" aria-label="Save session" title="Save Session"><img src="images/icons/save.png" alt=""></button>
+        <button id="session-load-button" class="btn session-load-button session-icon-button" type="button" onclick="loadSavedSession()" aria-label="Load session" title="Load Session"><img src="images/icons/load.png" alt=""></button>
+        <button id="session-clear-button" class="btn session-clear-button session-icon-button" type="button" onclick="clearSavedSession()" aria-label="Delete saved session" title="Delete Save"><img src="images/icons/trash.png" alt=""></button>
       </div>
     </div>
   </div>
@@ -482,7 +494,7 @@
   </div>
   
   <script src="tokendata.js?v=ipad-banner-3"></script>
-  <script src="duo.js?v=dossier-vitals-bottom-99"></script>
+  <script src="duo.js?v=session-empty-status-106"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));

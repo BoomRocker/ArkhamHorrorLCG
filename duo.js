@@ -429,6 +429,13 @@ const campaignScenarios = {
   ]
 };
 
+const campaignSealImages = {
+  notz: 'images/icons/seal_zealot1.png',
+  dunwich: 'images/icons/seal_dunwich1.png',
+  carcosa: 'images/icons/seal_carcosa1.png',
+  ash: 'images/icons/seal_brethren1.png'
+};
+
 function getActiveScenarioDefinition() {
   const campaign = document.getElementById('campaign-select').value;
   const scenario = document.getElementById('scenario-select').value;
@@ -456,6 +463,19 @@ function syncDifficultyBagLayout() {
   const campaign = document.getElementById('campaign-select').value;
   const difficulty = document.getElementById('difficulty-select').value;
   const scenario = getActiveScenarioDefinition();
+
+  const difficultyLevels = { easy: 1, standard: 2, hard: 3, expert: 4 };
+  const filledElderSigns = difficultyLevels[difficulty] || 1;
+  const difficultyElderSigns = document.getElementById('difficulty-elder-signs');
+  if (difficultyElderSigns) {
+    difficultyElderSigns.querySelectorAll('.difficulty-elder-sign').forEach((elderSign, index) => {
+      elderSign.classList.toggle('filled', index < filledElderSigns);
+    });
+    difficultyElderSigns.setAttribute(
+      'aria-label',
+      `${difficulty} difficulty: ${filledElderSigns} of 4 Elder Signs filled`
+    );
+  }
   
   if (campaignBags[campaign] && campaignBags[campaign][difficulty]) {
     activeBagContents = [...campaignBags[campaign][difficulty]];
@@ -463,6 +483,14 @@ function syncDifficultyBagLayout() {
 
   const campaignLabel = document.getElementById('campaign-select').selectedOptions[0]?.textContent || campaign;
   const scenarioLabel = scenario?.label || 'Scenario';
+  const campaignSealPath = campaignSealImages[campaign] || campaignSealImages.notz;
+  const campaignSeal = document.getElementById('active-campaign-seal');
+  const sessionCampaignSeal = document.getElementById('session-campaign-seal');
+  if (campaignSeal) {
+    campaignSeal.src = campaignSealPath;
+    campaignSeal.alt = `${campaignLabel} wax seal`;
+  }
+  if (sessionCampaignSeal) sessionCampaignSeal.src = campaignSealPath;
   document.getElementById('bag-headline').textContent = `${campaignLabel} — ${scenarioLabel} (${difficulty})`;
   const scenarioContext = document.getElementById('active-scenario-context');
   scenarioContext.replaceChildren(
@@ -1037,18 +1065,34 @@ function updateSessionSaveStatus(message = '') {
   const clearButton = document.getElementById('session-clear-button');
   if (!status || !loadButton || !clearButton) return;
 
+  status.classList.toggle('no-saved-session', !saved);
+
   if (message) {
     status.textContent = message;
   } else if (saved?.savedAt) {
     status.textContent = `Last saved ${new Date(saved.savedAt).toLocaleString()}.`;
   } else {
-    status.textContent = 'No saved session on this device.';
+    status.textContent = 'No saved session';
   }
   loadButton.disabled = !saved;
   clearButton.disabled = !saved;
 }
 
 function saveCurrentSession() {
+  const existingSession = readSavedSession();
+  if (existingSession) {
+    const savedTime = existingSession.savedAt
+      ? ` from ${new Date(existingSession.savedAt).toLocaleString()}`
+      : '';
+    const shouldOverwrite = window.confirm(
+      `A session is already saved${savedTime}. Are you sure you want to replace it?`
+    );
+    if (!shouldOverwrite) {
+      updateSessionSaveStatus('Save canceled. Your previous session was kept.');
+      return;
+    }
+  }
+
   const counterIds = ['val-target', 'val-commit', 'val-events', 'val-assets', 'val-other'];
   saveBonusSkillStateForSlot(activeInvestigatorSlot);
   const player = document.getElementById('audio-player');
@@ -1180,11 +1224,28 @@ function loadSavedSession() {
   }, { once: true });
 
   if (masterMuted !== Boolean(audioState.masterMuted)) toggleMasterMute();
-  switchActiveTab(session.activeTab || 'setup');
+  switchActiveTab(session.activeTab || 'session');
   toggleSessionModal(false);
 }
 
 function clearSavedSession() {
+  const savedSession = readSavedSession();
+  if (!savedSession) {
+    updateSessionSaveStatus('No saved session is available to delete.');
+    return;
+  }
+
+  const savedTime = savedSession.savedAt
+    ? ` from ${new Date(savedSession.savedAt).toLocaleString()}`
+    : '';
+  const shouldDelete = window.confirm(
+    `Are you sure you want to permanently delete the saved session${savedTime}?`
+  );
+  if (!shouldDelete) {
+    updateSessionSaveStatus('Delete canceled. Your saved session was kept.');
+    return;
+  }
+
   try {
     localStorage.removeItem(savedSessionStorageKey);
     updateSessionSaveStatus('Saved session deleted.');

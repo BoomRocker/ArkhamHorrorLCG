@@ -3316,6 +3316,38 @@ text-align:center;
   position: relative;
 }
 
+#view-arena .token-theater .active-campaign-seal {
+  position: absolute;
+  left: 50%;
+  bottom: 16%;
+  z-index: 4;
+  display: block;
+  width: 112px;
+  height: 112px;
+  object-fit: contain;
+  transform: translateX(-50%);
+  opacity: 0.84;
+  filter: drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.35));
+  pointer-events: none;
+
+  /* Safari */
+  -webkit-transform: translateX(-50%);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+#view-arena .token-theater.trial-started .active-campaign-seal {
+  display: block;
+  top: 8%;
+  left: 9%;
+  bottom: auto;
+  z-index: 5;
+  width: 58px;
+  height: 58px;
+  transform: rotate(-7deg);
+  filter: drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.4));
+}
+
 #view-arena .token-theater .active-scenario-context {
   position: absolute;
   right: 14%;
@@ -3350,6 +3382,20 @@ text-align:center;
 }
 
 @media (max-width: 520px) {
+  #view-arena .token-theater .active-campaign-seal {
+    bottom: 25%;
+    width: 82px;
+    height: 82px;
+  }
+
+  #view-arena .token-theater.trial-started .active-campaign-seal {
+    top: 7%;
+    left: 8%;
+    bottom: auto;
+    width: 44px;
+    height: 44px;
+  }
+
   #view-arena .token-theater .active-scenario-context {
     right: 12%;
     bottom: 7%;
@@ -3363,6 +3409,24 @@ text-align:center;
 
 /* iPad Safari rendering fixes. */
 @media (min-width: 768px) and (max-width: 1366px) {
+  #view-arena .test-score-counter {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    isolation: isolate;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #view-arena .counter-frame-shape {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    filter: var(--counter-filter) !important;
+    -webkit-filter: var(--counter-filter) !important;
+    mix-blend-mode: normal !important;
+  }
+
   /* Keep the class color on the real banner layer. Put the texture in a
      translucent pseudo-layer so Safari cannot replace the color with white. */
   html body #dynamic-class-skin,
@@ -3865,8 +3929,7 @@ text-align:center;
   transform: none;
     transform: rotate(-3deg);
   /* Stretches to cover the box from the top-center down */
-  background: url('images/textures/card1.png') center top / cover no-repeat;
-  background-color: #342A21;
+  background: var(--class-color);
 }
 
   .ipad-card-class-icon {
@@ -5043,12 +5106,15 @@ margin-top: -10px;
 
 .session-page-card {
   width: 100%;
+  height: 100%;
   min-height: 100%;
-  padding: 24px;
+  flex: 1 1 auto;
+  padding: 75px 60px 0 60px;
   background-color: #f4eddc;
-  background-image: url('images/textures/papel.png');
-  background-position: left top;
-  background-repeat: repeat;
+  background-image: url('images/textures/dossierBG.jpg');
+  background-position: center top;
+  background-size: cover;
+  background-repeat: no-repeat;
   border-radius: 10px;
   box-shadow: 4px 7px 14px rgba(0, 0, 0, 0.35);
 }
@@ -5058,7 +5124,24 @@ margin-top: -10px;
   align-items: center;
   justify-content: center;
   margin-bottom: 18px;
+  padding: 12px 20px;
+  background: rgba(248, 243, 224, 0.72) url('images/textures/notebookpapergrey.jpg') center / cover;
+  border-radius: 8px;
+  box-shadow: 3px 5px 10px rgba(47, 32, 20, 0.3);
   border-bottom: 0;
+}
+
+@media (min-width: 768px) and (max-width: 1366px) {
+  #view-session {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  #view-session .session-page-card {
+    height: 100%;
+    min-height: 1000px;
+    overflow: hidden;
+  }
 }
 
 .session-page-heading img {
@@ -5077,13 +5160,62 @@ margin-top: -10px;
 }
 
 #session-page-setup .setup-grid {
+  position: relative;
+  grid-template-rows: auto 4px auto;
+  align-content: start;
   width: 100%;
   margin: 0 0 20px;
   padding: 20px;
   column-gap: 28px;
-  row-gap: 20px;
+  row-gap: 12px;
   background: rgba(248, 243, 224, 0.72) url('images/textures/notebookpapergrey.jpg') center / cover;
   border-radius: 8px;
+  box-shadow: 3px 5px 10px rgba(47, 32, 20, 0.3);
+}
+
+#session-page-setup .session-investigator-divider {
+  grid-column: 1 / 3;
+  grid-row: 2;
+  width: 100%;
+  height: 4px;
+  background-image:
+    linear-gradient(to bottom, transparent 0,
+      color-mix(in srgb, var(--class-color) 40%, transparent) 35%,
+      var(--class-color) 50%,
+      color-mix(in srgb, var(--class-color) 70%, transparent) 65%,
+      transparent 100%),
+    repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, 0.10) 0 2px,
+      rgba(0, 0, 0, 0.08) 2px 4px);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+#session-page-setup .session-campaign-seal-space {
+  position: absolute;
+  top: calc(68% - 10px);
+  right: 0;
+  z-index: 4;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: calc(50% - 24px);
+  height: 1px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+#session-page-setup .session-campaign-seal {
+  position: relative;
+  z-index: 5;
+  display: block;
+  width: 182px;
+  height: 182px;
+  object-fit: contain;
+  transform: translate(130px, -45px) rotate(-8deg);
+  filter: drop-shadow(2px 3px 3px rgba(43, 25, 15, 0.45));
+  opacity: 0.96;
+  pointer-events: none;
 }
 
 #view-session .form-group label {
@@ -5123,29 +5255,91 @@ margin-top: -10px;
   background: #e8dcc1;
 }
 
+#session-page-setup .difficulty-elder-signs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  margin-top: 15px;
+  padding: 0 6px;
+}
+
+#session-page-setup .campaign-difficulty-group {
+  margin-top: 15px;
+}
+
+#session-page-setup .difficulty-elder-sign {
+  display: block;
+  flex: 0 0 58px;
+  width: 58px;
+  height: 58px;
+  opacity: 0.2;
+  overflow: hidden;
+}
+
+#session-page-setup .difficulty-elder-sign img {
+  display: block;
+  width: 46px;
+  height: 46px;
+  margin: 6px;
+  object-fit: contain;
+  transform: translateX(-52px);
+  filter: drop-shadow(52px 0 0 var(--class-color));
+}
+
+#session-page-setup .difficulty-elder-sign.filled {
+  opacity: 1;
+  filter: drop-shadow(1px 2px 2px rgba(31, 20, 13, 0.35));
+}
+
+#session-page-setup .difficulty-elder-sign.filled img {
+  width: 58px;
+  height: 58px;
+  margin: 0;
+  transform: translateX(-60px);
+  filter: drop-shadow(60px 0 0 var(--class-color));
+}
+
 #session-page-save {
+  display: grid;
+  grid-template-columns: 50px 50px 1fr 50px;
+  column-gap: 10px;
+  align-items: stretch;
   padding: 16px 20px;
   background: rgba(248, 243, 224, 0.72) url('images/textures/notebookpapergrey.jpg') center / cover;
   border-radius: 8px;
+  box-shadow: 3px 5px 10px rgba(47, 32, 20, 0.3);
 }
 
 #session-page-save .session-modal-copy {
-  font-family: 'Special Elite', 'Courier New', monospace;
-  font-weight: bold;
+  grid-column: 1 / 5;
+  grid-row: 1;
+  color: var(--class-color);
+  font-family: 'La Belle Aurore', 'Segoe Print', cursive;
+  font-size: 1.7rem;
+  line-height: 1.25;
+  font-weight: normal;
+  text-align: center;
+  transform: none;
 }
 
 #session-page-save .session-save-status {
+  grid-column: 3;
+  grid-row: 2;
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
   color: var(--class-color);
   font-family: 'Special Elite', 'Courier New', monospace;
   font-weight: 700 !important;
 }
 
 #session-page-save .session-modal-actions {
-  display: flex;
-  align-items: stretch;
+  display: contents;
 }
 
 #session-page-save .session-modal-actions button {
+  width: 100%;
   -webkit-appearance: none;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
@@ -5155,22 +5349,79 @@ margin-top: -10px;
   background-blend-mode: multiply;
 }
 
+#session-page-save .session-icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 50px !important;
+  width: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+  height: 50px;
+  padding: 4px;
+  background-color: transparent !important;
+  background-image: url('images/textures/bigPaper.jpg') !important;
+  background-position: center !important;
+  background-size: cover !important;
+  border: 2px solid var(--panel-border);
+  border-radius: 6px;
+  box-shadow: inset 0 2px 6px rgba(45, 31, 20, 0.35);
+}
+
+#session-page-save .session-icon-button img {
+  display: block;
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+#session-page-save .session-icon-button:active {
+  background-color: transparent !important;
+  transform: scale(0.94);
+}
+
 #session-page-save .session-save-button {
-  background-color: var(--class-color) !important;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.2)), url('images/textures/paper01.png') !important;
-  color: #ffffff !important;
+  grid-column: 1;
+  grid-row: 2;
+  transform: none;
 }
 
 #session-page-save .session-load-button {
-  background-color: #e8dcc1 !important;
-  background-image: linear-gradient(rgba(255, 250, 230, 0.26), rgba(111, 91, 66, 0.12)), url('images/textures/paper01.png') !important;
-  color: #271f18 !important;
+  grid-column: 4;
+  grid-row: 2;
 }
 
 #session-page-save .session-clear-button {
-  background-color: #702126 !important;
-  background-image: linear-gradient(rgba(70, 0, 4, 0.08), rgba(55, 0, 3, 0.28)), url('images/textures/paper01.png') !important;
-  color: #ffffff !important;
+  grid-column: 2;
+  grid-row: 2;
+  margin-top: 0;
+  transform: none;
+}
+
+#session-page-save .session-save-button {
+  background-color: transparent !important;
+  background-image: url('images/textures/bigPaper.jpg') !important;
+}
+
+#session-page-save .session-load-button {
+  background-color: transparent !important;
+  background-image: url('images/textures/bigPaper.jpg') !important;
+}
+
+#session-page-save .session-clear-button {
+  background-color: transparent !important;
+  background-image: url('images/textures/bigPaper.jpg') !important;
+}
+
+#session-page-save .session-save-status.no-saved-session {
+  opacity: 0.45;
+}
+
+#session-page-save .session-load-button:disabled,
+#session-page-save .session-clear-button:disabled {
+  opacity: 0.28;
+  filter: grayscale(1);
 }
 
 /* iPad/iPhone Safari: color the real banner layer and remove the stale blended overlay. */
