@@ -815,7 +815,10 @@ select option {
 
 /* Investigator dossier: a typed private-investigator case sheet. */
 #view-setup {
-  background-color: transparent;
+  background-color: none;
+  background-image: url('images/textures/p1aper01.png');
+  background-position: center;
+  background-size: cover;
   padding: 0 50px 0 55px;
 }
 
@@ -3138,11 +3141,87 @@ text-align:center;
             90deg,
             rgba(255,255,255,.10) 0 2px,
             rgba(0,0,0,.08) 2px 4px
+        ),
+        linear-gradient(
+            to bottom,
+            transparent 0,
+            color-mix(in srgb, var(--class-color) 40%, transparent) 35%,
+            var(--class-color) 50%,
+            color-mix(in srgb, var(--class-color) 70%, transparent) 65%,
+            transparent 100%
+        ),
+        repeating-linear-gradient(
+            90deg,
+            rgba(255,255,255,.10) 0 2px,
+            rgba(0,0,0,.08) 2px 4px
         );
 
     background-repeat: no-repeat;
-    background-size: 100% 3px, 100% 3px;
-    background-position: top left, top left;
+    background-size: 100% 3px, 100% 3px, 100% 3px, 100% 3px;
+    background-position: top left, top left, bottom left, bottom left;
+}
+
+#view-setup #dossier-flavor {
+  display: none;
+}
+
+#view-setup .ipad-investigator-rule {
+  position: relative;
+  isolation: isolate;
+  padding: 10px 12px;
+  background-color: #f5efdf;
+  background-image: none;
+  border: 1px solid rgba(71, 55, 40, 0.26);
+  border-radius: 4px;
+  box-shadow: 2px 4px 7px rgba(31, 22, 15, 0.28);
+  overflow: hidden;
+}
+
+#view-setup .ipad-investigator-rule:nth-of-type(1) {
+  transform: rotate(-0.5deg);
+}
+
+#view-setup .ipad-investigator-rule:nth-of-type(2) {
+  position: relative;
+  isolation: isolate;
+  transform: rotate(0.5deg);
+  background-color: #f5efdf;
+  background-image: none;
+  overflow: hidden;
+}
+
+#view-setup .ipad-investigator-rule::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url('images/textures/notebook3.png') center / cover no-repeat;
+  transform: scaleX(-1);
+}
+
+#view-setup .ipad-investigator-rule > span {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  background:
+    linear-gradient(to bottom, transparent 0, color-mix(in srgb, var(--class-color) 40%, transparent) 35%, var(--class-color) 50%, color-mix(in srgb, var(--class-color) 70%, transparent) 65%, transparent 100%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.10) 0 2px, rgba(0,0,0,.08) 2px 4px);
+  background-repeat: no-repeat;
+  background-size: 100% 3px, 100% 3px;
+  background-position: bottom left, bottom left;
+}
+
+#investigator-modal .investigator-profile-modal h3 {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border: 0;
+  background:
+    linear-gradient(to bottom, transparent 0, color-mix(in srgb, var(--class-color) 40%, transparent) 35%, var(--class-color) 50%, color-mix(in srgb, var(--class-color) 70%, transparent) 65%, transparent 100%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.10) 0 2px, rgba(0,0,0,.08) 2px 4px),
+    linear-gradient(to bottom, transparent 0, color-mix(in srgb, var(--class-color) 40%, transparent) 35%, var(--class-color) 50%, color-mix(in srgb, var(--class-color) 70%, transparent) 65%, transparent 100%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.10) 0 2px, rgba(0,0,0,.08) 2px 4px);
+  background-repeat: no-repeat;
+  background-size: 100% 3px, 100% 3px, 100% 3px, 100% 3px;
+  background-position: top left, top left, bottom left, bottom left;
 }
 
 .profile-case-notes {
@@ -3186,11 +3265,10 @@ text-align:center;
   font-size: 1.45rem;
   font-weight: normal;
   line-height: 1;
-  border-bottom: 2px solid #333; /* Fixed: Removed the space in 2px */
- border-top: 2px solid #333; /* Fixed: Removed the space in 2px */
+  border: 0;
  display: block;
   width: 100%;
-  padding: 4px 0 0 0;
+  padding: 6px 0;
 }
 
 #investigator-modal .investigator-profile-modal p,
@@ -3690,25 +3768,25 @@ text-align:center;
 
   .ipad-investigator-card {
     top: 20%;
-    right: 7%;
-    width: 700px;
+    left: 3%;
+    right: 3%;
+    width: auto;
     min-height: 350px;
     padding: 20px 22px 12px 14px;
     color: #251d16;
-    background: rgba(248, 243, 224, 0.88) url('images/textures/notebookpapergrey.jpg') center / cover;
+    background-color: rgba(248, 243, 224, 0.88);
+    background-image: url('images/textures/notebookpaperflip.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
     border: 0 solid rgba(49, 42, 35, 0.72);
     box-shadow: 4px 7px 14px rgba(0, 0, 0, 0.35);
-    transform: rotate(-3deg);
-    margin-top: 40px;
+    transform: none;
+    /* margin-top: 40px; */
   }
   
   .ipad-investigator-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(248,243,224,.88) url("images/textures/notebookpapergrey.jpg") center/cover no-repeat;
-    transform: scaleY(-1);   /* Vertical flip */
-    z-index: -1;
+    content: none;
 }
 
   .ipad-investigator-card-heading {
@@ -3730,6 +3808,15 @@ text-align:center;
     text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
+    transform: translateY(3px);
+  }
+
+  .ipad-investigator-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-width: 0;
   }
 
   .ipad-investigator-nav {
@@ -3755,42 +3842,41 @@ text-align:center;
 
   .ipad-investigator-card-body {
     display: grid;
-    grid-template-columns: 122px minmax(0, 1fr);
+    grid-template-columns: 150px minmax(0, 1fr);
     gap: 13px;
     padding-top: 10px;
   }
 
   .ipad-investigator-photo-wrap {
     position: relative;
-    width: 122px;
-    height: 182px;
+    width: 150px;
+    height: 210px;
+    margin-top: 0;
   }
 
 .ipad-investigator-portrait {
-  width: 165px;
-  height: 200px;
+  width: 190px;
+  height: 225px;
   object-fit: cover;
   object-position: center top;
   border: 5px solid #fff;
   box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.42);
-  margin: 0px 0 0 -60px;
-  transform: rotate(6deg);
-  
+  margin: -15px 0 0 -35px;
+  transform: none;
+    transform: rotate(-3deg);
   /* Stretches to cover the box from the top-center down */
   background: url('images/textures/card1.png') center top / cover no-repeat;
   background-color: #342A21;
 }
 
   .ipad-card-class-icon {
-    position: absolute;
+    position: static;
     z-index: 2;
-    top: 190px;
-    left: -50px;
-    width: 100px;
-    height: auto;
+    width: 46px;
+    height: 46px;
     object-fit: contain;
     filter: drop-shadow(2px 3px 3px rgba(0, 0, 0, 0.42));
-    transform: rotate(-5deg);
+    transform: none;
   }
 
   .ipad-investigator-details {
@@ -3822,7 +3908,7 @@ text-align:center;
     font-size: 1.35rem;
     font-weight: normal;
     line-height: 1.18;
-	width:460px;
+	width: auto;
   }
 
   .ipad-investigator-rule p .rule-term-highlight {
@@ -4780,6 +4866,283 @@ margin-top: -10px;
 #view-setup #dossier-vital-reset button:active {
   transform: translateY(1px);
   box-shadow: none;
+}
+
+#dossier-card-controls {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.ipad-investigator-photo-wrap {
+  z-index: 3;
+}
+
+#dossier-card-controls .skills-row {
+  width: 100%;
+  margin: 0;
+}
+
+#profile-modal-skills {
+  margin-top: 14px;
+}
+
+#profile-modal-skills .skills-row {
+  width: 100%;
+  margin: 0;
+}
+
+#profile-modal-skills .modal-skills-row .stat-badge {
+  border-color: var(--class-color);
+}
+
+#profile-modal-skills .modal-skills-row .stat-badge.active-test {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4), 0 0 5px var(--class-color);
+}
+
+#dossier-vitals-host {
+  width: 100%;
+  margin-top: 10px;
+}
+
+#view-setup #dossier-vitals-host .dossier-vitals {
+  position: static;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+  transform: none;
+  background: none !important;
+}
+
+#view-setup #dossier-vitals-host .dossier-vitals-divider {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 3px;
+  margin: 4px 0;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      color-mix(in srgb, var(--class-color) 40%, transparent) 35%,
+      var(--class-color) 50%,
+      color-mix(in srgb, var(--class-color) 70%, transparent) 65%,
+      transparent 100%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,.10) 0 2px,
+      rgba(0,0,0,.08) 2px 4px
+    );
+  background-repeat: no-repeat;
+  background-size: 100% 3px, 100% 3px;
+  border: 0;
+}
+
+#view-setup #dossier-vitals-host .dossier-vital-block {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 82%;
+  gap: 6px;
+  padding: 8px 14px;
+  justify-self: center;
+  box-sizing: border-box;
+  background: rgba(248, 243, 224, 0.48) url('images/textures/paper01.png') center / cover;
+  border: 1px solid rgba(49, 42, 35, 0.35);
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.34), 1px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#view-setup #dossier-vitals-host .dossier-vital-block-body {
+  border-top: 0px solid var(--class-color);
+}
+
+#view-setup #dossier-vitals-host .dossier-vital-block .dossier-vital {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+#view-setup #dossier-vitals-host .dossier-vital-control > span {
+  font-weight: 700 !important;
+}
+
+#view-setup #dossier-vitals-host .dossier-vital {
+  width: 88%;
+  min-width: 0;
+  justify-self: center;
+}
+
+#view-setup .dossier-vital-health {
+  background: linear-gradient(rgba(145, 38, 38, 0.16), rgba(145, 38, 38, 0.16)), url('images/textures/paper01.png') center / cover !important;
+}
+
+#view-setup .dossier-vital-sanity {
+  background: linear-gradient(rgba(37, 82, 139, 0.16), rgba(37, 82, 139, 0.16)), url('images/textures/paper01.png') center / cover !important;
+}
+
+#view-setup .dossier-vital-resources {
+  background: linear-gradient(rgba(83, 55, 35, 0.18), rgba(83, 55, 35, 0.18)), url('images/textures/paper01.png') center / cover !important;
+}
+
+#view-setup .dossier-vital-clues {
+  background: linear-gradient(rgba(38, 105, 65, 0.16), rgba(38, 105, 65, 0.16)), url('images/textures/paper01.png') center / cover !important;
+}
+
+#view-setup #dossier-vitals-host #dossier-vital-reset {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
+.setup-modal-card {
+  width: 760px;
+  max-width: calc(100vw - 120px);
+  padding: 18px;
+  background: #f4eddc url('images/textures/dossier3.jpg') center / cover;
+}
+
+.setup-modal-heading,
+.setup-modal-title-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.setup-modal-heading {
+  justify-content: space-between;
+  padding-bottom: 10px;
+}
+
+.setup-modal-title-wrap {
+  gap: 10px;
+}
+
+.setup-modal-title-wrap img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.setup-modal-title-wrap h2 {
+  margin: 0;
+  font-family: 'Special Elite', 'Courier New', monospace;
+}
+
+#setup-modal-body .setup-grid {
+  width: auto;
+  margin: 0;
+  padding: 18px;
+}
+
+#view-session {
+  padding: 24px;
+}
+
+.session-page-card {
+  width: 100%;
+  min-height: 100%;
+  padding: 24px;
+  background-color: #f4eddc;
+  background-image: url('images/textures/papel.png');
+  background-position: left top;
+  background-repeat: repeat;
+  border-radius: 10px;
+  box-shadow: 4px 7px 14px rgba(0, 0, 0, 0.35);
+}
+
+.session-page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  border-bottom: 0;
+}
+
+.session-page-heading img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+}
+
+.session-page-heading h2 {
+  margin: 0;
+  width: 100%;
+  color: var(--class-color);
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 2rem;
+  text-align: center;
+}
+
+#session-page-setup .setup-grid {
+  width: 100%;
+  margin: 0 0 20px;
+  padding: 20px;
+  column-gap: 28px;
+  row-gap: 20px;
+  background: rgba(248, 243, 224, 0.72) url('images/textures/notebookpapergrey.jpg') center / cover;
+  border-radius: 8px;
+}
+
+#view-session .form-group label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--class-color);
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: bold;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+#view-session select {
+  height: 30px;
+  padding: 0 7px;
+  color: #241b14;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 22px;
+  font-weight: normal;
+  background: linear-gradient(96deg, rgba(224, 210, 174, 0.48), rgba(255, 255, 255, 0.62));
+  border: 0;
+  border-bottom: 1px solid rgba(94, 77, 49, 0.54);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+#view-session select:focus {
+  border-bottom-color: #0a0a0a;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+#view-session select option {
+  color: #241b14;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  background: #e8dcc1;
+}
+
+#session-page-save {
+  padding: 16px 20px;
+  background: rgba(248, 243, 224, 0.72) url('images/textures/notebookpapergrey.jpg') center / cover;
+  border-radius: 8px;
+}
+
+#session-page-save .session-modal-copy {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-weight: bold;
+}
+
+#session-page-save .session-save-status {
+  color: var(--class-color);
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-weight: 700 !important;
+}
+
+#session-page-save .session-modal-actions {
+  display: flex;
+  align-items: stretch;
 }
 
 /* iPad/iPhone Safari: color the real banner layer and remove the stale blended overlay. */

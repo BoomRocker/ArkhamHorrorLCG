@@ -207,19 +207,30 @@ const investigatorVitalState = {};
 
 function syncDossierVitals(investigatorId) {
   const limits = investigatorVitalLimits[investigatorId] || { health: 7, sanity: 7 };
-  const vitals = investigatorVitalState[investigatorId] ||= { ...limits };
-  document.getElementById('vital-health').textContent = vitals.health;
-  document.getElementById('vital-sanity').textContent = vitals.sanity;
-  document.getElementById('profile-vital-health').textContent = vitals.health;
-  document.getElementById('profile-vital-sanity').textContent = vitals.sanity;
-  document.getElementById('profile-modal-vital-health').textContent = vitals.health;
-  document.getElementById('profile-modal-vital-sanity').textContent = vitals.sanity;
+  const vitals = investigatorVitalState[investigatorId] ||= { ...limits, resources: 5, clues: 0 };
+  if (!Number.isFinite(vitals.resources)) vitals.resources = 5;
+  if (!Number.isFinite(vitals.clues)) vitals.clues = 0;
+  const setVitalText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  };
+  setVitalText('vital-health', vitals.health);
+  setVitalText('vital-sanity', vitals.sanity);
+  setVitalText('vital-resources', vitals.resources);
+  setVitalText('vital-clues', vitals.clues);
+  setVitalText('profile-vital-health', vitals.health);
+  setVitalText('profile-vital-sanity', vitals.sanity);
+  setVitalText('profile-vital-resources', vitals.resources);
+  setVitalText('profile-vital-clues', vitals.clues);
+  setVitalText('profile-modal-vital-health', vitals.health);
+  setVitalText('profile-modal-vital-sanity', vitals.sanity);
 }
 
 function adjustVital(type, delta) {
   const investigatorId = getActiveInvestigatorKey();
   const limits = investigatorVitalLimits[investigatorId] || { health: 7, sanity: 7 };
-  const vitals = investigatorVitalState[investigatorId] ||= { ...limits };
+  const vitals = investigatorVitalState[investigatorId] ||= { ...limits, resources: 5, clues: 0 };
+  if (!Number.isFinite(vitals[type])) vitals[type] = type === 'resources' ? 5 : 0;
   vitals[type] = Math.max(0, vitals[type] + delta);
   syncDossierVitals(investigatorId);
   playSfx(delta > 0 ? 'sfx/symbol.mp3' : 'sfx/trash.mp3');
@@ -228,7 +239,7 @@ function adjustVital(type, delta) {
 function resetDossierVitals() {
   const investigatorId = getActiveInvestigatorKey();
   const limits = investigatorVitalLimits[investigatorId] || { health: 7, sanity: 7 };
-  investigatorVitalState[investigatorId] = { ...limits };
+  investigatorVitalState[investigatorId] = { ...limits, resources: 5, clues: 0 };
   syncDossierVitals(investigatorId);
   playSfx('sfx/flip.mp3');
 }
@@ -799,7 +810,6 @@ function loadInvestigatorProfileManual() {
   
   const classIcon = data.classIcon || "images/icons/class_" + data.classId + ".png";
   document.getElementById('class-mood-badge').src = classIcon;
-  document.getElementById('dossier-start-class-icon').src = classIcon;
   document.getElementById('profile-class-icon').src = classIcon;
   document.getElementById('ipad-card-class-icon').src = classIcon;
   document.getElementById('ipad-card-class-icon').alt = `${data.classId} class`;
@@ -810,6 +820,18 @@ function loadInvestigatorProfileManual() {
   document.getElementById('stat-intellect').innerText = data.intellect;
   document.getElementById('stat-combat').innerText = data.combat;
   document.getElementById('stat-agility').innerText = data.agility;
+  const dossierStats = {
+    will: data.will,
+    intellect: data.intellect,
+    combat: data.combat,
+    agility: data.agility
+  };
+  Object.entries(dossierStats).forEach(([skill, value]) => {
+    const dossierStat = document.getElementById(`dossier-stat-${skill}`);
+    if (dossierStat) dossierStat.innerText = value;
+    const modalStat = document.getElementById(`modal-stat-${skill}`);
+    if (modalStat) modalStat.innerText = value;
+  });
 
   const classColors = {
     guardian: "#1a334d",
@@ -880,9 +902,22 @@ function selectSkillManual(skill, val, playSound = true) {
   if (playSound) resetUnlockedBonusSkillCounters(activeInvestigatorSlot, activeSkillType);
   restoreBonusSkillStateForSlot(activeInvestigatorSlot, activeSkillType);
   document.querySelectorAll('.stat-badge').forEach(b => b.classList.remove('active-test'));
-  document.getElementById(`badge-${skill}`).classList.add('active-test');
+  document.getElementById(`badge-${skill}`)?.classList.add('active-test');
+  document.getElementById(`dossier-badge-${skill}`)?.classList.add('active-test');
+  document.getElementById(`modal-badge-${skill}`)?.classList.add('active-test');
   updateBonusSkillVisual(skill);
   if (playSound) playSfx('sfx/dice.mp3');
+}
+
+function selectDossierSkill(skill) {
+  const investigator = investigators[getActiveInvestigatorKey()];
+  selectSkillManual(skill, investigator?.[skill] || 0);
+  switchActiveTab('arena');
+}
+
+function selectModalSkill(skill) {
+  selectDossierSkill(skill);
+  toggleInvestigatorModal(false);
 }
 
 function updateBonusSkillVisual(skill) {
@@ -952,6 +987,7 @@ function switchActiveTab(target) {
   document.querySelectorAll('.nav-tab-item').forEach(t => t.classList.remove('active-tab'));
   document.getElementById(`view-${target}`).classList.add('active-view');
   document.getElementById(`tab-btn-${target}`).classList.add('active-tab');
+  if (target === 'session') updateSessionSaveStatus();
 }
 
 function toggleBagPopover(show) {
@@ -966,10 +1002,18 @@ function toggleInvestigatorModal(show) {
   document.getElementById('investigator-modal').style.display = show ? 'flex' : 'none';
 }
 
+function toggleSetupModal(show) {
+  const modal = document.getElementById('setup-modal');
+  if (!modal) return;
+  modal.style.display = show ? 'flex' : 'none';
+  if (show) playSfx('sfx/pageflip1.mp3');
+}
+
 const savedSessionStorageKey = 'arkham-duo-saved-session-v1';
 
 function toggleSessionModal(show) {
   const modal = document.getElementById('session-modal');
+  if (!modal) return;
   modal.style.display = show ? 'flex' : 'none';
   if (show) {
     playSfx('sfx/pageflip1.mp3');
@@ -1444,6 +1488,56 @@ function syncAudioScrubber() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  const setupGrid = document.querySelector('#view-setup .setup-grid');
+  const sessionPageSetup = document.getElementById('session-page-setup');
+  if (setupGrid && sessionPageSetup) sessionPageSetup.appendChild(setupGrid);
+
+  const sessionPageSave = document.getElementById('session-page-save');
+  const sessionModalCard = document.querySelector('#session-modal .session-modal-card');
+  if (sessionPageSave && sessionModalCard) {
+    const sessionCopy = sessionModalCard.querySelector('.session-modal-copy');
+    const sessionStatus = sessionModalCard.querySelector('.session-save-status');
+    const sessionActions = sessionModalCard.querySelector('.session-modal-actions');
+    if (sessionCopy) sessionPageSave.appendChild(sessionCopy);
+    if (sessionStatus) sessionPageSave.appendChild(sessionStatus);
+    if (sessionActions) sessionPageSave.appendChild(sessionActions);
+  }
+
+  const dossierCardControls = document.getElementById('dossier-card-controls');
+  const dossierVitals = document.querySelector('#view-setup .dossier-vitals');
+  const trialSkills = document.querySelector('#view-arena .skills-row');
+  if (dossierCardControls && trialSkills) {
+    const dossierSkills = trialSkills.cloneNode(true);
+    dossierSkills.classList.add('dossier-skills-row');
+    ['will', 'intellect', 'combat', 'agility'].forEach(skill => {
+      const badge = dossierSkills.querySelector(`#badge-${skill}`);
+      const stat = dossierSkills.querySelector(`#stat-${skill}`);
+      if (badge) {
+        badge.id = `dossier-badge-${skill}`;
+        badge.setAttribute('onclick', `selectDossierSkill('${skill}')`);
+      }
+      if (stat) stat.id = `dossier-stat-${skill}`;
+    });
+    dossierCardControls.appendChild(dossierSkills);
+  }
+  const modalSkillsHost = document.getElementById('profile-modal-skills');
+  if (modalSkillsHost && trialSkills) {
+    const modalSkills = trialSkills.cloneNode(true);
+    modalSkills.classList.add('dossier-skills-row', 'modal-skills-row');
+    ['will', 'intellect', 'combat', 'agility'].forEach(skill => {
+      const badge = modalSkills.querySelector(`#badge-${skill}`);
+      const stat = modalSkills.querySelector(`#stat-${skill}`);
+      if (badge) {
+        badge.id = `modal-badge-${skill}`;
+        badge.setAttribute('onclick', `selectModalSkill('${skill}')`);
+      }
+      if (stat) stat.id = `modal-stat-${skill}`;
+    });
+    modalSkillsHost.appendChild(modalSkills);
+  }
+  const dossierVitalsHost = document.getElementById('dossier-vitals-host');
+  if (dossierVitalsHost && dossierVitals) dossierVitalsHost.appendChild(dossierVitals);
+
   const primarySelect = document.getElementById('investigator-select');
   const secondarySelect = document.getElementById('co-investigator-select');
   secondarySelect.innerHTML = primarySelect.innerHTML;

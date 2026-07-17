@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="images/icons/favicon.png">
   <link rel="apple-touch-icon" href="images/icons/favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="duo.css?v=skill-specific-locks-68">
+  <link rel="stylesheet" href="duo.css?v=no-dossier-card-margin-top-120">
 </head>
 <body>
 
@@ -100,26 +100,21 @@
           </select>
         </div>
 
-        <div class="form-group dossier-start-group">
-          <label>Skill trial</label>
-          <button class="dossier-start-trial" type="button" onclick="switchActiveTab('arena')">
-            <img id="dossier-start-class-icon" src="images/icons/class_guardian.png" alt="">
-            <span>Start a Skill Trial</span>
-          </button>
-        </div>
-
       </div>
 
       <section class="ipad-investigator-card" aria-label="Investigator case card">
         <div class="ipad-investigator-card-heading">
           <button class="ipad-investigator-nav" type="button" aria-label="Previous investigator" onclick="cycleInvestigator(-1)"><img src="images/icons/arrow-left.svg" alt=""></button>
-          <h4 id="ipad-investigator-name">Roland Banks</h4>
+          <div class="ipad-investigator-title">
+            <img id="ipad-card-class-icon" class="ipad-card-class-icon" src="images/icons/class_guardian.png" alt="Guardian class">
+            <h4 id="ipad-investigator-name">Roland Banks</h4>
+          </div>
           <button class="ipad-investigator-nav" type="button" aria-label="Next investigator" onclick="cycleInvestigator(1)"><img src="images/icons/arrow-right.svg" alt=""></button>
         </div>
+        <div id="dossier-card-controls"></div>
         <div class="ipad-investigator-card-body">
           <div class="ipad-investigator-photo-wrap">
             <img id="ipad-investigator-portrait" class="ipad-investigator-portrait" src="images/investigators/roland.png" alt="Roland Banks portrait">
-            <img id="ipad-card-class-icon" class="ipad-card-class-icon" src="images/icons/class_guardian.png" alt="Guardian class">
           </div>
           <div class="ipad-investigator-details">
             <div class="ipad-investigator-rule">
@@ -134,11 +129,13 @@
 
           </div>
         </div>
-	
+        <div id="dossier-vitals-host"></div>
       </section>
 
       <section class="dossier-vitals" aria-label="Investigator health and sanity">
-        <div class="dossier-vital">
+        <hr class="dossier-vitals-divider">
+        <div class="dossier-vital-block dossier-vital-block-body">
+        <div class="dossier-vital dossier-vital-health">
           <div class="dossier-vital-label"><img src="images/icons/investigator_hp.png" alt=""><span>Health</span></div>
           <div class="dossier-vital-control">
             <button type="button" onclick="adjustVital('health', -1)" aria-label="Reduce health">−</button>
@@ -146,7 +143,7 @@
             <button class="bonus-skill-control" type="button" onclick="adjustVital('health', 1)" aria-label="Increase health">+</button>
           </div>
         </div>
-        <div class="dossier-vital">
+        <div class="dossier-vital dossier-vital-sanity">
           <div class="dossier-vital-label"><img src="images/icons/investigator_sanity.png" alt=""><span>Sanity</span></div>
           <div class="dossier-vital-control">
             <button type="button" onclick="adjustVital('sanity', -1)" aria-label="Reduce sanity">−</button>
@@ -155,6 +152,25 @@
           </div>
 
         </div>
+		</div>
+		<div class="dossier-vital-block dossier-vital-block-supplies">
+		<div class="dossier-vital dossier-vital-resources">
+		  <div class="dossier-vital-label"><img src="images/icons/box01.png" alt=""><span>Resources</span></div>
+		  <div class="dossier-vital-control">
+		    <button type="button" onclick="adjustVital('resources', -1)" aria-label="Reduce resources">−</button>
+		    <span id="vital-resources">5</span>
+		    <button type="button" onclick="adjustVital('resources', 1)" aria-label="Increase resources">+</button>
+		  </div>
+		</div>
+		<div class="dossier-vital dossier-vital-clues">
+		  <div class="dossier-vital-label"><img src="images/icons/clue.png" alt=""><span>Clues</span></div>
+		  <div class="dossier-vital-control">
+		    <button type="button" onclick="adjustVital('clues', -1)" aria-label="Reduce clues">−</button>
+		    <span id="vital-clues">0</span>
+		    <button type="button" onclick="adjustVital('clues', 1)" aria-label="Increase clues">+</button>
+		  </div>
+		</div>
+		</div>
 				 <div id="dossier-vital-reset"><button type="button" onclick="resetDossierVitals()">Reset</button></div>
       </section>
       
@@ -343,12 +359,26 @@
       </div>
     </div>
 
+    <div id="view-session" class="view-panel">
+      <div class="session-page-card">
+        <div class="session-page-heading">
+          <h2>Campaign Session</h2>
+        </div>
+        <div id="session-page-setup"></div>
+        <div id="session-page-save"></div>
+      </div>
+    </div>
+
   </div>
 
   <!-- FIXED BOTTOM NAVIGATION -->
   <div class="pwa-navbar-tabs">
     <div class="nav-investigator-photo investigator-profile-trigger" role="button" tabindex="0" aria-label="Open investigator profile" onclick="toggleInvestigatorModal(true)">
       <img id="card-portrait" class="header-portrait" src="images/investigators/roland.png" alt="Portrait">
+    </div>
+    <div id="tab-btn-session" class="nav-tab-item" onclick="switchActiveTab('session')">
+      <img src="images/icons/tab_round_order.png" alt="Session">
+      <span>Session</span>
     </div>
     <div id="tab-btn-setup" class="nav-tab-item active-tab" onclick="switchActiveTab('setup')">
       <img src="images/icons/tab_investigator.png" alt="Setup">
@@ -365,10 +395,6 @@
     <div id="tab-btn-music" class="nav-tab-item" onclick="switchActiveTab('music')">
       <img id="ambient-tab-music-icon" src="images/icons/tab_music.png" alt="Music">
       <span>Ambient</span>
-    </div>
-    <div id="tab-btn-session" class="nav-tab-item" role="button" tabindex="0" onclick="toggleSessionModal(true)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleSessionModal(true); }">
-      <img src="images/icons/tab_round_order.png" alt="Save session">
-      <span>Session</span>
     </div>
   </div>
 
@@ -402,6 +428,7 @@
             <img src="images/icons/investigator_sanity.png" alt="Sanity">
             <span id="profile-modal-vital-sanity">5</span>
           </div>
+
         </div>
         <button class="modal-close" onclick="toggleInvestigatorModal(false)" aria-label="Close profile">×</button>
       </div>
@@ -417,6 +444,7 @@
         <p id="profile-ability"><b>Reaction:</b> After you defeat an enemy: Discover 1 clue at your location. (Limit once per round.)</p>
         <h3>Elder Sign</h3>
         <div id="profile-elder"><b>Effect:</b> <img src="images/icons/chaos_eldersign.png" class="token-icon" alt="Elder Sign"> +1 for each clue on your location.</div>
+        <div id="profile-modal-skills"></div>
       </div>
     </div>
   </div>
@@ -439,9 +467,22 @@
       </div>
     </div>
   </div>
+
+  <div id="setup-modal" class="popover-overlay" onclick="toggleSetupModal(false)">
+    <div class="popover-container setup-modal-card" role="dialog" aria-modal="true" aria-labelledby="setup-modal-title" onclick="event.stopPropagation()">
+      <div class="setup-modal-heading">
+        <div class="setup-modal-title-wrap">
+          <img src="images/icons/bag.png" alt="">
+          <h2 id="setup-modal-title">Investigation Setup</h2>
+        </div>
+        <button class="modal-close" type="button" onclick="toggleSetupModal(false)" aria-label="Close setup window">×</button>
+      </div>
+      <div id="setup-modal-body"></div>
+    </div>
+  </div>
   
   <script src="tokendata.js?v=ipad-banner-3"></script>
-  <script src="duo.js?v=investigator-switch-reset-69"></script>
+  <script src="duo.js?v=dossier-vitals-bottom-99"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
