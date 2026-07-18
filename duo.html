@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="images/icons/favicon.png">
   <link rel="apple-touch-icon" href="images/icons/favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="duo.css?v=ambient-icon-fixed-186">
+  <link rel="stylesheet" href="duo.css?v=session-seal-trials-link-202">
 </head>
 <body>
 
@@ -36,8 +36,10 @@
     <!-- TAB 1: SETUP -->
     <div id="view-setup" class="view-panel">
       <div class="setup-grid">
-        
-        <div class="form-group">
+        <div class="session-investigator-row">
+        <div class="form-group session-investigator-field">
+          <img class="session-investigator-field-icon" src="images/icons/phase_investigation.png" alt="Investigator">
+          <div class="session-investigator-field-content">
           <label>First investigator</label>
           <select id="investigator-select" onchange="setInvestigatorForSlot('primary')">
             <option value="agnes">Agnes Baker [Mystic] — Core</option>
@@ -62,6 +64,7 @@
             <option value="yorick">William Yorick [Survivor] — Carcosa</option>
             <option value="zoey">Zoey Samaras [Guardian] — Dunwich</option>
           </select>
+          </div>
         </div>
 
         <div class="form-group">
@@ -70,10 +73,13 @@
             <!-- Options are kept in sync with the first investigator list by duo.js. -->
           </select>
         </div>
+        </div>
 
         <div class="session-investigator-divider" aria-hidden="true"></div>
 
-		<div class="form-group">
+		<div class="form-group session-campaign-field">
+          <img class="session-campaign-field-icon" src="images/icons/phase_mythos.png" alt="Campaign and chaos bag">
+          <div class="session-campaign-field-content">
           <label>Campaign log chronology</label>
           <select id="campaign-select" onchange="updateCampaignScenario()">
             <option value="notz">Night of the Zealot</option>
@@ -89,6 +95,7 @@
               <option value="hard">Hard</option>
               <option value="expert">Expert</option>
             </select>
+          </div>
           </div>
         </div>
 
@@ -107,8 +114,8 @@
           </div>
         </div>
 
-        <div class="session-campaign-seal-space" aria-hidden="true">
-          <img id="session-campaign-seal" class="session-campaign-seal" src="images/icons/seal_zealot1.png" alt="">
+        <div class="session-campaign-seal-space">
+          <img id="session-campaign-seal" class="session-campaign-seal" src="images/icons/seal_zealot1.png" alt="Open Trials" role="button" tabindex="0" title="Open Trials" onclick="switchActiveTab('arena')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); switchActiveTab('arena'); }">
         </div>
 
       </div>
@@ -497,7 +504,7 @@
   </div>
   
   <script src="tokendata.js?v=ipad-banner-3"></script>
-  <script src="duo.js?v=dossier-name-reset-111"></script>
+  <script src="duo.js?v=session-save-resume-check-112"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));

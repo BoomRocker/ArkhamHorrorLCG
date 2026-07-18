@@ -1644,4 +1644,15 @@ window.addEventListener('DOMContentLoaded', () => {
   player.addEventListener('loadedmetadata', syncAudioScrubber);
   player.addEventListener('play', updatePlayButton);
   player.addEventListener('pause', updatePlayButton);
+
+  // Refresh the saved-session message after the status element has been moved
+  // onto the Session page, and whenever iOS restores the app from suspension.
+  updateSessionSaveStatus();
+  window.addEventListener('pageshow', () => updateSessionSaveStatus());
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') updateSessionSaveStatus();
+  });
+  window.addEventListener('storage', event => {
+    if (event.key === savedSessionStorageKey) updateSessionSaveStatus();
+  });
 });

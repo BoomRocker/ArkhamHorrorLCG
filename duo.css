@@ -125,7 +125,7 @@
   justify-content: center;
   padding: 28px 45px;
   color: #30271f;
-  background: #e9e8e4 url('images/textures/notebookpapergrey.jpg') center / cover no-repeat;
+  background: #e9e8e4 url('images/textures/card3.png') center / cover no-repeat;
   border: 0;
   border-radius: 0;
   box-shadow: 0 4px 14px rgba(22, 17, 13, 0.35);
@@ -299,7 +299,7 @@ html {
 body {
   background-color: var(--bg-dark);
   background-image: url('images/textures/paper01.png');
-  background-size: cover;
+  background-size: auto;
   background-attachment: fixed;
   color: var(--text-dark);
   font-family: 'Alegreya Sans', sans-serif;
@@ -3168,7 +3168,7 @@ text-align:center;
 #view-setup .ipad-investigator-rule {
   position: relative;
   isolation: isolate;
-  padding: 10px 12px;
+  padding: 19px 44px 10px 38px;
   background-color: #f5efdf;
   background-image: none;
   border: 1px solid rgba(71, 55, 40, 0.26);
@@ -5223,6 +5223,22 @@ background-image: url('images/textures/dossierBG.jpg');
   box-shadow: 3px 5px 10px rgba(47, 32, 20, 0.3);
 }
 
+#session-page-setup .session-investigator-row {
+  grid-column: 1 / 3;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 28px;
+  padding: 14px 16px;
+  background-color: #e9e0ca;
+  background-image: url('images/textures/grunge.jpg');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 7px;
+  box-shadow: 3px 5px 10px rgba(47, 32, 20, 0.38);
+}
+
 #session-page-setup .session-investigator-divider {
   grid-column: 1 / 3;
   grid-row: 2;
@@ -5265,7 +5281,8 @@ background-image: url('images/textures/dossierBG.jpg');
   transform: translate(130px, -45px) rotate(-8deg);
   filter: drop-shadow(2px 3px 3px rgba(43, 25, 15, 0.45));
   opacity: 0.96;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 #view-session .form-group label {
@@ -5280,8 +5297,50 @@ background-image: url('images/textures/dossierBG.jpg');
   text-transform: uppercase;
 }
 
+#view-session .session-investigator-field {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  align-items: center;
+  column-gap: 10px;
+}
+
+#view-session .session-investigator-field-icon {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+#view-session .session-investigator-field-content {
+  min-width: 0;
+}
+
+#view-session .session-investigator-field-content select {
+  width: 100%;
+}
+
+#view-session .session-campaign-field {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  align-items: center;
+  column-gap: 10px;
+}
+
+#view-session .session-campaign-field-icon {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+#view-session .session-campaign-field-content {
+  min-width: 0;
+}
+
+#view-session .session-campaign-field-content select {
+  width: 100%;
+}
+
 #view-session select {
-  height: 30px;
+  height: 46px;
   padding: 0 7px;
   color: #241b14;
   font-family: 'Special Elite', 'Courier New', monospace;
@@ -6089,4 +6148,88 @@ background-image: url('images/textures/dossierBG.jpg');
 @keyframes playingMusicIconSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* iPad Safari: render difficulty Elder Signs with an SVG mask instead of a
+   translated drop-shadow, which Safari can clip away completely. */
+#session-page-setup .difficulty-elder-sign {
+  position: relative;
+}
+
+#session-page-setup .difficulty-elder-sign img {
+  display: none;
+}
+
+#session-page-setup .difficulty-elder-sign::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 46px;
+  height: 46px;
+  background-color: var(--class-color);
+  -webkit-mask-image: url('images/icons/diffculty-elder.svg');
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-image: url('images/icons/diffculty-elder.svg');
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+#session-page-setup .difficulty-elder-sign.filled::before {
+  top: 0;
+  left: 0;
+  width: 58px;
+  height: 58px;
+}
+
+/* Reliable desktop and iPad fallback: display the actual SVG without moving
+   it outside its button, then tint it with the active class filter. */
+#session-page-setup .difficulty-elder-sign::before {
+  display: none;
+}
+
+#session-page-setup .difficulty-elder-sign img {
+  display: block;
+  width: 46px;
+  height: 46px;
+  margin: 6px;
+  transform: none;
+  filter: var(--profile-arrow-filter, none);
+}
+
+#session-page-setup .difficulty-elder-sign.filled img {
+  width: 58px;
+  height: 58px;
+  margin: 0;
+  transform: none;
+  filter: var(--profile-arrow-filter, none) drop-shadow(1px 2px 2px rgba(31, 20, 13, 0.35));
+}
+
+/* Hide the connecting arrows while preserving the phase board cards. */
+.phase-flow-board .phase-flow-step::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Enlarge the Trials campaign seal without changing its anchor point. */
+#view-arena .token-theater .active-campaign-seal {
+  transform: translateX(-50%) scale(1.15);
+  -webkit-transform: translateX(-50%) scale(1.15);
+}
+
+#view-arena .token-theater.trial-started .active-campaign-seal {
+  transform: rotate(-7deg) scale(1.15);
+  -webkit-transform: rotate(-7deg) scale(1.15);
+}
+
+/* Final Phase-card texture override. */
+.phase-flow-board .phase-flow-step {
+  background-color: #e9e8e4;
+  background-image: url('images/textures/card3.png') !important;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
